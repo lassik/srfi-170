@@ -1,0 +1,16 @@
+* SRFI 170: POSIX API
+
+** by Olin Shivers (original author), John Cowan (editor and shepherd)
+
+This repository hosts [[https://srfi.schemers.org/srfi-170/][SRFI 170]]: POSIX API, a [[https://srfi.schemers.org/][Scheme Request for Implementation]].
+
+This SRFI is in /draft/ status.
+
+The full documentation for this SRFI can be found in the [[https://srfi.schemers.org/srfi-170/srfi-170.html][SRFI Document]].
+
+If you'd like to participate in the discussion of this SRFI, or report issues with it, please [[https://srfi.schemers.org/srfi-170/][join the SRFI-170 mailing list]] and send your message there.
+
+Thank you.
+
+
+[[mailto:srfi-editors@srfi.schemers.org][The SRFI Editors]]
