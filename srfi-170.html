@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>SRFI 170: Host environment API</title>
+    <title>SRFI 170: POSIX API</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/srfi.css" type="text/css" />
     <link href="/favicon.png" rel="icon" sizes="192x192" type="image/png" />
@@ -11,7 +11,7 @@
 
 <h1>Title</h1>
 
-Host environment API
+POSIX API
 
 <h1>Authors</h1>
 
@@ -200,14 +200,8 @@ the <tt>errno/intr</tt> exception is never raised.
 <h2><a href="#node_toc_node_sec_3.2">3.2&nbsp;&nbsp;I/O</a></h2>
 <p></p>
 <a name="node_sec_3.2.1"></a>
-<h3><a href="#node_toc_node_sec_3.2.1">3.2.1&nbsp;&nbsp;Standard R5RS I/O procedures</a></h3>
+<h3><a href="#node_toc_node_sec_3.2.1">3.2.1&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 <a name="node_sec_3.2.2"></a>
-<p>This SRFI recommends, but does not require, that implementors modify
-their implementations of standard Scheme I/O procedures such as
-<tt>read</tt>, <tt>display</tt>, <tt>display</tt>, <tt>close-port</tt> etc.
-that take ports as arguments
-to accept P<small>OSIX</small> file descriptors (integers) wherever a
-port argument is expected.  See below.</p>
 <h3><a href="#node_toc_node_sec_3.2.2">3.2.2&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 <a name="node_sec_3.2.3"></a>
 <h3><a href="#node_toc_node_sec_3.2.3">3.2.3&nbsp;&nbsp;[Intentionally omitted]</a></h3>
@@ -658,8 +652,7 @@ Note that these procedures use the process's <em>effective</em> user
 and group ids for permission checking. P<small>OSIX</small> defines an <tt>access()</tt>
 function that uses the process's real uid and gids. This is handy
 for setuid programs that would like to find out if the actual user
-has specific rights, but is not supported by this SRFI
-at the current time). </p>
+has specific rights, but is not supported by this SRFI). </p>
 <p>
 There are several problems with these procedures. First, there's an
 atomicity issue. In between checking permissions for a file and then trying
@@ -792,7 +785,7 @@ Some examples:
 
 (glob "*lexer*")
     ("mylexer.c" "lexer1.notes")
-    ;; All files containing the string "lexer".
+    ;; All files whose names contain the string "lexer".
 
 (glob "lexer")
     ;; Either ("lexer") or ().</pre><p>
@@ -927,7 +920,7 @@ To rename a file to a temporary name:
 (temp-file-iterate&nbsp;(lambda&nbsp;(backup)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(create-hard-link&nbsp;old-file&nbsp;backup)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;backup)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".#temp.~a")&nbsp;;&nbsp;Keep&nbsp;link&nbsp;in&nbsp;cwd.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".#temp.")&nbsp;;&nbsp;Keep&nbsp;link&nbsp;in&nbsp;cwd.<br>
 (delete-file&nbsp;old-file)</tt></blockquote>
 Recall that this SRFI reports procedure failure by raising an error
 exception, not by returning an error code. This is critical to
@@ -939,7 +932,7 @@ To create a unique temporary directory:
 </p>
 <blockquote><tt><br>
 (temp-file-iterate&nbsp;(lambda&nbsp;(dir)&nbsp;(create-directory&nbsp;dir)&nbsp;dir)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/var/tmp/tempdir.~a")</tt></blockquote>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/var/tmp/tempdir.")</tt></blockquote>
 Similar operations can be used to generate unique symlinks and fifos,
 or to return values other than the new filename (<em>e.g.</em>, an open file
 descriptor or port).<p>
