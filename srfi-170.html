@@ -1076,13 +1076,13 @@ Status values can be queried with the procedures in section
 The <i>flags</i> argument is an exact integer whose bits specify
 additional options. It is composed by adding together either or both of the
 flags <tt>wait/poll</tt> and <tt>wait/stopped-children</tt>.
-The first causes <tt>wait</i> to return <tt>#f</tt> immediately if
- a child is still active; the second causes <tt>wait</i> to
+The first causes <tt>wait</tt> to return <tt>#f</tt> immediately if
+a child is still active; the second causes <tt>wait</tt> to
 wait for suspended as well as terminated children.
 </p>
 </blockquote><p>
 </p>
-<p></p>
+<p></p>/
 <p></p>
 <p></p>
 <div align="left"><tt>(wait-process-group <i>proc/pid [flags]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>[proc status]</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
