@@ -226,8 +226,7 @@ This causes a problem. Suppose we have a Scheme port constructed
 on top of file descriptor 3. We intend to fork off a program that
 will inherit this file descriptor. If we drop references to the port,
 the garbage collector may prematurely close file 3 before we fork
-the subprocess. The interface described below is intended to fix this and
-other problems arising from the mismatch between ports and file descriptors.</p>
+the subprocess.</p>
 <p>
 Unfortunately, there is no even vaguely portable solution to this problem.
 Scsh and Guile undertake heroic measures to
@@ -719,7 +718,7 @@ These functions implement a direct interface to the
 family of functions for processing directories.
 The <tt>open-directory</tt> procedure opens the
 directory with the specified pathname for reading, returning an opaque directory object.
-Then <tt>read-directory directory-object</tt>
+Then <tt>read-directory</tt>
 returns the name of the next available file in a <i>directory-object</i>, or an end of file object if there are no more files.
 Finally, <tt>close-directory</tt> closes a directory object.</p>
 <p>
@@ -980,7 +979,7 @@ value of the environment variable <tt>PATH</tt>.
 A path-search is not performed if the program name contains
 a slash character &mdash; it is used directly. So a program with a name like
 <tt>"bin/prog"</tt> always executes the program <tt>bin/prog</tt> in the current working
-directory. See <tt>exec-path-list</tt>, below.</p>
+directory. See <tt>exec-path-list</tt> below.</p>
 <p>
 The variants without <tt>0</tt> in their names pass the <i>prog</i> as the zeroth argument of
 the argument vector, which is normally the right thing.  The variants with <tt>0</tt> require it
@@ -1621,7 +1620,7 @@ In Scsh the <tt>exec0</tt> procedures are called <tt>%exec</tt> and accept the e
 the argument vector as a list, including the zeroth argument.
 </li>
 <li>
-Scsh specified, but does not implement, the procedures for getting or setting process priorities.
+Scsh specifies, but does not implement, the procedures for getting or setting process priorities.
 </li>
 <li>
 In Scsh <tt>set-signal-handler</tt>
