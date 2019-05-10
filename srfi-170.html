@@ -1398,12 +1398,14 @@ the overhead of precisely calculating with them until after collection.<p>
 <p>Most support for environment variables is provided in R7RS-small.
 </p>
 <div align=left><tt>exec-path-list</tt> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> list</div>
+<blockquote>
 This variable contains the contents of the <tt>PATH</tt> environment variable as
 a list of strings, where each string contains a single directory pathname.  It is an
 error to change the value of this variable or
 to mutate this list or any of the strings.
 On Windows, the pathnames are separated by semicolons rather than by colons.
 Changing the value of <tt>PATH</tt> will not change the value of this variable.
+</blockquote>
 <a name="node_sec_3.12"></a>
 <h2><a href="#node_toc_node_sec_3.12">3.12&nbsp;&nbsp;Terminal device control</a></h2>
 <p></p>
