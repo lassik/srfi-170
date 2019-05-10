@@ -52,7 +52,7 @@ functions of this SRFI are available on all operating systems.
     the output of <tt>stat</tt>.  Should <tt>access</tt>
     (which uses the real uid/gid) be added?  Or should they all be
     removed, given that they sometimes lie (i.e. they claim that
-    root can wirte a file on a read-only device).</li>
+    root can write a file on a read-only device).</li>
   <li>Should <tt>start-file</tt> be added to open arbitrary files using
     an appropriate application?  This is native on Windows, but can be
     done on Linux and MacOS by spawning the <tt>xdg-open</tt>
@@ -910,7 +910,7 @@ To rename a file to a temporary name:
 Recall that this SRFI reports procedure failure by raising an error
 exception, not by returning an error code. This is critical to
 to this example &mdash; the programmer can assume that if the
-<tt>temp-file-iterate</tt> call returns, it returns successully.
+<tt>temp-file-iterate</tt> call returns, it returns successfully.
 So the following <tt>delete-file</tt> call can be reliably invoked,
 safe in the knowledge that the backup link has definitely been established.<p>
 To create a unique temporary directory:
@@ -1192,7 +1192,7 @@ process.
 </blockquote>
 <div align=left><tt>(nice <i>[proc/pid delta]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-  Iincrements the niceness of the single process specified by
+  Increments the niceness of the single process specified by
   a process object or pid by <i>delta</i>.</p>
   <p>Real-time processes are not affected by <tt>nice</tt>.</p>
 </blockquote><p>
@@ -1568,7 +1568,7 @@ constitutes an implementation of this SRFI, with the following exceptions and de
   Therefore, the procedures <tt>syscall-error:errno</tt>, <tt>syscall-error:message</tt>,
   <tt>syscall-error:procedure</tt>, and <tt>syscall-error:data</tt> can be defined as
   <tt>cadr</tt>, <tt>caddr</tt>, <tt>cadddr</tt>, and <tt>cddddr</tt> respectively.
-</li>  
+</li>
 <li>
 It's likely that not all of the error and signal numbers supported
 by P<small>OSIX</small> are available in Scsh.
