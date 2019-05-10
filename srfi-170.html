@@ -258,7 +258,7 @@ or <tt>#f</tt> if it has none (a string port, e.g.),
 effectively exporting it from the Scheme world.
 </blockquote><p>
 </p>
-<div align="left"><tt>(dup->fdes <i>port<i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(dup->fdes <i>port fd</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 This procedure replicates the file descriptor that underlies
 <i>port</i> onto the file descriptor <i>fd</i> using
