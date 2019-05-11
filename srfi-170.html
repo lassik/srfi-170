@@ -251,7 +251,7 @@ descriptors.</p>
 effectively importing it into the Scheme world.</p>
 </blockquote>
 
-<div align="left"><tt>(port->fdes <i>port</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(port-fdes <i>port</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure exposes the file descriptor of a port,
@@ -259,13 +259,17 @@ or <tt>#f</tt> if it has none (a string port, e.g.),
 effectively exporting it from the Scheme world.
 </blockquote><p>
 </p>
-<div align="left"><tt>(dup->fdes <i>port fd</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(dup->fdes <i>port [fd]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 This procedure replicates the file descriptor that underlies
-<i>port</i> onto the file descriptor <i>fd</i> using
-the P<small>OSIX</small> <tt>dup2()</tt> procedure,
-thus arranging for a port to be exported from the Scheme
-world on a specified file descriptor.</p>
+<i>port</i> onto another file descriptor.
+This allows a port to be exported from the Scheme
+world.  If the particular file descriptor to be used is important,
+as before doing a <tt>spawn</tt> or <tt>fork</tt>, then
+it can be specified as the second argument.
+Otherwise, an unused file descriptor will be selected.
+In either case, the newly modified file descriptor is returned.
+</p>
 <p>If <i>fd</i> is a file descriptor underlying some existing
 port, and operations have already been done on that port,
 it is an error to perform further operations on it.</p>
@@ -838,13 +842,6 @@ an exception.
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(abort<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-Aborts the current process with a SIGABRT signal.
-This is portable to systems where <tt>signal</tt> is not available.
-</blockquote><p>
-</p>
-<p></p>
 <div align="left"><tt>(suspend<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Suspend the current process with a SIGSTOP signal.
 </blockquote><p>
@@ -1401,6 +1398,10 @@ so there are only two procedures to convert file descriptors to ports,
 and <tt>fdes->binary-input-port</tt>, and
 <tt>fdes->outport</tt> in place of <tt>fdes->textual-output-port</tt>
 and <tt>fdes->binary-output-port</tt>.
+</li>
+<ltt>The <tt>port-fdes</tt> procedure is called <tt>port->fdes</tt> in Scsh.
+The name was changed because the use of the arrow suggests a conversion of the
+port to a file descriptor, which is not the case.
 </li>
 <li>There is no <tt>close-fdes</tt> procedure in Scsh, as the standard <tt>close-port</tt>
 procedure suffices.
