@@ -24,6 +24,7 @@ Olin Shivers (original author), John Cowan (editor and shepherd)
   <li>Received: 2019/5/4</li>
   <li>60-day deadline: 2019/7/5</li>
   <li>Draft #1 published: 2019/5/6</li>
+  <li>Draft #2 published: 2019/5/10</li>
 </ul>
 
 
@@ -737,7 +738,7 @@ To rename a file to a temporary name:
 Recall that this SRFI reports procedure failure by raising an error
 exception, not by returning an error code. This is critical to
 to this example &mdash; the programmer can assume that if the
-<tt>temp-file-iterate</tt> call returns, it returns successully.
+<tt>temp-file-iterate</tt> call returns, it returns successfully.
 So the following <tt>delete-file</tt> call can be reliably invoked,
 safe in the knowledge that the backup link has definitely been established.<p>
 To create a unique temporary directory:
@@ -1019,7 +1020,7 @@ process.
 </blockquote>
 <div align=left><tt>(nice <i>[proc/pid delta]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-  Iincrements the niceness of the single process specified by
+  Increments the niceness of the single process specified by
   a process object or pid by <i>delta</i>.</p>
   <p>Real-time processes are not affected by <tt>nice</tt>.</p>
 </blockquote><p>
@@ -1388,7 +1389,7 @@ constitutes an implementation of this SRFI, with the following exceptions and de
   Therefore, the procedures <tt>syscall-error:errno</tt>, <tt>syscall-error:message</tt>,
   <tt>syscall-error:procedure</tt>, and <tt>syscall-error:data</tt> can be defined as
   <tt>cadr</tt>, <tt>caddr</tt>, <tt>cadddr</tt>, and <tt>cddddr</tt> respectively.
-</li>  
+</li>
 <li>
 It's likely that not all of the error and signal numbers supported
 by P<small>OSIX</small> are available in Scsh.
