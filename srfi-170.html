@@ -1229,11 +1229,11 @@ the first string returned is the full name and the second string, if any, is the
 of <tt>"a.m."</tt> and the second string is the localized representation of <tt>"p.m."</tt>;
 if these do not exist in the locale, the empty list is returned.</li>
 <li>For <tt>time-localized-date-format</tt>, the string returned represents how the year number,
-month number, and day number are ordered, where
-<tt>%d</tt> represents the day number as a two-digit number,
-<tt>%m</tt> represents the month number as a two-digit number,
-<tt>%y</tt> or <tt>%Y</tt> represent the year number as a two-digit or four-digit number respectively,
-and all other characters represent themselves.</li></ul>
+month number, and day number are ordered, where:
+<ul><li><tt>%d</tt> represents the day number as a two-digit number,</li>
+<li><tt>%m</tt> represents the month number as a two-digit number,</li>
+<li><tt>%y</tt> or <tt>%Y</tt> represent the year number as a two-digit or four-digit number respectively,</li>
+<li>all other characters represent themselves.</li></ul></li></ul>
 </blockquote> 
 <h2><a href="#node_toc_node_sec_3.11">3.11&nbsp;&nbsp;Environment variables</a></h2>
 <p>Most support for environment variables is provided in R7RS-small.
@@ -1450,7 +1450,7 @@ and <tt>interrupt-handler</tt> respectively.
 They accept a Scheme 48 interrupt
 value rather than a signal value.  Fortunately, the Scsh procedure
 <code>signal->interrupt</code> can be used to convert its argument
-from a signal value to an interrupt value.</i></p>
+from a signal value to an interrupt value.
 </li>
 <li>
   Scsh provides a complete set of <tt>termios.h</tt> operations, from which the
