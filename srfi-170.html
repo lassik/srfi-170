@@ -1189,42 +1189,51 @@ signal handler to the default handler.<p>
 </p>
 <a name="node_sec_3.10"></a>
 <h2><a href="#node_toc_node_sec_3.10">3.10&nbsp;&nbsp;Time</a></h2>
-<div align=left><tt>(time+ticks<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>[secs ticks]</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><tt>(posix-time)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><tt>(timespec:seconds <i>timespec</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><tt>(timespec:nanoseconds <i>timespec</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align=left><tt>(ticks/sec<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i><i>real</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-The current time, with sub-second resolution.
-The time is returned as elapsed seconds since the Unix epoch excluding leap seconds, plus
-a number of sub-second "ticks."
-The length of a tick may vary, but a value of 1 nanosecond is recommended;
-it can be determined from <tt>(ticks/sec)</tt>.
-The system clock is not required to report time at the full resolution
-given by <tt>(ticks/sec)</tt>.
-If the OS does not support sub-second resolution, the <i>ticks</i> value
-is always 0, and <tt>(ticks/sec)</tt> returns 1.</p>
-<p>
+<p>The <tt>posix-time</tt> procedure returns the current time as a <tt>timespec</i>.
+This may or may not be a disjoint type; for example, a pair would work as well
+and may be more efficient to allocate.
+The <tt>timespec:seconds</tt> procedure extracts the number of 
+elapsed seconds since the Unix epoch excluding leap seconds; the
+<tt>timespec:nanoseconds</tt> extracts the number of elapsed nanoseconds
+since the beginning of the current second.
+The system clock is not required to report time at
+full nanosecond resolution, nor is anything guaranteed about accuracy.
 </p>
-System clock resolution is represented as ticks per second
-instead of seconds per tick to increase the odds that the value could
-be represented as an exact integer, increasing efficiency and
-making it easier for Scheme implementations that don't have
-sophisticated numeric support to deal with the quantity.<p>
-You can convert seconds and ticks to seconds with the expression
+<p>You can convert seconds and nanoseconds to an inexact number of seconds with the expression
 </p>
-<blockquote><tt>(+ <i>secs</i> (/ <i>ticks</i> (ticks/sec)))</tt></blockquote>
-Given that, why not have the fine-grain time procedure just
-return a non-integer real for time? Following Common Lisp, I chose to
-allow the system clock to report sub-second time in its own units to
-lower the overhead of determining the time.  This would be important
-for a system that wanted to precisely time the duration of some
-event. Time stamps could be collected with little overhead, deferring
-the overhead of precisely calculating with them until after collection.<p>
-</p>
+<blockquote><tt>(+ (timespec:seconds<i>timespec</i> (/ (timespec:nanoseconds <i>timespec 1000000000))</tt></blockquote>
 </blockquote>
 </blockquote><p>
 </p>
 <p></p>
+<div align=left><tt>(time-localized-month <i>locale month-number</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><tt>(time-localized-weekday <i>locale weekday-number</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><tt>(time-localized-am-pm <i>locale</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><tt>(time-localized-date-format <i>locale</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <p></p>
+<blockquote>
+These procedures return the month names, weekday names, AM and PM strings,
+and a string representing how an all-numeric date is written in the specified
+<i>locale</i> (an implementation-dependent string name).
+If <i>locale</tt> is <tt>#f</tt>, the process global locale is used.
+Note that month 1 is January and weekday 1 is Sunday.
+<ul><li>For <tt>time-localized-month</tt> and <tt>time-localized-weekday</tt>,
+the first string returned is the full name and the second string, if any, is the abbreviated name.</li>
+<li>For <tt>time-localized-am-pm</i>, the first string returned is the localized representation
+of <tt>"a.m."</tt> and the second string is the localized representation of <tt>"p.m."</tt>;
+if these do not exist in the locale, the empty list is returned.</li>
+<li>For <tt>time-localized-date-format</tt>, the string returned represents how the year number,
+month number, and day number are ordered, where
+<tt>%d</tt> represents the day number as a two-digit number,
+<tt>%m</tt> represents the month number as a two-digit number,
+<tt>%y</tt> or <tt>%Y</tt> represent the year number as a two-digit or four-digit number respectively,
+and all other characters represent themselves.</li></ul>
+</blockquote> 
 <h2><a href="#node_toc_node_sec_3.11">3.11&nbsp;&nbsp;Environment variables</a></h2>
 <p>Most support for environment variables is provided in R7RS-small.
 </p>
@@ -1442,6 +1451,26 @@ value rather than a signal value.  Fortunately, the Scsh procedure
 <code>signal->interrupt</code> can be used to convert its argument
 from a signal value to an interrupt value.</i></p>
 </li>
+<li>
+  Scsh provides a complete set of <tt>termios.h</tt> operations, from which the
+  <tt>with-raw-mode</tt>, <tt>without-echo</tt>, and <tt>without-interrupt-chars</tt>
+  procedures can be implemented along the lines specified by the definitions.
+  For <tt>with-raw-mode</tt>, it's important to preserve and restore the
+  <tt>eof</tt> and <tt>eol</tt> control characters, as these may occupy the same
+  memory locations in cooked mode as the <tt>min</tt> and <tt>time</tt> settings in raw mode.
+</li>
+<li>
+  Scsh does not provide <tt>posix-time</tt>, but it is easily defined using the procedures
+  <tt>time+ticks</tt> and <tt>ticks/sec</tt>.  The first returns two values, the Posix
+  second and the subsecond time in ticks; the second procedure specifies how many ticks
+  a second contains.  These are easily converted to seconds and nanoseconds.
+</li>
+<li>
+  Scsh does not provide the <tt>time-localized</tt> functions either.  The simplest way to
+  provide them is to use <tt>newlocale()</tt> to create a locale object based on the locale name.
+  Then invoke <tt>nl_langinfo_l()</tt>, passing it the appropriate integer from
+  <tt>langinfo.h</tt> and the locale; the locale must then be freed with <tt>freelocale</tt>.
+  Alternatively, invoking <tt>nl_langinfo()</tt> will use the process global locale.
 </ul>
 
 
