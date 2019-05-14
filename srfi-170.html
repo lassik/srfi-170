@@ -819,6 +819,7 @@ as a separate argument.
 </p>
 <p>
 All of these procedures may flush buffered output.
+</blockquote>
 </p><p>
 <p></p>
 <p></p>
@@ -1194,7 +1195,7 @@ signal handler to the default handler.<p>
 <div align=left><tt>(timespec:nanoseconds <i>timespec</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-<p>The <tt>posix-time</tt> procedure returns the current time as a <tt>timespec</i>.
+<p>The <tt>posix-time</tt> procedure returns the current time as a <tt>timespec</tt>.
 This may or may not be a disjoint type; for example, a pair would work as well
 and may be more efficient to allocate.
 The <tt>timespec:seconds</tt> procedure extracts the number of 
@@ -1206,7 +1207,7 @@ full nanosecond resolution, nor is anything guaranteed about accuracy.
 </p>
 <p>You can convert seconds and nanoseconds to an inexact number of seconds with the expression
 </p>
-<blockquote><tt>(+ (timespec:seconds<i>timespec</i> (/ (timespec:nanoseconds <i>timespec 1000000000))</tt></blockquote>
+<blockquote><tt>(+ (timespec:seconds<i>timespec</i> (/ (timespec:nanoseconds <i>timespec</i> 1000000000))</tt></blockquote>
 </blockquote>
 </blockquote><p>
 </p>
