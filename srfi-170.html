@@ -1221,11 +1221,11 @@ full nanosecond resolution, nor is anything guaranteed about accuracy.
 These procedures return the month names, weekday names, AM and PM strings,
 and a string representing how an all-numeric date is written in the specified
 <i>locale</i> (an implementation-dependent string name).
-If <i>locale</tt> is <tt>#f</tt>, the process global locale is used.
+If <i>locale</i> is <tt>#f</tt>, the process global locale is used.
 Note that month 1 is January and weekday 1 is Sunday.
 <ul><li>For <tt>time-localized-month</tt> and <tt>time-localized-weekday</tt>,
 the first string returned is the full name and the second string, if any, is the abbreviated name.</li>
-<li>For <tt>time-localized-am-pm</i>, the first string returned is the localized representation
+<li>For <tt>time-localized-am-pm</tt>, the first string returned is the localized representation
 of <tt>"a.m."</tt> and the second string is the localized representation of <tt>"p.m."</tt>;
 if these do not exist in the locale, the empty list is returned.</li>
 <li>For <tt>time-localized-date-format</tt>, the string returned represents how the year number,
