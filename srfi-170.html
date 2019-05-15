@@ -49,11 +49,7 @@ functions of this SRFI are available on all operating systems.
     <tt>readv</tt>, <tt>writev</tt>, <tt>sendfile</tt>,
     <tt>sched_{get,set}scheduler</tt> and friends.
     None are provided by Scsh.</li>
-  <li>The current access procedures use the effective uid/gid and
-    the output of <tt>stat</tt>.  Should <tt>access</tt>
-    (which uses the real uid/gid) be added?  Or should they all be
-    removed, given that they sometimes lie (i.e. they claim that
-    root can write a file on a read-only device).</li>
+  <li>(Resolved)</li>
   <li>Should <tt>start-file</tt> be added to open arbitrary files using
     an appropriate application?  This is native on Windows, but can be
     done on Linux and MacOS by spawning the <tt>xdg-open</tt>
@@ -107,10 +103,17 @@ highly portable interfaces (many of them even available on Windows)
 with wrappers to make them more Scheme-like.
 </p>
 
-<p>Networking operations are not provided by this SRFI: see
+<p>
+  This SRFI excludes most operations on ports and file descriptors
+  other than converting between them.  For such operations, see SRFI FIXME,
+  which is currently in pre-SRFI format at
+  <a href="https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md">
+    https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md</a>.
+Networking operations are not provided by this SRFI: see
 <a href="http://srfi.schemers.org/srfi-106/srfi-106.html">SRFI 106</a>.
 Date and time operations will be provided by a future SRFI, as the
-P<small>OSIX</small> date and time operations are irregular and awkward.
+P<small>OSIX</small> date and time operations are irregular and awkward,
+so this SRFI provides only a few non-portable hooks.
 Access to command-line arguments and environment variables, as well
 as provisions for exiting a process, are already provided by R7RS.
 P<small>OSIX</small> file locking, which is notoriously broken as
@@ -126,12 +129,6 @@ The use of colons to join record names and fields into the name of a
 record accessor is a convention of Scheme 48, on which Scsh is built.
 </p>
 
-<p>
-  This version of SRFI 170 excludes most operations on ports and file descriptors
-  other than converting between them.  For such operations, see SRFI FIXME,
-  which is currently in pre-SRFI format at
-  <a href="https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md">
-    https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md</a>.
 <h1>Specification</h1>
 
 <p>
@@ -208,7 +205,9 @@ programs, since file descriptors are preserved across <tt>fork</tt> and
 <p>
 Scheme, on the other hand, uses ports for specifying I/O sources. Ports are
 garbage-collected Scheme objects, not integers.
-When a port is garbage collected, it is also closed. Because file
+When a port is garbage collected, it is effectively closed,
+but whether the underlying file descriptor is closed is left as an implementation detail.
+Because file
 descriptors are just integers, it's impossible to garbage collect them &mdash; you
 wouldn't be able to close file descriptor 3 unless there were no 3's in the
 system, and you could further prove that your program would never again
@@ -221,8 +220,8 @@ when interfacing to foreign code, and
 when interfacing to a subprocess.
 </p><p>
 This causes a problem. Suppose we have a Scheme port constructed
-on top of file descriptor 3. We intend to fork off a program that
-will inherit this file descriptor. If we drop references to the port,
+on top of file descriptor 3. We intend to execute a successor program that
+will expect this file descriptor. If we drop references to the port,
 the garbage collector may prematurely close file 3 before we fork
 the subprocess.</p>
 <p>
@@ -255,16 +254,20 @@ effectively importing it into the Scheme world.</p>
 
 <blockquote>
 This procedure exposes the file descriptor of a port,
-or <tt>#f</tt> if it has none (a string port, e.g.),
 effectively exporting it from the Scheme world.
+Alternatively, <tt>#f</tt> is returned if <i>port</i> does not have a
+file descriptor (a string port, e.g.),
 </blockquote><p>
 </p>
 <div align="left"><tt>(dup->fdes <i>port [fd]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 This procedure replicates the file descriptor that underlies
 <i>port</i> onto another file descriptor.
-This allows a port to be exported from the Scheme
-world.  If the particular file descriptor to be used is important,
+This allows what is open on <i>port</i> to be exported from the Scheme
+world in such a way that the port and the file descriptor can be
+manipulated semi-independently (although they will still share the
+same file pointer and other things).
+If the particular file descriptor to be used is important,
 as before doing a <tt>spawn</tt> or <tt>fork</tt>, then
 it can be specified as the second argument.
 Otherwise, an unused file descriptor will be selected.
@@ -364,7 +367,7 @@ Setting file user ownership usually requires root privileges.
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(set-file-times <i>fname [access-time mod-time]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(set-file-timespecs <i>fname [access-timespec mod-timespec]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure sets the access and modified times for the file
@@ -421,13 +424,15 @@ or port.<p>
 <div align="left"><tt>(file-info:uid <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><tt>(file-info:gid <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><tt>(file-info:size <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:atime <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:mtime <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:ctime <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info:atime <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info:mtime <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info:ctime <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the device number, inode number, mode,
 number of hard links, user id, group id, size in bytes,
 last access time, last modification time, and
-last change of status time stored in <i>file-info</i> respectively.
+last change of status time stored in <i>file-info</i> respectively
+(see section&nbsp;<a href="#node_sec_3.10">3.10</a>
+for this SRFI's representation of time).
 </blockquote>
 
 </blockquote>
@@ -447,7 +452,7 @@ last change of status time stored in <i>file-info</i> respectively.
 <div align="left"><tt>(file-info-symlink? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 These procedures are file-type predicates that test the
-file type stored in a file-info record.
+file type stored in <i>file-info</i>.
 </blockquote>
 <p>
 The following set of procedures are a convenient means to investigate the
@@ -456,66 +461,29 @@ permission bits stored in a file-info record:</p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(file-info-not-readable? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-not-writable? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-not-executable? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info-u+r? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info-u+w? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info-u+x? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info-g+r? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info-g+w? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info-g+x? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info-o+r? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info-o+w? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(file-info-o+x? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-Returns:
-<blockquote><table border="0"><tbody><tr><td valign="top">Value      </td><td valign="top">meaning </td></tr>
-<tr><td valign="top"><tt>#f</tt></td><td valign="top">Access permitted </td></tr>
-<tr><td valign="top"><tt>search-denied</tt>          </td><td valign="top"><table border="0"><tbody><tr><td valign="top">Can't stat &mdash; a protected directory </td></tr>
-<tr><td valign="top">is blocking access.</td></tr></tbody></table> </td></tr>
-<tr><td valign="top"><tt>permission</tt>             </td><td valign="top">Permission denied. </td></tr>
-<tr><td valign="top"><tt>no-directory</tt>           </td><td valign="top">Some directory doesn't exist. </td></tr>
-<tr><td valign="top"><tt>nonexistent</tt>            </td><td valign="top">File doesn't exist.
-</td></tr></tbody></table></blockquote>
-A file is considered writeable if either (1) it exists and is writeable
-or (2) it doesn't exist and the directory is writeable.
-Since symlink permission bits are ignored by the filesystem, these
-calls do not take a <i>chase?</i> flag.<p>
-Note that these procedures use the process's <em>effective</em> user
-and group ids for permission checking. P<small>OSIX</small> defines an <tt>access()</tt>
-function that uses the process's real uid and gids. This is handy
-for setuid programs that would like to find out if the actual user
-has specific rights, but is not supported by this SRFI). </p>
-<p>
-There are several problems with these procedures. First, there's an
+Returns <tt>#t</tt> if the appropriate bit in the mode of <i>file-info</i>
+(user-readable, user-writable, user-executable, group-readable, ... other-executable)
+is set, and <tt>#f</tt> if it is clear.
+There are several problems with these procedures.
+First, there's an
 atomicity issue. In between checking permissions for a file and then trying
 an operation on the file, another process could change the permissions,
 so a return value from these functions guarantees nothing. Second,
 the code special-cases permission checking when the uid is root &mdash; if
 the file exists, root is assumed to have the requested permission.
 However, not even root can write a file that is on a read-only file system,
-such as a CD-ROM. In this case, <tt>file-not-writable?</tt> will lie, saying
-that root has write access, when in fact the opening the file for write
-access will fail.
-Finally, write permission confounds write access and create access.
-These should be disentangled.</p>
-<p>
-Some of these problems could be avoided if P<small>OSIX</small> had a real-uid
-variant of the <tt>access()</tt> call we could use, but the atomicity
-issue is still a problem. In the final analysis, the only way to
-find out if you have the right to perform an operation on a file
-is to try and open it for the desired operation. These permission-checking
-functions are mostly intended for script-writing, where loose guarantees
-are tolerated.
-</p>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><tt>(file-info-readable? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-writable? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-executable? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-These procedures are the logical negation of the
-preceding <tt>file-info-not-<tt>...</tt>?</tt> procedures.
-Refer to them for a discussion of their problems and limitations.
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<p></p>
+such as a CD-ROM.</p>
+</blockquote>
 <p></p>
 <p></p>
 <div align="left"><tt>(directory-files <i>[dir dotfiles?]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -908,7 +876,7 @@ wait for suspended as well as terminated children.
 </p>
 </blockquote><p>
 </p>
-<p></p>/
+<p></p>
 <p></p>
 <p></p>
 <div align="left"><tt>(wait-process-group <i>proc/pid [flags]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>[proc status]</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -1151,7 +1119,7 @@ the P<small>OSIX</small> specification of <tt>signal.h</tt></a> for the complete
 <div align="left"><tt>(signal-process <i>proc sig</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><tt>(signal-process-group <i>prgrp sig</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-These two procedures send signals to a specific process, and all the processes
+These two procedures send signals to a specific process and all the processes
 in a specific process group, respectively.
 The <i>proc</i> and <i>prgrp</i> arguments are either processes
 or exact integer process ids.
@@ -1162,7 +1130,7 @@ or exact integer process ids.
 <p>
 <div align="left"><tt>(set-signal-handler <i>signal handler</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>old-handler</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-Assigns a handler for a given signal,
+Assigns a handler for a given signal
 and returns the signal's old handler.
 The <i>handler</i> argument is <tt>#f</tt> (ignore), <tt>#t</tt> (default), or a
 procedure taking an exact integer argument representing the signal number;
@@ -1199,15 +1167,16 @@ signal handler to the default handler.<p>
 This may or may not be a disjoint type; for example, a pair would work as well
 and may be more efficient to allocate.
 The <tt>timespec:seconds</tt> procedure extracts the number of 
-elapsed seconds since the Unix epoch excluding leap seconds; the
-<tt>timespec:nanoseconds</tt> extracts the number of elapsed nanoseconds
-since the beginning of the current second.
+elapsed seconds since the P<small>OSIX</small> epoch
+(midnight January 1, 1970 Universal Time) excluding leap seconds.
+The <tt>timespec:nanoseconds</tt> procedure extracts the number of
+elapsed nanoseconds since the beginning of the current second.
 The system clock is not required to report time at
 full nanosecond resolution, nor is anything guaranteed about accuracy.
 </p>
 <p>You can convert seconds and nanoseconds to an inexact number of seconds with the expression
 </p>
-<blockquote><tt>(+ (timespec:seconds<i>timespec</i> (/ (timespec:nanoseconds <i>timespec</i> 1000000000))</tt></blockquote>
+<blockquote><tt>(+ (timespec:seconds <i>timespec</i> (/ (timespec:nanoseconds <i>timespec</i> 1000000000))</tt></blockquote>
 </blockquote>
 </blockquote><p>
 </p>
@@ -1232,7 +1201,7 @@ if these do not exist in the locale, the empty list is returned.</li>
 month number, and day number are ordered, where:
 <ul><li><tt>%d</tt> represents the day number as a two-digit number,</li>
 <li><tt>%m</tt> represents the month number as a two-digit number,</li>
-<li><tt>%y</tt> or <tt>%Y</tt> represent the year number as a two-digit or four-digit number respectively,</li>
+<li><tt>%y</tt> and <tt>%Y</tt> represent the year number as a two-digit or four-digit number respectively,</li>
 <li>all other characters represent themselves.</li></ul></li></ul>
 </blockquote> 
 <h2><a href="#node_toc_node_sec_3.11">3.11&nbsp;&nbsp;Environment variables</a></h2>
@@ -1245,7 +1214,10 @@ a list of strings, where each string contains a single directory pathname.  It i
 error to change the value of this variable or
 to mutate this list or any of the strings.
 On Windows, the pathnames are separated by semicolons rather than by colons.
-Changing the value of <tt>PATH</tt> will not change the value of this variable.
+Changing the value of <tt>PATH</tt> may or may not not change the value
+of this variable.  In any case, this SRFI provides no mechanism to change
+the values of environment variables or to add new ones, operations which
+may in any case fail if there is not enough space in the environment.
 </blockquote>
 <a name="node_sec_3.12"></a>
 <h2><a href="#node_toc_node_sec_3.12">3.12&nbsp;&nbsp;Terminal device control</a></h2>
@@ -1260,7 +1232,7 @@ However, now that terminal emulators have almost completely displaced
 terminals, very little of this is useful except for directly
 controlling serial-line hardware, which itself is increasingly rare.
 Therefore, this SRFI provides only the functions that are still
-in common use: the ability to turn echoing on and off, the
+in common use by command-line programs: the ability to turn echoing on and off, the
 ability to suppress the recognition of interrupt, quit, and
 suspend characters; and the ability to put a terminal into
 raw mode, in which no characters are specially recognized.
@@ -1388,7 +1360,7 @@ portable than simply using a constant string.
 constitutes an implementation of this SRFI, with the following exceptions and deviations:
 
 <ul>
-<li>
+<li><p>
   Scsh defines the procedure <tt>syscall-error?</tt> but unfortunately does not expose it.
   A syscall-error object in Scsh is a list whose second, third, and fourth elements
   are the errno, the error message, and the procedure respectively,
@@ -1396,53 +1368,58 @@ constitutes an implementation of this SRFI, with the following exceptions and de
   Therefore, the procedures <tt>syscall-error:errno</tt>, <tt>syscall-error:message</tt>,
   <tt>syscall-error:procedure</tt>, and <tt>syscall-error:data</tt> can be defined as
   <tt>cadr</tt>, <tt>caddr</tt>, <tt>cadddr</tt>, and <tt>cddddr</tt> respectively.
-</li>
-<li>
+</p></li>
+<li><p>
 It's likely that not all of the error and signal numbers supported
 by P<small>OSIX</small> are available in Scsh.
-</li>
-<li>
+</p></li>
+<li><p>
 Scsh does not distinguish between textual and binary ports,
 so there are only two procedures to convert file descriptors to ports,
 <tt>fdes->inport</tt> in place of <tt>fdes->textual-inport-port</tt>
 and <tt>fdes->binary-input-port</tt>, and
 <tt>fdes->outport</tt> in place of <tt>fdes->textual-output-port</tt>
 and <tt>fdes->binary-output-port</tt>.
-</li>
-<ltt>The <tt>port-fdes</tt> procedure is called <tt>port->fdes</tt> in Scsh.
+</p></li>
+<li><p>The <tt>port-fdes</tt> procedure is called <tt>port->fdes</tt> in Scsh.
 The name was changed because the use of the arrow suggests a conversion of the
 port to a file descriptor, which is not the case.
-</li>
-<li>There is no <tt>close-fdes</tt> procedure in Scsh, as the standard <tt>close-port</tt>
+</p></li>
+<li><p>There is no <tt>close-fdes</tt> procedure in Scsh, as the standard <tt>close-port</tt>
 procedure suffices.
-</li>
-<li>
+</p></li>
+<li><p>
+The <tt>file-info-u+r</tt> and related procedures do not exist in Scsh,
+but they are trivial bit-twiddling operations on the result of
+<tt>file-info:mode</tt>.
+</p></li>
+<li><p>
 The <tt>open-directory</tt>, <tt>read-directory</tt>, and <tt>close-directory</tt>
 procedures are called <tt>open-directory-stream</tt> etc.  The <tt>read-directory-stream</tt>
 functions returns <tt>#f</tt> at the end of the directory instead of
 an end of file object.
-<li>
+<li><p>
 Scsh does not support parameters, so <tt>temp-file-prefix</tt> does not exist.
 Instead, there is a fluid variable named <tt>*temp-file-template*</tt> whose
 value is as defined in this SRFI with <tt>"~a"</tt> appended to it.
-</li>
-<li>
+</p></li>
+<li><p>
 Scsh does not support the <tt>real-path</tt> procedure, but it would be trivial to add
 it to the source by cloning <tt>read-symlink</tt> and making it invoke the P<small>OSIX</small>
 <tt>realpath()</tt> function.
-</li>
-<li>
+</p></li>
+<li><p>
 Scsh does not provide the <tt>spawn</tt> functions, but they are easily provided using
 <tt>fork</tt> and the corresponding <tt>exec</tt> procedures.
-</li>
-<li>
+</p></li>
+<li><p>
 In Scsh the <tt>exec0</tt> procedures are called <tt>%exec</tt> and accept the elements of
 the argument vector as a list, including the zeroth argument.
-</li>
-<li>
+</p></li>
+<li><p>
 Scsh specifies, but does not implement, the procedures for getting or setting process priorities.
-</li>
-<li>
+</p></li>
+<li><p>
 In Scsh <tt>set-signal-handler</tt>
 and <tt>signal-handler</tt> are called
 <code>set-interrupt-handler</code>
@@ -1451,27 +1428,28 @@ They accept a Scheme 48 interrupt
 value rather than a signal value.  Fortunately, the Scsh procedure
 <code>signal->interrupt</code> can be used to convert its argument
 from a signal value to an interrupt value.
-</li>
-<li>
+</p></li>
+<li><p>
   Scsh provides a complete set of <tt>termios.h</tt> operations, from which the
   <tt>with-raw-mode</tt>, <tt>without-echo</tt>, and <tt>without-interrupt-chars</tt>
   procedures can be implemented along the lines specified by the definitions.
   For <tt>with-raw-mode</tt>, it's important to preserve and restore the
   <tt>eof</tt> and <tt>eol</tt> control characters, as these may occupy the same
   memory locations in cooked mode as the <tt>min</tt> and <tt>time</tt> settings in raw mode.
-</li>
-<li>
+</p></li>
+<li><p>
   Scsh does not provide <tt>posix-time</tt>, but it is easily defined using the procedures
   <tt>time+ticks</tt> and <tt>ticks/sec</tt>.  The first returns two values, the Posix
   second and the subsecond time in ticks; the second procedure specifies how many ticks
   a second contains.  These are easily converted to seconds and nanoseconds.
-</li>
-<li>
+</p></li>
+<li><p>
   Scsh does not provide the <tt>time-localized</tt> functions either.  The simplest way to
   provide them is to use <tt>newlocale()</tt> to create a locale object based on the locale name.
   Then invoke <tt>nl_langinfo_l()</tt>, passing it the appropriate integer from
   <tt>langinfo.h</tt> and the locale; the locale must then be freed with <tt>freelocale</tt>.
   Alternatively, invoking <tt>nl_langinfo()</tt> will use the process global locale.
+</p></li>
 </ul>
 
 
