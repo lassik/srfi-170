@@ -19,7 +19,7 @@ Olin Shivers (original author), John Cowan (editor and shepherd)
 
 <h1>Status</h1>
 
-<p>This SRFI is currently in <em>draft</em> status.  Here is <a href="https://srfi.schemers.org/srfi-process.html">an explanation</a> of each status that a SRFI can hold.  To provide input on this SRFI, please send email to <code><a href="mailto:srfi+minus+170+at+srfi+dotschemers+dot+org">srfi-170@<span class="antispam">nospam</span>srfi.schemers.org</a></code>.  To subscribe to the list, follow <a href="https://srfi.schemers.org/srfi-list-subscribe.html">these instructions</a>.  You can access previous messages via the mailing list <a href="https://srfi-email.schemers.org/srfi-170">archive</a>.</p>
+<p>This SRFI is currently in <i>draft</i> status.  Here is <a href="https://srfi.schemers.org/srfi-process.html">an explanation</a> of each status that a SRFI can hold.  To provide input on this SRFI, please send email to <tt><a href="mailto:srfi+minus+170+at+srfi+dotschemers+dot+org">srfi-170@<span class="antispam">nospam</span>srfi.schemers.org</a></tt>.  To subscribe to the list, follow <a href="https://srfi.schemers.org/srfi-list-subscribe.html">these instructions</a>.  You can access previous messages via the mailing list <a href="https://srfi-email.schemers.org/srfi-170">archive</a>.</p>
 <ul>
   <li>Received: 2019/5/4</li>
   <li>60-day deadline: 2019/7/5</li>
@@ -114,7 +114,7 @@ Networking operations are not provided by this SRFI: see
 <a href="http://srfi.schemers.org/srfi-106/srfi-106.html">SRFI 106</a>.
 Date and time operations will be provided by a future SRFI, as the
 P<small>OSIX</small> date and time operations are irregular and awkward,
-so this SRFI provides only a few non-portable hooks.
+so this SRFI provides only the current timezone and locale.
 Access to command-line arguments and environment variables, as well
 as provisions for exiting a process, are already provided by R7RS.
 P<small>OSIX</small> file locking, which is notoriously broken as
@@ -154,7 +154,7 @@ concurrently running ones.
 Errors are consistently reported by raising exceptions.
 This frees up the procedures to return useful values,
 and allows the programmer to assume that
-<em>if a procedure returns, it succeeded.</em>
+<i>if a procedure returns, it succeeded.</i>
 This greatly simplifies the flow of the code from the programmer's point
 of view.
 For reference purposes, the P<small>OSIX</small> <tt>errno</tt> numbers
@@ -199,7 +199,7 @@ It is an error to pass an <tt>errno</tt> that is not provided by the OS.</p>
 <p></p>
 <p>Dealing with P<small>OSIX</small> file descriptors in a Scheme environment is difficult.
 In P<small>OSIX</small>, open files are part of the process environment, and are referenced
-by small exact integers called <em>file descriptors</em>. Open file descriptors are
+by small exact integers called <i>file descriptors</i>. Open file descriptors are
 the fundamental way I/O redirections are passed to subprocesses and executed
 programs, since file descriptors are preserved across <tt>fork</tt> and
 <tt>exec</tt> operations.</p>
@@ -330,28 +330,6 @@ and <i>oldname</i> and <i>newname</i> refer to the same file, it is an error
 </p>
 </blockquote><p>
 </p>
-<div align="left"><tt>(read-symlink <i>fname</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Return the filename referenced by symbolic link <tt>fname</tt>.
-</blockquote><p>
-</p>
-<div align="left"><tt>(rename-file <i>oldname newname [override?]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>If you override an existing object, then <i>oldname</i>
-and <i>newname</i> must type-match &mdash; either both directories,
-or both non-directories.
-This is required by the semantics of P<small>OSIX</small> <tt>rename()</tt>.<p>
-</p>
-<blockquote><i>Remark: </i>
-There is an unfortunate atomicity problem with the <tt>rename-file</tt>
-procedure: if you
-specify no-override, but create file <tt>newname</tt> sometime between
-<tt>rename-file</tt>'s existence check and the actual rename operation,
-your file will be clobbered with <tt>oldname</tt>. There is no way to fix
-this problem, given the semantics of P<small>OSIX</small> <tt>rename()</tt>;
-at least it is highly unlikely to occur in practice.
-</blockquote>
-</blockquote><p>
-</p>
-<p></p>
 <p></p>
 <div align="left"><tt>(set-file-mode <i>fname/port mode</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><tt>(set-file-owner <i>fname/port uid</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -456,32 +434,16 @@ These procedures are file-type predicates that test the
 file type stored in <i>file-info</i>.
 </blockquote>
 <p>
-The following set of procedures are a convenient means to investigate the
-permission bits stored in a file-info record:</p>
-<p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><tt>(file-info-u+r? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-u+w? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-u+x? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-g+r? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-g+w? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-g+x? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-o+r? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-o+w? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info-o+x? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-Returns <tt>#t</tt> if the appropriate bit in the mode of <i>file-info</i>
-(user-readable, user-writable, user-executable, group-readable, ... other-executable)
-is set, and <tt>#f</tt> if it is clear.
-There are several problems with these procedures.
+This SRFI does not provide a special means for checking the
+permission bits in a <tt>file-info</tt> record,
+though they are available in <tt>file-info:mode</tt>.
+There are several problems with such procedures.
 First, there's an
 atomicity issue. In between checking permissions for a file and then trying
 an operation on the file, another process could change the permissions,
 so a return value from these functions guarantees nothing. Second,
-the code special-cases permission checking when the uid is root &mdash; if
-the file exists, root is assumed to have the requested permission.
+Posix special-cases permission checking with the uid is 0 (<tt>root</tt>)
+&mdash; if the file exists, root is assumed to have the requested permission.
 However, not even root can write a file that is on a read-only file system,
 such as a CD-ROM.</p>
 </blockquote>
@@ -495,12 +457,12 @@ which defaults to the current working directory.
 The <i>dotfiles?</i> flag (default <tt>#f</tt>) causes dot files to be
 included in the list.
 Regardless of the value of <i>dotfiles?</i>, the two files <tt>.</tt> and
-<tt>..</tt> are <em>never</em> returned.<p>
+<tt>..</tt> are <i>never</i> returned.<p>
 The directory <i>dir</i> is not prepended to each file name in the
 result list. That is,
 </p>
 <blockquote><tt>(directory-files "/etc")</tt></blockquote>returns
-<blockquote><tt>("chown" "exports" "fstab" <tt>...</tt>)</tt></blockquote><em>not</em>
+<blockquote><tt>("chown" "exports" "fstab" <tt>...</tt>)</tt></blockquote><i>not</i>
 <blockquote><tt>("/etc/chown" "/etc/exports" "/etc/fstab" <tt>...</tt>)</tt></blockquote>To use the files in returned list, the programmer can either manually
 prepend the directory,
 change to the directory before using the file names,
@@ -520,7 +482,10 @@ family of functions for processing directories.
 The <tt>open-directory</tt> procedure opens the
 directory with the specified pathname for reading, returning an opaque directory object.
 Then <tt>read-directory</tt>
-returns the name of the next available file in a <i>directory-object</i>, or an end of file object if there are no more files.
+returns the name of the next available file
+(including all files whose names begin with dot, and
+without <i>dir</i> present) in a <i>directory-object</i>,
+or an end of file object if there are no more files.
 Finally, <tt>close-directory</tt> closes a directory object.</p>
 <p>
 </p>
@@ -532,9 +497,9 @@ Finally, <tt>close-directory</tt> closes a directory object.</p>
 Glob each pattern against the filesystem and return the sorted list.
 Duplicates are not removed. Patterns matching nothing are <i>not</i> included
 literally, as they are in the shell.
-Shell <code class="verbatim">{a,b,c}</code> patterns are expanded. Backslash quotes
+Shell <tt class="verbatim">{a,b,c}</tt> patterns are expanded. Backslash quotes
 characters, turning off the special meaning of
-<code class="verbatim">{</code>, <code class="verbatim">}</code>, <tt>*</tt>, <code class="verbatim">[</code>, <code class="verbatim">]</code>, and <code class="verbatim">?</code>. <p>
+<tt class="verbatim">{</tt>, <tt class="verbatim">}</tt>, <tt>*</tt>, <tt class="verbatim">[</tt>, <tt class="verbatim">]</tt>, and <tt class="verbatim">?</tt>. <p>
 Note that the rules of backslash for Scheme strings and glob patterns
 work together to require four backslashes in a row to specify a
 single literal backslash. Fortunately, it is very rare that a backslash
@@ -581,7 +546,7 @@ If the first character of the pattern (after expanding braces) is a slash,
 the search begins at root; otherwise, the search begins in the current
 working directory.<p>
 If the last character of the pattern (after expanding braces) is a slash,
-then the result matches must be directories, <em>e.g.</em>,
+then the result matches must be directories, <i>e.g.</i>,
 </p>
 <blockquote><tt><br>
 (glob&nbsp;"/usr/man/man?/")&nbsp;==>&nbsp;<br>
@@ -652,7 +617,7 @@ allocated when the file is opened. This will work if the file
 only needs to be opened once.
 </p>
 </li><li><p>If the file needs to be opened twice or more, create it in a
-protected directory, <em>e.g.</em>, <code class="verbatim">$HOME</code>.</p>
+protected directory, <i>e.g.</i>, <tt class="verbatim">$HOME</tt>.</p>
 </li><li><p>Ensure that <tt>/var/tmp</tt> has its sticky bit set. This
 requires system administrator privileges.
 </p>
@@ -720,11 +685,11 @@ To create a unique temporary directory:
 (temp-file-iterate&nbsp;(lambda&nbsp;(dir)&nbsp;(create-directory&nbsp;dir)&nbsp;dir)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/var/tmp/tempdir.")</tt></blockquote>
 Similar operations can be used to generate unique symlinks and fifos,
-or to return values other than the new filename (<em>e.g.</em>, an open file
+or to return values other than the new filename (<i>e.g.</i>, an open file
 descriptor or port).<p>
 For increased security, a user may wish to
 change the template to use a directory not allowing world write
-access (<em>e.g.</em>, his home directory).
+access (<i>e.g.</i>, his home directory).
 </p>
 </blockquote><p>
 </p>
@@ -742,14 +707,14 @@ and whose resolution does not involve <tt>.</tt>, <tt>..</tt>, or symbolic links
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><tt>(spawn <i>mode prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn-path <i>mode prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn/env <i>mode prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn-path/env <i>mode prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn0 <i>mode prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn0-path <i>mode prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn0/env <i>mode prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn0-path/env <i>mode prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(spawn <i>mode prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(spawn-path <i>mode prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(spawn/env <i>mode prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(spawn-path/env <i>mode prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(spawn0 <i>mode prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(spawn0-path <i>mode prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(spawn0/env <i>mode prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(spawn0-path/env <i>mode prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>
 These procedures cause a new process to be created running
@@ -792,14 +757,14 @@ All of these procedures may flush buffered output.
 </p><p>
 <p></p>
 <p></p>
-<div align="left"><tt>(exec <i>prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec-path <i>prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec/env <i>prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec-path/env <i>prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec0 <i>prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec0-path <i>prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec0/env <i>prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec0-path/env <i>prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><em>n</em></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(exec <i>prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(exec-path <i>prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(exec/env <i>prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(exec-path/env <i>prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(exec0 <i>prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(exec0-path <i>prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(exec0/env <i>prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><tt>(exec0-path/env <i>prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>
 These procedures do the same things as the corresponding <tt>spawn</tt> procedures,
@@ -824,7 +789,7 @@ an exception.
 <blockquote>
 <tt>fork</tt> with no arguments or <tt>#f</tt> instead of a thunk is like
 <tt>fork()</tt>.
-In the parent process, it returns the child's <em>process object</em>
+In the parent process, it returns the child's <i>process object</i>
 (see below for more information on process objects).  In the child
 process, it returns <tt>#f</tt>.<p>
 <tt>fork</tt> with an argument only returns in the parent process, returning
@@ -841,7 +806,7 @@ The child process calls <i>thunk</i> and then exits.</p>
 <a name="node_sec_3.4.1"></a>
 <h3><a href="#node_toc_node_sec_3.4.1">3.4.1&nbsp;&nbsp;Process objects</a></h3>
 <p>
-This SRFI uses <em>process objects</em> to represent P<small>OSIX</small> processes.
+This SRFI uses <i>process objects</i> to represent P<small>OSIX</small> processes.
 They are created by the <tt>fork</tt> procedure, and
 are opaque objects wrapping the pid of the process, the exact id
 assigned by the kernel to the process.
@@ -1022,7 +987,7 @@ saved set-user/group-ID.
 <a name="node_sec_3.6"></a>
 <h2><a href="#node_toc_node_sec_3.6">3.6&nbsp;&nbsp;User and group database access</a></h2>
 <p>These procedures are used to access the user and group databases
-(<em>e.g.</em>, the ones traditionally stored in <tt>/etc/passwd</tt> and <tt>/etc/group</tt>).</p>
+(<i>e.g.</i>, the ones traditionally stored in <tt>/etc/passwd</tt> and <tt>/etc/group</tt>).</p>
 <p>
 </p>
 <p></p>
@@ -1108,6 +1073,25 @@ fully-qualified domain name.
 </p>
 </blockquote><p>
 </p>
+<p></p>
+<p></p>
+<div align="left"><tt>(current-timezone<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+
+<blockquote>
+Returns the current timezone as a string, or <tt>#f</tt> if is not known.
+</blockquote>
+
+</blockquote><p>
+</p>
+<p></p>
+<div align="left"><tt>(current-locale<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+
+<blockquote>
+Returns the current locale as a string, or <tt>#f</tt> if is not known.
+</blockquote>
+
+</blockquote><p>
+</p>
 <a name="node_sec_3.9"></a>
 <h2><a href="#node_toc_node_sec_3.9">3.9&nbsp;&nbsp;Signal system</a></h2>
 <p>Signal numbers are bound to the variables <tt>signal/hup</tt>, <tt>signal/int</tt>, etc.
@@ -1181,30 +1165,6 @@ full nanosecond resolution, nor is anything guaranteed about accuracy.
 </blockquote>
 </blockquote><p>
 </p>
-<p></p>
-<div align=left><tt>(time-localized-month <i>locale month-number</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align=left><tt>(time-localized-weekday <i>locale weekday-number</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align=left><tt>(time-localized-am-pm <i>locale</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align=left><tt>(time-localized-date-format <i>locale</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<p></p>
-<blockquote>
-These procedures return the month names, weekday names, AM and PM strings,
-and a string representing how an all-numeric date is written in the specified
-<i>locale</i> (an implementation-dependent string name).
-If <i>locale</i> is <tt>#f</tt>, the process global locale is used.
-Note that month 1 is January and weekday 1 is Sunday.
-<ul><li>For <tt>time-localized-month</tt> and <tt>time-localized-weekday</tt>,
-the first string returned is the full name and the second string, if any, is the abbreviated name.</li>
-<li>For <tt>time-localized-am-pm</tt>, the first string returned is the localized representation
-of <tt>"a.m."</tt> and the second string is the localized representation of <tt>"p.m."</tt>;
-if these do not exist in the locale, the empty list is returned.</li>
-<li>For <tt>time-localized-date-format</tt>, the string returned represents how the year number,
-month number, and day number are ordered, where:
-<ul><li><tt>%d</tt> represents the day number as a two-digit number,</li>
-<li><tt>%m</tt> represents the month number as a two-digit number,</li>
-<li><tt>%y</tt> and <tt>%Y</tt> represent the year number as a two-digit or four-digit number respectively,</li>
-<li>all other characters represent themselves.</li></ul></li></ul>
-</blockquote> 
 <h2><a href="#node_toc_node_sec_3.11">3.11&nbsp;&nbsp;Environment variables</a></h2>
 <p>Most support for environment variables is provided in R7RS-small.
 </p>
@@ -1390,11 +1350,6 @@ port to a file descriptor, which is not the case.
 procedure suffices.
 </p></li>
 <li><p>
-The <tt>file-info-u+r</tt> and related procedures do not exist in Scsh,
-but they are trivial bit-twiddling operations on the result of
-<tt>file-info:mode</tt>.
-</p></li>
-<li><p>
 The <tt>open-directory</tt>, <tt>read-directory</tt>, and <tt>close-directory</tt>
 procedures are called <tt>open-directory-stream</tt> etc.  The <tt>read-directory-stream</tt>
 functions returns <tt>#f</tt> at the end of the directory instead of
@@ -1423,11 +1378,11 @@ Scsh specifies, but does not implement, the procedures for getting or setting pr
 <li><p>
 In Scsh <tt>set-signal-handler</tt>
 and <tt>signal-handler</tt> are called
-<code>set-interrupt-handler</code>
+<tt>set-interrupt-handler</tt>
 and <tt>interrupt-handler</tt> respectively.
 They accept a Scheme 48 interrupt
 value rather than a signal value.  Fortunately, the Scsh procedure
-<code>signal->interrupt</code> can be used to convert its argument
+<tt>signal->interrupt</tt> can be used to convert its argument
 from a signal value to an interrupt value.
 </p></li>
 <li><p>
@@ -1445,11 +1400,13 @@ from a signal value to an interrupt value.
   a second contains.  These are easily converted to seconds and nanoseconds.
 </p></li>
 <li><p>
-  Scsh does not provide the <tt>time-localized</tt> functions either.  The simplest way to
-  provide them is to use <tt>newlocale()</tt> to create a locale object based on the locale name.
-  Then invoke <tt>nl_langinfo_l()</tt>, passing it the appropriate integer from
-  <tt>langinfo.h</tt> and the locale; the locale must then be freed with <tt>freelocale</tt>.
-  Alternatively, invoking <tt>nl_langinfo()</tt> will use the process global locale.
+  Scsh does not provide the <tt>current-timezone</tt> and <tt>current-locale</tt> functions.
+  The first gets the value of the <tt>TZ</tt> environment variable, or failing that
+  the contents of a OS-specific file such as <tt>/etc/timezone</tt> 
+  or <tt>/etc/localtime</tt> or some other implementation-specific source.
+  The second gets the value of the <tt>LANG</tt> environment variable,
+  or failing that an OS-specific file such as <tt>/etc/locale.conf</tt>
+  or <tt>/etc/sysconfig/i18n</tt> or some other implementation-specific source.
 </p></li>
 </ul>
 
@@ -1488,7 +1445,7 @@ Copyright &copy; 2019 by John Cowan.
 
 <p>This SRFI is derived from the documentation for
   <a href="https://scsh.net/">Scsh</a>, whose copyright notice, from
-  the <code>COPYING</code> file, is reprinted here:</p>
+  the <tt>COPYING</tt> file, is reprinted here:</p>
 
 <blockquote>
   <p>Copyright (c) 1993-2003 Richard Kelsey and Jonathan Rees</p>
