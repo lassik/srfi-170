@@ -19,7 +19,18 @@ Olin Shivers (original author), John Cowan (editor and shepherd)
 
 <h1>Status</h1>
 
-<p>This SRFI is currently in <i>draft</i> status.  Here is <a href="https://srfi.schemers.org/srfi-process.html">an explanation</a> of each status that a SRFI can hold.  To provide input on this SRFI, please send email to <tt><a href="mailto:srfi+minus+170+at+srfi+dotschemers+dot+org">srfi-170@<span class="antispam">nospam</span>srfi.schemers.org</a></tt>.  To subscribe to the list, follow <a href="https://srfi.schemers.org/srfi-list-subscribe.html">these instructions</a>.  You can access previous messages via the mailing list <a href="https://srfi-email.schemers.org/srfi-170">archive</a>.</p>
+<p>This SRFI is currently in <em>draft</em> status.  Here is <a
+    href="https://srfi.schemers.org/srfi-process.html">an
+    explanation</a> of each status that a SRFI can hold.  To provide
+    input on this SRFI, please send email to <code><a
+    href="mailto:srfi+minus+170+at+srfi+dotschemers+dot+org">srfi-167@<span
+    class="antispam">nospam</span>srfi.schemers.org</a></code>.  To
+    subscribe to the list, follow <a
+    href="https://srfi.schemers.org/srfi-list-subscribe.html">these
+    instructions</a>.  You can access previous messages via the
+    mailing list <a
+    href="https://srfi-email.schemers.org/srfi-170">archive</a>.</p>
+
 <ul>
   <li>Received: 2019/5/4</li>
   <li>60-day deadline: 2019/7/5</li>
@@ -44,17 +55,17 @@ functions of this SRFI are available on all operating systems.
 <h1>Issues</h1>
 
 <ol>
-  <li>Candidates for additional procedures from the Python <tt>os</tt> module:
-    <tt>pathconf</tt>, <tt>sysconf</tt>, <tt>statvfs</tt>,
-    <tt>posix_fallocate</tt>, <tt>posix_fadvise</tt>,
-    <tt>readv</tt>, <tt>writev</tt>, <tt>sendfile</tt>,
-    <tt>sched_{get,set}scheduler</tt> and friends.
+  <li>Candidates for additional procedures from the Python <code>os</code> module:
+    <code>pathconf</code>, <code>sysconf</code>, <code>statvfs</code>,
+    <code>posix_fallocate</code>, <code>posix_fadvise</code>,
+    <code>readv</code>, <code>writev</code>, <code>sendfile</code>,
+    <code>sched_{get,set}scheduler</code> and friends.
     None are provided by Scsh.</li>
   <li>(Resolved)</li>
-  <li>Should <tt>start-file</tt> be added to open arbitrary files using
+  <li>Should <code>start-file</code> be added to open arbitrary files using
     an appropriate application?  This is native on Windows, but can be
-    done on Linux and MacOS by spawning the <tt>xdg-open</tt>
-    and <tt>open</tt> programs respectively.  The procedure returns
+    done on Linux and MacOS by spawning the <code>xdg-open</code>
+    and <code>open</code> programs respectively.  The procedure returns
     as soon as the application is launched with an unspecified value, so
     there is no access to the pid of the new process.</li>
 </ol>
@@ -137,7 +148,7 @@ Implementations of this SRFI on non-P<small>OSIX</small> systems, especially Win
 must provide all the procedure names and syntax keywords.
 However, if the specified action is not possible, the procedure should
 either take no action and return some reasonable default value,
-or raise an <tt>errno-error</tt> exception.
+or raise an <code>errno-error</code> exception.
 </p>
 <p>A Scheme implementation that supports both this SRFI and multiple
 threads of control must ensure that when a thread invokes a blocking I/O
@@ -150,44 +161,44 @@ concurrently running ones.
 <a name="node_sec_3.1"></a>
 <h2><a href="#node_toc_node_sec_3.1">3.1&nbsp;&nbsp;Errors</a></h2>
 <p>This SRFI's procedures never return error codes, and do not use a global
-<tt>errno</tt> variable to report errors.
+<code>errno</code> variable to report errors.
 Errors are consistently reported by raising exceptions.
 This frees up the procedures to return useful values,
 and allows the programmer to assume that
 <i>if a procedure returns, it succeeded.</i>
 This greatly simplifies the flow of the code from the programmer's point
 of view.
-For reference purposes, the P<small>OSIX</small> <tt>errno</tt> numbers
-are bound to the variables <tt>errno/perm</tt>, <tt>errno/noent</tt>, etc.
+For reference purposes, the P<small>OSIX</small> <code>errno</code> numbers
+are bound to the variables <code>errno/perm</code>, <code>errno/noent</code>, etc.
 See <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/errno.h.html">
-the P<small>OSIX</small> specification of <tt>errno.h</tt></a> for the complete list.
+the P<small>OSIX</small> specification of <code>errno.h</code></a> for the complete list.
 <p>
 </p>
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><tt>(errno-error <i>errno procedure . data</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(errno-error <i>errno procedure . data</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 Raises a non-continuable exception for P<small>OSIX</small> error number <i>errno</i>.
 The <i>procedure</i> and <i>data</i> arguments are packaged up in the exception
 packet passed to the exception handler.
-It is an error to pass an <tt>errno</tt> that is not provided by the OS.</p>
+It is an error to pass an <code>errno</code> that is not provided by the OS.</p>
 </blockquote><p>
 </p>
-<div align="left"><tt>(syscall-error? <i>obj</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(syscall-error? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-  Returns <tt>#t</tt> if <i>obj</i> is an object created by a call to <tt>errno-error</tt>
-  and possibly on an implementation-defined set of other objects, and <tt>#f</tt> otherwise.
+  Returns <code>#t</code> if <i>obj</i> is an object created by a call to <code>errno-error</code>
+  and possibly on an implementation-defined set of other objects, and <code>#f</code> otherwise.
 </blockquote><p>
 </p>
-<div align="left"><tt>(syscall-error:errno <i>syscall-error</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(syscall-error:message <i>syscall-error</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(syscall-error:procedure <i>syscall-error</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>procedure</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(syscall-error:data <i>syscall-error</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>list</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(syscall-error:errno <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(syscall-error:message <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(syscall-error:procedure <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>procedure</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(syscall-error:data <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>list</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
   Returns a value equal to the Posix error number,
-  the corresponding error message as determined by the Posix interface <tt>strerror()</tt>,
-  the procedure passed to <tt>errno-error</tt>,
+  the corresponding error message as determined by the Posix interface <code>strerror()</code>,
+  the procedure passed to <code>errno-error</code>,
   and  a list containing the data packaged in in the <i>syscall-error</i> object respectively.
   All of these, with the possible exception of the error message, are
   packaged in the <i>syscall-error</i> object.
@@ -201,8 +212,8 @@ It is an error to pass an <tt>errno</tt> that is not provided by the OS.</p>
 In P<small>OSIX</small>, open files are part of the process environment, and are referenced
 by small exact integers called <i>file descriptors</i>. Open file descriptors are
 the fundamental way I/O redirections are passed to subprocesses and executed
-programs, since file descriptors are preserved across <tt>fork</tt> and
-<tt>exec</tt> operations.</p>
+programs, since file descriptors are preserved across <code>fork</code> and
+<code>exec</code> operations.</p>
 <p>
 Scheme, on the other hand, uses ports for specifying I/O sources. Ports are
 garbage-collected Scheme objects, not integers.
@@ -241,26 +252,26 @@ performed on ports.</p>
   
 <p>The following routines allow conversion between ports and file
 descriptors.</p>
-<div align="left"><tt>(fdes->textual-input-port <i>fd</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(fdes->binary-input-port <i>fd</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(fdes->textual-input-port <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(fdes->binary-input-port <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(fdes->textual-output-port <i>fd</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(fdes->binary-output-port <i>fd</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(fdes->textual-output-port <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(fdes->binary-output-port <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>These procedures wrap a newly created port around the specified file descriptor,
 effectively importing it into the Scheme world.</p>
 </blockquote>
 
-<div align="left"><tt>(port-fdes <i>port</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(port-fdes <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure exposes the file descriptor of a port,
 effectively exporting it from the Scheme world.
-Alternatively, <tt>#f</tt> is returned if <i>port</i> does not have a
+Alternatively, <code>#f</code> is returned if <i>port</i> does not have a
 file descriptor (a string port, e.g.),
 </blockquote><p>
 </p>
-<div align="left"><tt>(dup->fdes <i>port [fd]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(dup->fdes <i>port [fd]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 This procedure replicates the file descriptor that underlies
 <i>port</i> onto another file descriptor.
@@ -269,7 +280,7 @@ world in such a way that the port and the file descriptor can be
 manipulated semi-independently (although they will still share the
 same file pointer and other things).
 If the particular file descriptor to be used is important,
-as before doing a <tt>spawn</tt> or <tt>fork</tt>, then
+as before doing a <code>spawn</code> or <code>fork</code>, then
 it can be specified as the second argument.
 Otherwise, an unused file descriptor will be selected.
 In either case, the newly modified file descriptor is returned.
@@ -278,13 +289,13 @@ In either case, the newly modified file descriptor is returned.
 port, and operations have already been done on that port,
 it is an error to perform further operations on it.</p>
 </blockquote>
-<div align="left"><tt>(close-fdes <i>fd</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(close-fdes <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <p></p>
 <blockquote>
 <p>Closes the file descriptor <i>fd</i>.</p>
 <p>If <i>fd</i> is associated with a port, it is an error
 to do any further operations on that port.
-The same is true of calls to <tt>close-port</tt> on a file descriptor,
+The same is true of calls to <code>close-port</code> on a file descriptor,
 if the implementation permits them.
 </p>
 </blockquote>
@@ -295,27 +306,27 @@ computer's file system.
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(create-directory <i>fname [perms override?]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(create-directory <i>fname [perms override?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(create-fifo <i>fname [perms override?]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(create-fifo <i>fname [perms override?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(create-hard-link <i>oldname newname [override?]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(create-hard-link <i>oldname newname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(create-symlink <i>oldname newname [override?]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(create-symlink <i>oldname newname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote><p>
 These procedures create objects of various kinds in the file system.</p>
 <p>
 The <i>override?</i> argument controls the action if there is already an
 object in the file system with the new name:
 </p>
-<blockquote><table border="0"><tbody><tr><td valign="top"><tt>#f</tt></td><td valign="top">signal an error (default) </td></tr>
-<tr><td valign="top"><tt>#t</tt></td><td valign="top">
-delete the old object (with <tt>delete-file</tt>
-or <tt>delete-directory,</tt> as appropriate) before
+<blockquote><table border="0"><tbody><tr><td valign="top"><code>#f</code></td><td valign="top">signal an error (default) </td></tr>
+<tr><td valign="top"><code>#t</code></td><td valign="top">
+delete the old object (with <code>delete-file</code>
+or <code>delete-directory,</code> as appropriate) before
 creating the new object.<p>
 </p>
 </td></tr></tbody></table></blockquote><p>
-<i>Perms</i> defaults to <tt>#o777</tt> (but is masked by the current umask).</p>
+<i>Perms</i> defaults to <code>#o777</code> (but is masked by the current umask).</p>
 <p>
 </p>
 If you try to create a hard or symbolic link
@@ -325,16 +336,16 @@ and <i>oldname</i> and <i>newname</i> refer to the same file, it is an error
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(delete-directory <i>fname</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(delete-directory <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>This procedure deletes directories from the file system.
 </p>
 </blockquote><p>
 </p>
 <p></p>
-<div align="left"><tt>(set-file-mode <i>fname/port mode</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(set-file-owner <i>fname/port uid</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-mode <i>fname/port mode</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-owner <i>fname/port uid</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(set-file-group <i>fname/port gid</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-group <i>fname/port gid</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 These procedures set the permission bits, owner id, and group id of a
@@ -346,7 +357,7 @@ Setting file user ownership usually requires root privileges.
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(set-file-timespecs <i>fname [access-timespec mod-timespec]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-timespecs <i>fname [access-timespec mod-timespec]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure sets the access and modified times for the file
@@ -355,18 +366,18 @@ for this SRFI's representation of time).
 If neither time argument is supplied, they are both taken to be
 the current time. You must provides both times or neither.
 If the procedure completes successfully, the file's time of last
-status-change (<tt>ctime</tt>) is set to the current time.
+status-change (<code>ctime</code>) is set to the current time.
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(sync-file <i>port</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(sync-file-system<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(sync-file <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(sync-file-system<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-Calling <tt>sync-file</tt>
+Calling <code>sync-file</code>
 causes P<small>OSIX</small> to update the disk data structures for a given file.
 Any buffered data that <i>port</i> may have is first flushed.
-Calling <tt>sync-file-system</tt> synchronises the kernel's entire file
+Calling <code>sync-file-system</code> synchronises the kernel's entire file
 system with the disk.<p>
 </p>
 </blockquote><p>
@@ -374,16 +385,16 @@ system with the disk.<p>
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><tt>(truncate-file <i>fname/port len</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(truncate-file <i>fname/port len</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>The specified file is truncated to <i>len</i> bytes in length.
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><tt>(file-info <i>fname/port [chase?]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info <i>fname/port [chase?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-The <tt>file-info</tt> procedure
+The <code>file-info</code> procedure
 returns a file-info record containing everything
 there is to know about a file. If the <i>chase?</i> flag is true
 (the default), then the procedure chases symlinks and reports on
@@ -392,20 +403,20 @@ the procedure checks the actual file itself, even if it's a symlink.
 The <i>chase?</i> flag is ignored if the file argument is a file descriptor
 or port.<p>
 </blockquote>
-<div align="left"><tt>(file-info? <i>obj</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns <tt>#t</tt> if <i>obj</i> is a file-info object and <tt>#f</tt> otherwise.
+<div align="left"><code>(file-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>Returns <code>#t</code> if <i>obj</i> is a file-info object and <code>#f</code> otherwise.
 </blockquote>
 
-<div align="left"><tt>(file-info:device <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:inode <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:mode <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:nlinks <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:uid <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:gid <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:size <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:atime <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:mtime <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(file-info:ctime <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info:device <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info:inode <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info:mode <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info:nlinks <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info:uid <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info:gid <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info:size <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info:atime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info:mtime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info:ctime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the device number, inode number, mode,
 number of hard links, user id, group id, size in bytes,
 last access time, last modification time, and
@@ -418,99 +429,99 @@ for this SRFI's representation of time).
 <table border="0"><tbody><tr><td valign="top"></td></tr></tbody></table>
 </blockquote>
 <p></p>
-<div align="left"><tt>(file-info-directory? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info-directory? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(file-info-fifo? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info-fifo? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(file-info-regular? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info-regular? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(file-info-socket? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info-socket? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(file-info-special? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info-special? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(file-info-symlink? <i>file-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info-symlink? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 These procedures are file-type predicates that test the
 file type stored in <i>file-info</i>.
 </blockquote>
 <p>
 This SRFI does not provide a special means for checking the
-permission bits in a <tt>file-info</tt> record,
-though they are available in <tt>file-info:mode</tt>.
+permission bits in a <code>file-info</code> record,
+though they are available in <code>file-info:mode</code>.
 There are several problems with such procedures.
 First, there's an
 atomicity issue. In between checking permissions for a file and then trying
 an operation on the file, another process could change the permissions,
 so a return value from these functions guarantees nothing. Second,
-Posix special-cases permission checking with the uid is 0 (<tt>root</tt>)
+Posix special-cases permission checking with the uid is 0 (<code>root</code>)
 &mdash; if the file exists, root is assumed to have the requested permission.
 However, not even root can write a file that is on a read-only file system,
 such as a CD-ROM.</p>
 </blockquote>
 <p></p>
 <p></p>
-<div align="left"><tt>(directory-files <i>[dir dotfiles?]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(directory-files <i>[dir dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 Return the list of files in directory <i>dir</i>,
 which defaults to the current working directory.
-The <i>dotfiles?</i> flag (default <tt>#f</tt>) causes dot files to be
+The <i>dotfiles?</i> flag (default <code>#f</code>) causes dot files to be
 included in the list.
-Regardless of the value of <i>dotfiles?</i>, the two files <tt>.</tt> and
-<tt>..</tt> are <i>never</i> returned.<p>
+Regardless of the value of <i>dotfiles?</i>, the two files <code>.</code> and
+<code>..</code> are <i>never</i> returned.<p>
 The directory <i>dir</i> is not prepended to each file name in the
 result list. That is,
 </p>
-<blockquote><tt>(directory-files "/etc")</tt></blockquote>returns
-<blockquote><tt>("chown" "exports" "fstab" <tt>...</tt>)</tt></blockquote><i>not</i>
-<blockquote><tt>("/etc/chown" "/etc/exports" "/etc/fstab" <tt>...</tt>)</tt></blockquote>To use the files in returned list, the programmer can either manually
+<blockquote><code>(directory-files "/etc")</code></blockquote>returns
+<blockquote><code>("chown" "exports" "fstab" <code>...</code>)</code></blockquote><i>not</i>
+<blockquote><code>("/etc/chown" "/etc/exports" "/etc/fstab" <code>...</code>)</code></blockquote>To use the files in returned list, the programmer can either manually
 prepend the directory,
 change to the directory before using the file names,
-or use the <tt>glob</tt> procedure, defined below.
+or use the <code>glob</code> procedure, defined below.
 </p>
 </blockquote><p>
 </p>
-<div align="left"><tt>(open-directory <i>dir</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>directory-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(read-directory <i>directory-object</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string or <tt>#f</tt></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(close-directory <i>directory-object</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(open-directory <i>dir</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>directory-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(read-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(close-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <p>
 These functions implement a direct interface to the
-<tt>opendir()</tt>/
-<tt>readdir()</tt>/
-<tt>closedir()</tt>
+<code>opendir()</code>/
+<code>readdir()</code>/
+<code>closedir()</code>
 family of functions for processing directories.
-The <tt>open-directory</tt> procedure opens the
+The <code>open-directory</code> procedure opens the
 directory with the specified pathname for reading, returning an opaque directory object.
-Then <tt>read-directory</tt>
+Then <code>read-directory</code>
 returns the name of the next available file
 (including all files whose names begin with dot, and
 without <i>dir</i> present) in a <i>directory-object</i>,
 or an end of file object if there are no more files.
-Finally, <tt>close-directory</tt> closes a directory object.</p>
+Finally, <code>close-directory</code> closes a directory object.</p>
 <p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(glob <i><i>pat</i><sub>1</sub> <tt>...</tt></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(glob <i><i>pat</i><sub>1</sub> <code>...</code></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 Glob each pattern against the filesystem and return the sorted list.
 Duplicates are not removed. Patterns matching nothing are <i>not</i> included
 literally, as they are in the shell.
-Shell <tt class="verbatim">{a,b,c}</tt> patterns are expanded. Backslash quotes
+Shell <tt class="verbatim">{a,b,c}</code> patterns are expanded. Backslash quotes
 characters, turning off the special meaning of
-<tt class="verbatim">{</tt>, <tt class="verbatim">}</tt>, <tt>*</tt>, <tt class="verbatim">[</tt>, <tt class="verbatim">]</tt>, and <tt class="verbatim">?</tt>. <p>
+<tt class="verbatim">{</code>, <tt class="verbatim">}</code>, <code>*</code>, <tt class="verbatim">[</code>, <tt class="verbatim">]</code>, and <tt class="verbatim">?</code>. <p>
 Note that the rules of backslash for Scheme strings and glob patterns
 work together to require four backslashes in a row to specify a
 single literal backslash. Fortunately, it is very rare that a backslash
 occurs in a P<small>OSIX</small> file name.</p>
 <p>
 A glob subpattern will not match against dot files unless the first
-character of the subpattern is a literal "<tt>.</tt>".
-Further, a dot subpattern will not match the files <tt>.</tt> or <tt>..</tt>
-unless it is a constant pattern, as in <tt>(glob "../*/*.c")</tt>.
+character of the subpattern is a literal "<code>.</code>".
+Further, a dot subpattern will not match the files <code>.</code> or <code>..</code>
+unless it is a constant pattern, as in <code>(glob "../*/*.c")</code>.
 So a directory's dot files can be reliably generated
-with the simple glob pattern <tt>".*"</tt>.</p>
+with the simple glob pattern <code>".*"</code>.</p>
 <p>
 Some examples:
 </p>
@@ -548,55 +559,55 @@ working directory.<p>
 If the last character of the pattern (after expanding braces) is a slash,
 then the result matches must be directories, <i>e.g.</i>,
 </p>
-<blockquote><tt><br>
+<blockquote><code><br>
 (glob&nbsp;"/usr/man/man?/")&nbsp;==>&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("/usr/man/man1/"&nbsp;"/usr/man/man2/"&nbsp;<tt>...</tt>)</tt></blockquote><p>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("/usr/man/man1/"&nbsp;"/usr/man/man2/"&nbsp;<code>...</code>)</code></blockquote><p>
 Globbing can sometimes be useful when we need a list of a directory's files
 where each element in the list includes the pathname for the file.
 Compare:
 </p>
-<blockquote><tt><br>
+<blockquote><code><br>
 (directory-files&nbsp;"../include")&nbsp;==>&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;("cig.h"&nbsp;"decls.h"&nbsp;<tt>...</tt>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;("cig.h"&nbsp;"decls.h"&nbsp;<code>...</code>)<br>
 <br>
 (glob&nbsp;"../include/*")&nbsp;==>&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;("../include/cig.h"&nbsp;"../include/decls.h"&nbsp;<tt>...</tt>)</tt></blockquote>
+&nbsp;&nbsp;&nbsp;&nbsp;("../include/cig.h"&nbsp;"../include/decls.h"&nbsp;<code>...</code>)</code></blockquote>
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(glob-quote <i>str</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(glob-quote <i>str</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 Returns a constant glob pattern that exactly matches <i>str</i>.
 All wild-card characters in <i>str</i> are quoted with a backslash.
-<blockquote><tt><br>
+<blockquote><code><br>
 (glob-quote&nbsp;"Any&nbsp;*.c&nbsp;files?")<br>
-&nbsp;&nbsp;&nbsp;&nbsp;==>&nbsp;"Any&nbsp;\*.c&nbsp;files\?"</tt></blockquote>
+&nbsp;&nbsp;&nbsp;&nbsp;==>&nbsp;"Any&nbsp;\*.c&nbsp;files\?"</code></blockquote>
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>temp-file-prefix</tt> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>string parameter</i>&nbsp;</div>
+<div align="left"><code>temp-file-prefix</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>string parameter</i>&nbsp;</div>
 <p></p>
 <blockquote>
 A SRFI 39 or R7RS parameter that returns a string when invoked.  Its initial value is
-the value of the environment variable <tt>TMPDIR</tt> concatenated with <tt>"/<i>pid</i>"</tt>
-if <tt>TMPDIR</tt> is set and to
-<tt>"/var/tmp/<i>pid</i>"</tt> otherwise, where <i>pid</i> is the id of the current process.
+the value of the environment variable <code>TMPDIR</code> concatenated with <code>"/<i>pid</i>"</code>
+if <code>TMPDIR</code> is set and to
+<code>"/var/tmp/<i>pid</i>"</code> otherwise, where <i>pid</i> is the id of the current process.
 </blockquote>
-<div align="left"><tt>(create-temp-file <i>[prefix]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote><tt>Create-temp-file</tt> creates a new temporary file and returns its name.
+<div align="left"><code>(create-temp-file <i>[prefix]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote><code>Create-temp-file</code> creates a new temporary file and returns its name.
 The optional argument specifies the filename prefix to use, and defaults
-to the result of invoking <tt>temp-file-prefix</tt>.
+to the result of invoking <code>temp-file-prefix</code>.
 The procedure generates a sequence of filenames that have <i>prefix</i> as
 a common prefix, looking for a filename that doesn't already exist in the
-file system. When it finds one, it creates it with permission <tt>#o600</tt>
+file system. When it finds one, it creates it with permission <code>#o600</code>
 and returns the filename. (The file permission can be changed to a more
-permissive permission with <tt>set-file-mode</tt> after being created).<p>
+permissive permission with <code>set-file-mode</code> after being created).<p>
 This file is guaranteed to be brand new. No other process will have it
 open. This procedure does not simply return a filename that is very
 likely to be unused. It returns a filename that definitely did not exist
-at the moment <tt>create-temp-file</tt> created it.</p>
+at the moment <code>create-temp-file</code> created it.</p>
 <p>
 It is not necessary for the process's pid to be a part of the filename
 for the uniqueness guarantees to hold. The pid component of the default
@@ -604,27 +615,27 @@ prefix simply serves to scatter the name searches into sparse regions, so
 that collisions are less likely to occur. This speeds things up, but does
 not affect correctness.</p>
 <p>
-Security note: doing I/O to files created this way in <tt>/var/tmp/</tt> is
-not necessarily secure. General users have write access to <tt>/var/tmp/</tt>,
+Security note: doing I/O to files created this way in <code>/var/tmp/</code> is
+not necessarily secure. General users have write access to <code>/var/tmp/</code>,
 so even if an attacker cannot access the new temp file, he can delete it
 and replace it with one of his own. A subsequent open of this filename
 will then give you his file, to which he has access rights. There are
 several ways to defeat this attack:
 </p>
 <ol>
-<li><p>Use <tt>temp-file-iterate</tt>, below, to return the file descriptor
+<li><p>Use <code>temp-file-iterate</code>, below, to return the file descriptor
 allocated when the file is opened. This will work if the file
 only needs to be opened once.
 </p>
 </li><li><p>If the file needs to be opened twice or more, create it in a
-protected directory, <i>e.g.</i>, <tt class="verbatim">$HOME</tt>.</p>
-</li><li><p>Ensure that <tt>/var/tmp</tt> has its sticky bit set. This
+protected directory, <i>e.g.</i>, <tt class="verbatim">$HOME</code>.</p>
+</li><li><p>Ensure that <code>/var/tmp</code> has its sticky bit set. This
 requires system administrator privileges.
 </p>
 </li></ol>
 </blockquote><p>
 </p>
-<div align="left"><tt>(temp-file-iterate <i>maker [prefix]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i><sup>+</sup></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(temp-file-iterate <i>maker [prefix]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i><sup>+</sup></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure can be used to perform certain atomic transactions on
@@ -640,50 +651,50 @@ the file system involving filenames. Some examples:
 <p>
 This procedure uses <i>prefix</i> to generate a series of trial
 file names.  <i>Prefix</i> is a string, and
-defaults to the value of invoking <tt>temp-file-prefix</tt>.
+defaults to the value of invoking <code>temp-file-prefix</code>.
 File names are generated by
 concatenating <i>prefix</i>
 with a varying string.<p>
 <i>Maker</i> is a procedure which is serially called on each file name
 generated.  It must return at least one value; it may return multiple
-values. If the first return value is <tt>#f</tt> or if <i>maker</i> raises the
-<tt>errno/exist</tt> errno exception, <tt>temp-file-iterate</tt> will loop,
+values. If the first return value is <code>#f</code> or if <i>maker</i> raises the
+<code>errno/exist</code> errno exception, <code>temp-file-iterate</code> will loop,
 generating a new file name and calling <i>maker</i> again. If the first
 return value is true, the loop is terminated, returning whatever value(s)
 <i>maker</i> returned.</p>
 <p>
-After a number of unsuccessful trials, <tt>temp-file-iterate</tt> may give up
+After a number of unsuccessful trials, <code>temp-file-iterate</code> may give up
 and signal an error.</p>
 <p>
 Thus, if we ignore its optional <i>prefix</i> argument,
-<tt>create-temp-file</tt> could be defined as:
+<code>create-temp-file</code> could be defined as:
 </p>
-<blockquote><tt><br>
+<blockquote><code><br>
 (define&nbsp;(create-temp-file)<br>
 &nbsp;&nbsp;(let&nbsp;((flags&nbsp;(bitwise-ior&nbsp;open/create&nbsp;open/exclusive)))<br>
 &nbsp;&nbsp;&nbsp;&nbsp;(temp-file-iterate&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(f)&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(close&nbsp;(open-output-file&nbsp;f&nbsp;flags&nbsp;#o600))<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f))))</tt></blockquote><p>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f))))</code></blockquote><p>
 To rename a file to a temporary name:
 </p>
-<blockquote><tt><br>
+<blockquote><code><br>
 (temp-file-iterate&nbsp;(lambda&nbsp;(backup)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(create-hard-link&nbsp;old-file&nbsp;backup)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;backup)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".#temp.")&nbsp;;&nbsp;Keep&nbsp;link&nbsp;in&nbsp;cwd.<br>
-(delete-file&nbsp;old-file)</tt></blockquote>
+(delete-file&nbsp;old-file)</code></blockquote>
 Recall that this SRFI reports procedure failure by raising an error
 exception, not by returning an error code. This is critical to
 to this example &mdash; the programmer can assume that if the
-<tt>temp-file-iterate</tt> call returns, it returns successfully.
-So the following <tt>delete-file</tt> call can be reliably invoked,
+<code>temp-file-iterate</code> call returns, it returns successfully.
+So the following <code>delete-file</code> call can be reliably invoked,
 safe in the knowledge that the backup link has definitely been established.<p>
 To create a unique temporary directory:
 </p>
-<blockquote><tt><br>
+<blockquote><code><br>
 (temp-file-iterate&nbsp;(lambda&nbsp;(dir)&nbsp;(create-directory&nbsp;dir)&nbsp;dir)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/var/tmp/tempdir.")</tt></blockquote>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/var/tmp/tempdir.")</code></blockquote>
 Similar operations can be used to generate unique symlinks and fifos,
 or to return values other than the new filename (<i>e.g.</i>, an open file
 descriptor or port).<p>
@@ -695,60 +706,60 @@ access (<i>e.g.</i>, his home directory).
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(real-path <i>path</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(real-path <i>path</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 Returns an absolute pathname
 derived from <i>pathname</i> that names the same file
-and whose resolution does not involve <tt>.</tt>, <tt>..</tt>, or symbolic links.
+and whose resolution does not involve <code>.</code>, <code>..</code>, or symbolic links.
 </blockquote>
 <a name="node_sec_3.4"></a>
 <h2><a href="#node_toc_node_sec_3.4">3.4&nbsp;&nbsp;Processes</a></h2>
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><tt>(spawn <i>mode prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn-path <i>mode prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn/env <i>mode prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn-path/env <i>mode prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn0 <i>mode prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn0-path <i>mode prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn0/env <i>mode prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(spawn0-path/env <i>mode prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn <i>mode prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn-path <i>mode prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn/env <i>mode prog env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn-path/env <i>mode prog env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn0 <i>mode prog arg0 <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn0-path <i>mode prog arg0 <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn0/env <i>mode prog arg0 env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn0-path/env <i>mode prog arg0 env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>
 These procedures cause a new process to be created running
 <i>prog</i>, passing it the specified arguments and environment.
 They are part of a P<small>OSIX</small> extension (they are easily
 defined if not provided), and also exist in Windows.
-They may work even when a combination of <tt>fork</tt> and <tt>exec</tt>
+They may work even when a combination of <code>fork</code> and <code>exec</code>
 will not (as on Windows), and are therefore preferred in portable code
 wherever possible.
 </p>
 <p>The <i>mode</i> argument is one of the values
-<tt>spawn/wait</tt>, <tt>spawn/nowait</tt>, or <tt>spawn/detach</tt>.
-  <tt>Spawn/wait</tt> causes the procedure to wait until the new process
-  terminates, and then returns its exit code (see <tt>wait</tt> for details).
+<code>spawn/wait</code>, <code>spawn/nowait</code>, or <code>spawn/detach</code>.
+  <code>Spawn/wait</code> causes the procedure to wait until the new process
+  terminates, and then returns its exit code (see <code>wait</code> for details).
   The other two values cause the procedure to return immediately
-  with an unspecified exact integer.  <tt>Spawn/detach</tt> will cause the new
+  with an unspecified exact integer.  <code>Spawn/detach</code> will cause the new
   process to run detached from any control terminal; on Windows it will have no
   access to the terminal at all.
 </p>
 <p>
-The <tt><tt>...</tt>/env</tt> variants take an environment specified as a
+The <code><code>...</code>/env</code> variants take an environment specified as a
 string&rarr;string alist.
-An environment of <tt>#t</tt> is taken to mean the current process's environment
-(i.e., the value of the external char <tt>**environ</tt>).</p>
+An environment of <code>#t</code> is taken to mean the current process's environment
+(i.e., the value of the external char <code>**environ</code>).</p>
 <p>
 The path-searching variants search the directories in the
-value of the environment variable <tt>PATH</tt>.
+value of the environment variable <code>PATH</code>.
 A path-search is not performed if the program name contains
 a slash character &mdash; it is used directly. So a program with a name like
-<tt>"bin/prog"</tt> always executes the program <tt>bin/prog</tt> in the current working
-directory. See <tt>exec-path-list</tt> below.</p>
+<code>"bin/prog"</code> always executes the program <code>bin/prog</code> in the current working
+directory. See <code>exec-path-list</code> below.</p>
 <p>
-The variants without <tt>0</tt> in their names pass the <i>prog</i> as the zeroth argument of
-the argument vector, which is normally the right thing.  The variants with <tt>0</tt> require it
+The variants without <code>0</code> in their names pass the <i>prog</i> as the zeroth argument of
+the argument vector, which is normally the right thing.  The variants with <code>0</code> require it
 as a separate argument.
 </p>
 <p>
@@ -757,17 +768,17 @@ All of these procedures may flush buffered output.
 </p><p>
 <p></p>
 <p></p>
-<div align="left"><tt>(exec <i>prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec-path <i>prog <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec/env <i>prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec-path/env <i>prog env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec0 <i>prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec0-path <i>prog arg0 <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec0/env <i>prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(exec0-path/env <i>prog arg0 env <i>arg</i><sub>1</sub> <tt>...</tt><i>arg</i><sub><i>n</i></sub></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(exec <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(exec-path <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(exec/env <i>prog env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(exec-path/env <i>prog env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(exec0 <i>prog arg0 <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(exec0-path <i>prog arg0 <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(exec0/env <i>prog arg0 env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(exec0-path/env <i>prog arg0 env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>
-These procedures do the same things as the corresponding <tt>spawn</tt> procedures,
+These procedures do the same things as the corresponding <code>spawn</code> procedures,
 except that no new process is created.  Instead, they cause the current program
 to be replaced in the current process.
 Consequently, these procedures never return under any circumstances.
@@ -777,26 +788,26 @@ an exception.
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(suspend<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(suspend<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Suspend the current process with a SIGSTOP signal.
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(fork <i>[thunk or <tt>#f</tt>]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>proc or <tt>#f</tt></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(fork <i>[thunk or <code>#f</code>]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>proc or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 
 <blockquote>
-<tt>fork</tt> with no arguments or <tt>#f</tt> instead of a thunk is like
-<tt>fork()</tt>.
+<code>fork</code> with no arguments or <code>#f</code> instead of a thunk is like
+<code>fork()</code>.
 In the parent process, it returns the child's <i>process object</i>
 (see below for more information on process objects).  In the child
-process, it returns <tt>#f</tt>.<p>
-<tt>fork</tt> with an argument only returns in the parent process, returning
+process, it returns <code>#f</code>.<p>
+<code>fork</code> with an argument only returns in the parent process, returning
 the child's process object.
 The child process calls <i>thunk</i> and then exits.</p>
 <p>
-<tt>fork</tt> may or may not flush buffered output before forking.
+<code>fork</code> may or may not flush buffered output before forking.
 </p>
 </blockquote><p>
 </p>
@@ -807,15 +818,15 @@ The child process calls <i>thunk</i> and then exits.</p>
 <h3><a href="#node_toc_node_sec_3.4.1">3.4.1&nbsp;&nbsp;Process objects</a></h3>
 <p>
 This SRFI uses <i>process objects</i> to represent P<small>OSIX</small> processes.
-They are created by the <tt>fork</tt> procedure, and
+They are created by the <code>fork</code> procedure, and
 are opaque objects wrapping the pid of the process, the exact id
 assigned by the kernel to the process.
 No constructor is exposed, but any procedure that accepts a process object
 also accepts a pid.
-<div align="left"><tt>(proc? <i>obj</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns <tt>#t</tt> if <i>obj</i> is a process object and <tt>#f</tt> otherwise.
+<div align="left"><code>(proc? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>Returns <code>#t</code> if <i>obj</i> is a process object and <code>#f</code> otherwise.
 </blockquote>
-<div align="left"><tt>(proc:pid <i>proc</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(proc:pid <i>proc</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the pid of <i>proc</i>.
 </blockquote>
 <a name="node_sec_3.4.2"></a>
@@ -823,21 +834,21 @@ also accepts a pid.
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><tt>(wait <i>proc/pid [flags]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>status</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(wait <i>proc/pid [flags]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>status</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure waits until a child process exits, and returns its
 exit code. The <i>proc/pid</i> argument is either a process object
 (section <a href="#node_sec_3.4.1">3.4.1</a>) or an exact integer process id.
-<tt>Wait</tt> returns the child's exit status code (or suspension code,
-if the <tt>wait/stopped-children</tt> option is used; see below).
+<code>Wait</code> returns the child's exit status code (or suspension code,
+if the <code>wait/stopped-children</code> option is used; see below).
 Status values can be queried with the procedures in section
 <a href="#node_sec_3.4.3">3.4.3</a>.<p>
 The <i>flags</i> argument is an exact integer whose bits specify
 additional options. It is composed by adding together either or both of the
-flags <tt>wait/poll</tt> and <tt>wait/stopped-children</tt>.
-The first causes <tt>wait</tt> to return <tt>#f</tt> immediately if
-a child is still active; the second causes <tt>wait</tt> to
+flags <code>wait/poll</code> and <code>wait/stopped-children</code>.
+The first causes <code>wait</code> to return <code>#f</code> immediately if
+a child is still active; the second causes <code>wait</code> to
 wait for suspended as well as terminated children.
 </p>
 </blockquote><p>
@@ -845,47 +856,47 @@ wait for suspended as well as terminated children.
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><tt>(wait-process-group <i>proc/pid [flags]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>[proc status]</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(wait-process-group <i>proc/pid [flags]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>[proc status]</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 This procedure waits for any child whose process group is <i>proc/pid</i>
 (either a process object or a pid).
-The <i>flags</i> argument is as for <tt>wait</tt>.
+The <i>flags</i> argument is as for <code>wait</code>.
 </blockquote><p>
 </p>
 <a name="node_sec_3.4.3"></a>
 <h3><a href="#node_toc_node_sec_3.4.3">3.4.3&nbsp;&nbsp;Analysing process status codes</a></h3>
 <p>
-When a child process dies (or is suspended), its parent can call the <tt>wait</tt>
+When a child process dies (or is suspended), its parent can call the <code>wait</code>
 procedure to recover the exit (or suspension) status of the child.
 The exit status is a small exact integer that encodes information
 describing how the child terminated.
 The bit-level format of the exit status is not defined by P<small>OSIX</small>;
 you must use the following three functions to decode one.
 However, if a child terminates normally with exit code 0,
-P<small>OSIX</small> does require <tt>wait</tt> to return an exit status that is exactly
+P<small>OSIX</small> does require <code>wait</code> to return an exit status that is exactly
 zero.
-So <tt>(zero? <i>status</i>)</tt> is a correct way to test for non-error,
+So <code>(zero? <i>status</i>)</code> is a correct way to test for non-error,
 normal termination.
 </p>
 <p></p>
-<div align="left"><tt>(status:exit-val <i>status</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i> or <tt>#f</tt></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(status:exit-val <i>status</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i> or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(status:stop-sig <i>status</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i> or <tt>#f</tt></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(status:stop-sig <i>status</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i> or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(status:term-sig <i>status</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i> or <tt>#f</tt></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(status:term-sig <i>status</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i> or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-For a given status value produced by calling <tt>wait</tt>,
+For a given status value produced by calling <code>wait</code>,
 exactly one of these routines will return a true value.<p>
-If the child process exited normally, <tt>status:exit-val</tt> returns the
-exit code for the child process (i.e., the value the child passed to <tt>exit</tt>
-or returned from <tt>main</tt>). Otherwise, this function returns false.</p>
+If the child process exited normally, <code>status:exit-val</code> returns the
+exit code for the child process (i.e., the value the child passed to <code>exit</code>
+or returned from <code>main</code>). Otherwise, this function returns false.</p>
 <p>
-If the child process was suspended by a signal, <tt>status:stop-sig</tt>
+If the child process was suspended by a signal, <code>status:stop-sig</code>
 returns the signal that suspended the child.
 Otherwise, this function returns false.</p>
 <p>
-If the child process terminated abnormally, <tt>status:term-sig</tt>
+If the child process terminated abnormally, <code>status:term-sig</code>
 returns the signal that terminated the child.
 Otherwise, this function returns false.
 </p>
@@ -900,35 +911,35 @@ Otherwise, this function returns false.
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><tt>(umask<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(set-umask <i>perms</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(umask<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-The process's current umask is retrieved with <tt>umask</tt>, and set with
-<tt>(set-umask <i>perms</i>)</tt>.
+The process's current umask is retrieved with <code>umask</code>, and set with
+<code>(set-umask <i>perms</i>)</code>.
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(chdir <i>[fname]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(cwd<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(chdir <i>[fname]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(cwd<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 These forms manipulate the current working directory.
-The cwd can be changed with <tt>chdir</tt>.
-If <tt>chdir</tt> is called with no arguments, it changes the cwd to
+The cwd can be changed with <code>chdir</code>.
+If <code>chdir</code> is called with no arguments, it changes the cwd to
 the user's home directory.
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(pid<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(parent-pid<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(process-group<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(set-process-group <i>[proc/pid] pgrp</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(parent-pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(process-group<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-process-group <i>[proc/pid] pgrp</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-<tt>(pid)</tt> and <tt>(parent-pid)</tt> retrieve the process id for the
+<code>(pid)</code> and <code>(parent-pid)</code> retrieve the process id for the
 current process and its parent.
-<tt>(process-group)</tt> returns the process group of the current process.
-A process's process group can be set with <tt>set-process-group</tt>;
+<code>(process-group)</code> returns the process group of the current process.
+A process's process group can be set with <code>set-process-group</code>;
 the value <i>proc/pid</i> specifies the affected process. It may be either
 a process object or an exact integer process id, and defaults to the current
 process.
@@ -936,43 +947,43 @@ process.
 </p>
 <p></p>
 <p></p>
-<div align=left><tt>(set-priority <i>which who niceness</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align=left><tt>(priority <i>which who</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>fixnum</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(set-priority <i>which who niceness</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(priority <i>which who</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>fixnum</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
   <p>These procedures modify and access the niceness of processes.</p>
-  <ul><li>The <i>which</i> argument is one of the constants <tt>priority/process</tt>,
-  <tt>priority/process-group</tt>, or <tt>priority/user</tt>, indicating whether
+  <ul><li>The <i>which</i> argument is one of the constants <code>priority/process</code>,
+  <code>priority/process-group</code>, or <code>priority/user</code>, indicating whether
   the priority of a single process, all processes in a process group, or all
   processes with the same effective uid are being set or retrieved.</li>
   <li>The <i>who</i> argument is the process object or pid, the process group, or the
   effective uid respectively.  If it is 0, the current pid, process group, or
   effective uid is used.</li>
   <li>The lower the <i>niceness</i> value is, the more the process is favored during scheduling.</li>
-  <p>Real-time processes are not affected by <tt>set-priority</tt>.</p>
+  <p>Real-time processes are not affected by <code>set-priority</code>.</p>
 </blockquote>
-<div align=left><tt>(nice <i>[proc/pid delta]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(nice <i>[proc/pid delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
   Increments the niceness of the single process specified by
   a process object or pid by <i>delta</i>.</p>
-  <p>Real-time processes are not affected by <tt>nice</tt>.</p>
+  <p>Real-time processes are not affected by <code>nice</code>.</p>
 </blockquote><p>
 </p>
-<div align="left"><tt>(user-login-name<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(user-uid<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(user-gid<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(user-supplementary-gids<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i> list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-login-name<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-uid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-supplementary-gids<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i> list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(set-uid <i>uid</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(set-gid <i>gid</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-uid <i>uid</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-gid <i>gid</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 These routines get and set the effective and real user and group ids.
 </blockquote><p>
 </p>
-<div align="left"><tt>(user-effective-uid<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(set-user-effective-uid <i><i>exact integer</i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-effective-uid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-user-effective-uid <i><i>exact integer</i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(user-effective-gid<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(set-user-effective-gid <i><i>exact integer</i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-effective-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-user-effective-gid <i><i>exact integer</i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <p>
 </p>
@@ -987,48 +998,48 @@ saved set-user/group-ID.
 <a name="node_sec_3.6"></a>
 <h2><a href="#node_toc_node_sec_3.6">3.6&nbsp;&nbsp;User and group database access</a></h2>
 <p>These procedures are used to access the user and group databases
-(<i>e.g.</i>, the ones traditionally stored in <tt>/etc/passwd</tt> and <tt>/etc/group</tt>).</p>
+(<i>e.g.</i>, the ones traditionally stored in <code>/etc/passwd</code> and <code>/etc/group</code>).</p>
 <p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(user-info <i>uid/name</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-info <i>uid/name</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-Return a <tt>user-info</tt> record giving the recorded information for a
+Return a <code>user-info</code> record giving the recorded information for a
 particular user.
 The <i>uid/name</i> argument is either an exact integer uid or a string user name.
 </blockquote><p>
 </p>
 <p></p>
-<div align="left"><tt>(user-info? <i>obj</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns <tt>#t</tt> if <i>obj</i> is a user info object and <tt>#f</tt> otherwise.
+<div align="left"><code>(user-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>Returns <code>#t</code> if <i>obj</i> is a user info object and <code>#f</code> otherwise.
 </blockquote>
-<div align="left"><tt>(user-info:name <i>user-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(user-info:uid <i>user-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(user-info:gid <i>user-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(user-info:home-dir <i>user-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(user-info:shell <i>user-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-info:name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-info:uid <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-info:gid <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-info:home-dir <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-info:shell <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the user name, user id, group id, home directory,
 and shell path stored in <i>user-info</i> respectively.</blockquote>
 <p></p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(group-info <i>gid/name</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(group-info <i>gid/name</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-Return a <tt>group-info</tt> record giving the recorded information for a
+Return a <code>group-info</code> record giving the recorded information for a
 particular group.
 The <i>gid/name</i> argument is either an exact integer gid or a string group name.
 </blockquote>
 
-<div align="left"><tt>(group-info? <i>obj</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns <tt>#t</tt> if <i>obj</i> is a group info object and <tt>#f</tt> otherwise.
+<div align="left"><code>(group-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>Returns <code>#t</code> if <i>obj</i> is a group info object and <code>#f</code> otherwise.
 </blockquote>
-<div align="left"><tt>(group-info:name <i>user-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(group-info:gid <i>user-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(group-info:members <i>user-info</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(group-info:name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(group-info:gid <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(group-info:members <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the group name, group id, and group member names
 stored in <i>group-info</i> respectively.</blockquote>
 
@@ -1040,7 +1051,7 @@ stored in <i>group-info</i> respectively.</blockquote>
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><tt>(system-name<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(system-name<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 Returns the name of the host on which we are executing.
 This may be a local name, such as "solar," as opposed to a
@@ -1049,21 +1060,21 @@ fully-qualified domain name such as "solar.csie.ntu.edu.tw."
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(uname<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>uname-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(uname<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>uname-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 Returns a uname record.
 </blockquote>
 
-<div align="left"><tt>(uname? <i>obj</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns <tt>#t</tt> if <i>obj</i> is a uname record and <tt>#f</tt> otherwise.
+<div align="left"><code>(uname? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>Returns <code>#t</code> if <i>obj</i> is a uname record and <code>#f</code> otherwise.
 </blockquote>
 
-<div align="left"><tt>(uname:os-name <i>uname</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(uname:node-name <i>uname</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(uname:release-name <i>uname</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(uname:version <i>uname</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(uname:machine <i>uname</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(uname:os-name <i>uname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(uname:node-name <i>uname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(uname:release-name <i>uname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(uname:version <i>uname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(uname:machine <i>uname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the OS name, node name, OS release name,
 OS version, and machine name stored in <i>uname</i> respectively.
 Each of the fields contains a string.
@@ -1075,34 +1086,34 @@ fully-qualified domain name.
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(current-timezone<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(current-timezone<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-Returns the current timezone as a string, or <tt>#f</tt> if is not known.
+Returns the current timezone as a string, or <code>#f</code> if is not known.
 </blockquote>
 
 </blockquote><p>
 </p>
 <p></p>
-<div align="left"><tt>(current-locale<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(current-locale<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-Returns the current locale as a string, or <tt>#f</tt> if is not known.
+Returns the current locale as a string, or <code>#f</code> if is not known.
 </blockquote>
 
 </blockquote><p>
 </p>
 <a name="node_sec_3.9"></a>
 <h2><a href="#node_toc_node_sec_3.9">3.9&nbsp;&nbsp;Signal system</a></h2>
-<p>Signal numbers are bound to the variables <tt>signal/hup</tt>, <tt>signal/int</tt>, etc.
+<p>Signal numbers are bound to the variables <code>signal/hup</code>, <code>signal/int</code>, etc.
 See <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html">
-the P<small>OSIX</small> specification of <tt>signal.h</tt></a> for the complete list.
+the P<small>OSIX</small> specification of <code>signal.h</code></a> for the complete list.
 <p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(signal-process <i>proc sig</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><tt>(signal-process-group <i>prgrp sig</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(signal-process <i>proc sig</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(signal-process-group <i>prgrp sig</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 These two procedures send signals to a specific process and all the processes
 in a specific process group, respectively.
@@ -1113,29 +1124,29 @@ or exact integer process ids.
 <p></p>
 <p></p>
 <p>
-<div align="left"><tt>(set-signal-handler <i>signal handler</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>old-handler</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-signal-handler <i>signal handler</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>old-handler</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 Assigns a handler for a given signal
 and returns the signal's old handler.
-The <i>handler</i> argument is <tt>#f</tt> (ignore), <tt>#t</tt> (default), or a
+The <i>handler</i> argument is <code>#f</code> (ignore), <code>#t</code> (default), or a
 procedure taking an exact integer argument representing the signal number;
 the return value follows the same conventions.
 It is an error to provide a procedure for a synchronous signal.
 </blockquote>
 </p>
-<div align="left"><tt>(signal-handler <i>signal</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>handler</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(signal-handler <i>signal</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>handler</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 Return the handler for a given interrupt.
-A handler is either <tt>#f</tt> (ignore), <tt>#t</tt> (default), or a
+A handler is either <code>#f</code> (ignore), <code>#t</code> (default), or a
 procedure taking an exact integer argument.
 </blockquote><p>
-<div align="left"><tt>(ignore-signal <i><i>integer</i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(ignore-signal <i><i>integer</i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(handle-signal-default <i><i>integer</i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(handle-signal-default <i><i>integer</i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-The procedure <tt>ignore-signal</tt> tells the process to ignore the
-given signal. The procedure <tt>handle-signal-default</tt> resets the
+The procedure <code>ignore-signal</code> tells the process to ignore the
+given signal. The procedure <code>handle-signal-default</code> resets the
 signal handler to the default handler.<p>
 </blockquote><p>
 </p>
@@ -1143,39 +1154,39 @@ signal handler to the default handler.<p>
 </p>
 <a name="node_sec_3.10"></a>
 <h2><a href="#node_toc_node_sec_3.10">3.10&nbsp;&nbsp;Time</a></h2>
-<div align=left><tt>(posix-time)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align=left><tt>(timespec:seconds <i>timespec</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align=left><tt>(timespec:nanoseconds <i>timespec</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(timespec:seconds <i>timespec</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(timespec:nanoseconds <i>timespec</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-<p>The <tt>posix-time</tt> procedure returns the current time as a <tt>timespec</tt>.
+<p>The <code>posix-time</code> procedure returns the current time as a <code>timespec</code>.
 This may or may not be a disjoint type; for example, a pair would work as well
 and may be more efficient to allocate.
-The <tt>timespec:seconds</tt> procedure extracts the number of 
+The <code>timespec:seconds</code> procedure extracts the number of 
 elapsed seconds since the P<small>OSIX</small> epoch
 (midnight January 1, 1970 Universal Time) excluding leap seconds.
-The <tt>timespec:nanoseconds</tt> procedure extracts the number of
+The <code>timespec:nanoseconds</code> procedure extracts the number of
 elapsed nanoseconds since the beginning of the current second.
 The system clock is not required to report time at
 full nanosecond resolution, nor is anything guaranteed about accuracy.
 </p>
 <p>You can convert seconds and nanoseconds to an inexact number of seconds with the expression
 </p>
-<blockquote><tt>(+ (timespec:seconds <i>timespec</i> (/ (timespec:nanoseconds <i>timespec</i> 1000000000))</tt></blockquote>
+<blockquote><code>(+ (timespec:seconds <i>timespec</i> (/ (timespec:nanoseconds <i>timespec</i> 1000000000))</code></blockquote>
 </blockquote>
 </blockquote><p>
 </p>
 <h2><a href="#node_toc_node_sec_3.11">3.11&nbsp;&nbsp;Environment variables</a></h2>
 <p>Most support for environment variables is provided in R7RS-small.
 </p>
-<div align=left><tt>exec-path-list</tt> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> list</div>
+<div align=left><code>exec-path-list</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> list</div>
 <blockquote>
-This variable contains the contents of the <tt>PATH</tt> environment variable as
+This variable contains the contents of the <code>PATH</code> environment variable as
 a list of strings, where each string contains a single directory pathname.  It is an
 error to change the value of this variable or
 to mutate this list or any of the strings.
 On Windows, the pathnames are separated by semicolons rather than by colons.
-Changing the value of <tt>PATH</tt> may or may not not change the value
+Changing the value of <code>PATH</code> may or may not not change the value
 of this variable.  In any case, this SRFI provides no mechanism to change
 the values of environment variables or to add new ones, operations which
 may in any case fail if there is not enough space in the environment.
@@ -1199,7 +1210,7 @@ suspend characters; and the ability to put a terminal into
 raw mode, in which no characters are specially recognized.
 </p>
 
-<div align="left"><tt>(tty? <i>port</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(tty? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 Return true if the argument is a tty.
@@ -1207,22 +1218,22 @@ Return true if the argument is a tty.
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(tty-file-name <i>port</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(tty-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 The argument <i>port</i> must be open on a tty.
 Return the file-name of the tty.
 </blockquote><p>
 </p>
-<p>The following procedures use <tt>dynamic-wind</tt> magic when executing
-their <tt>thunk</tt> arguments; if the thunk's dynamic extent is escaped,
+<p>The following procedures use <code>dynamic-wind</code> magic when executing
+their <code>thunk</code> arguments; if the thunk's dynamic extent is escaped,
 the action of the procedure is undone, but if the thunk's dynamic extent
 is re-entered, the action of the procedure is re-enabled.</p>
-<div align="left"><tt>(with-raw-mode <i>port min time thunk</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(with-raw-mode <i>port min time thunk</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 The argument <i>port</i> must be open on a tty.
-The tty is set to raw mode during the dynamic execution of <tt>thunk</tt>
+The tty is set to raw mode during the dynamic execution of <code>thunk</code>
 and then is restored to canonical ("cooked") mode.  The effect of the
   <i>min</i> and <i>time</i> arguments is that any reads done on the tty
   while raw mode is in effect will return to the caller after <i>min</i>
@@ -1230,29 +1241,29 @@ and then is restored to canonical ("cooked") mode.  The effect of the
   comes first.
 </blockquote><p>
 </p>
-<div align="left"><tt>(without-echo <i>port thunk</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(without-echo <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 The argument <i>port</i> must be open on a tty.
-Echoing of input is disabled on the tty during the execution of <tt>thunk</tt>
+Echoing of input is disabled on the tty during the execution of <code>thunk</code>
 and then is re-enabled.
 </blockquote><p>
 </p>
-<div align="left"><tt>(without-interrupt-chars <i>port thunk</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(without-interrupt-chars <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 The argument <i>port</i> must be open on a tty.
 The detection of interrupt (^C), quit (^\), and suspend (^Z) characters
-on the tty is disabled during the execution of <tt>thunk</tt> and then is re-enabled.
+on the tty is disabled during the execution of <code>thunk</code> and then is re-enabled.
 </blockquote><p>
 </p>
-<div align="left"><tt>(open-control-tty <i>tty-name</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(open-control-tty <i>tty-name</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure opens terminal device <i>tty-name</i> as the process's
 control terminal
-(see the <tt>termios</tt> man page for more information on control terminals).
-The <i>tty-name</i> argument is a filename such as <tt>/dev/ttya</tt>.
+(see the <code>termios</code> man page for more information on control terminals).
+The <i>tty-name</i> argument is a filename such as <code>/dev/ttya</code>.
 It is opened for both input and output.<p>
 <p>
 This procedure guarantees that it will make the opened terminal the
@@ -1261,23 +1272,23 @@ an assigned control terminal at the time of the call.
 If the SRFI process already has a control terminal, the results are undefined.</p>
 <p>
 To arrange for the process to have no control terminal prior to calling
-this procedure, use the <tt>become-session-leader</tt> procedure.</p>
+this procedure, use the <code>become-session-leader</code> procedure.</p>
 <p>
 </p>
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(become-session-leader<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(become-session-leader<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-This is the C <tt>setsid()</tt> call.
+This is the C <code>setsid()</code> call.
 P<small>OSIX</small> job-control has a three-level hierarchy:
 session/process-group/process.
 Every session has an associated control terminal.
 This procedure places the current process into a brand new session,
 and disassociates the process from any previous control terminal.
-You may subsequently use <tt>open-control-tty</tt> to open a new control
+You may subsequently use <code>open-control-tty</code> to open a new control
 terminal.<p>
 It is an error to call this procedure if the current process is already
 a process-group leader.
@@ -1288,9 +1299,9 @@ after forking.
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(tty-process-group <i>port/fname</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(tty-process-group <i>port/fname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><tt>(set-tty-process-group <i>port/fname pgrp</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-tty-process-group <i>port/fname pgrp</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This pair of procedures gets and sets the process group of a given
@@ -1299,7 +1310,7 @@ terminal.
 </p>
 <p></p>
 <p></p>
-<div align="left"><tt>(control-tty-file-name<i></i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(control-tty-file-name<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 Return the file-name of the process's control tty.
@@ -1318,13 +1329,13 @@ constitutes an implementation of this SRFI, with the following exceptions and de
 
 <ul>
 <li><p>
-  Scsh defines the procedure <tt>syscall-error?</tt> but unfortunately does not expose it.
+  Scsh defines the procedure <code>syscall-error?</code> but unfortunately does not expose it.
   A syscall-error object in Scsh is a list whose second, third, and fourth elements
   are the errno, the error message, and the procedure respectively,
-  and whose remaining elements (if any) are the data passed to <tt>errno-error</tt>.
-  Therefore, the procedures <tt>syscall-error:errno</tt>, <tt>syscall-error:message</tt>,
-  <tt>syscall-error:procedure</tt>, and <tt>syscall-error:data</tt> can be defined as
-  <tt>cadr</tt>, <tt>caddr</tt>, <tt>cadddr</tt>, and <tt>cddddr</tt> respectively.
+  and whose remaining elements (if any) are the data passed to <code>errno-error</code>.
+  Therefore, the procedures <code>syscall-error:errno</code>, <code>syscall-error:message</code>,
+  <code>syscall-error:procedure</code>, and <code>syscall-error:data</code> can be defined as
+  <code>cadr</code>, <code>caddr</code>, <code>cadddr</code>, and <code>cddddr</code> respectively.
 </p></li>
 <li><p>
 It's likely that not all of the error and signal numbers supported
@@ -1333,76 +1344,76 @@ by P<small>OSIX</small> are available in Scsh.
 <li><p>
 Scsh does not distinguish between textual and binary ports,
 so there are only two procedures to convert file descriptors to ports,
-<tt>fdes->inport</tt> in place of <tt>fdes->textual-inport-port</tt>
-and <tt>fdes->binary-input-port</tt>, and
-<tt>fdes->outport</tt> in place of <tt>fdes->textual-output-port</tt>
-and <tt>fdes->binary-output-port</tt>.
+<code>fdes->inport</code> in place of <code>fdes->textual-inport-port</code>
+and <code>fdes->binary-input-port</code>, and
+<code>fdes->outport</code> in place of <code>fdes->textual-output-port</code>
+and <code>fdes->binary-output-port</code>.
 </p></li>
-<li><p>The <tt>port-fdes</tt> procedure is called <tt>port->fdes</tt> in Scsh.
+<li><p>The <code>port-fdes</code> procedure is called <code>port->fdes</code> in Scsh.
 The name was changed because the use of the arrow suggests a conversion of the
 port to a file descriptor, which is not the case.
 </p></li>
-<li><p>There is no <tt>close-fdes</tt> procedure in Scsh, as the standard <tt>close-port</tt>
+<li><p>There is no <code>close-fdes</code> procedure in Scsh, as the standard <code>close-port</code>
 procedure suffices.
 </p></li>
 <li><p>
-The <tt>open-directory</tt>, <tt>read-directory</tt>, and <tt>close-directory</tt>
-procedures are called <tt>open-directory-stream</tt> etc.  The <tt>read-directory-stream</tt>
-functions returns <tt>#f</tt> at the end of the directory instead of
+The <code>open-directory</code>, <code>read-directory</code>, and <code>close-directory</code>
+procedures are called <code>open-directory-stream</code> etc.  The <code>read-directory-stream</code>
+functions returns <code>#f</code> at the end of the directory instead of
 an end of file object.
 <li><p>
-Scsh does not support parameters, so <tt>temp-file-prefix</tt> does not exist.
-Instead, there is a fluid variable named <tt>*temp-file-template*</tt> whose
-value is as defined in this SRFI with <tt>"~a"</tt> appended to it.
+Scsh does not support parameters, so <code>temp-file-prefix</code> does not exist.
+Instead, there is a fluid variable named <code>*temp-file-template*</code> whose
+value is as defined in this SRFI with <code>"~a"</code> appended to it.
 </p></li>
 <li><p>
-Scsh does not support the <tt>real-path</tt> procedure, but it would be trivial to add
-it to the source by cloning <tt>read-symlink</tt> and making it invoke the P<small>OSIX</small>
-<tt>realpath()</tt> function.
+Scsh does not support the <code>real-path</code> procedure, but it would be trivial to add
+it to the source by cloning <code>read-symlink</code> and making it invoke the P<small>OSIX</small>
+<code>realpath()</code> function.
 </p></li>
 <li><p>
-Scsh does not provide the <tt>spawn</tt> functions, but they are easily provided using
-<tt>fork</tt> and the corresponding <tt>exec</tt> procedures.
+Scsh does not provide the <code>spawn</code> functions, but they are easily provided using
+<code>fork</code> and the corresponding <code>exec</code> procedures.
 </p></li>
 <li><p>
-In Scsh the <tt>exec0</tt> procedures are called <tt>%exec</tt> and accept the elements of
+In Scsh the <code>exec0</code> procedures are called <code>%exec</code> and accept the elements of
 the argument vector as a list, including the zeroth argument.
 </p></li>
 <li><p>
 Scsh specifies, but does not implement, the procedures for getting or setting process priorities.
 </p></li>
 <li><p>
-In Scsh <tt>set-signal-handler</tt>
-and <tt>signal-handler</tt> are called
-<tt>set-interrupt-handler</tt>
-and <tt>interrupt-handler</tt> respectively.
+In Scsh <code>set-signal-handler</code>
+and <code>signal-handler</code> are called
+<code>set-interrupt-handler</code>
+and <code>interrupt-handler</code> respectively.
 They accept a Scheme 48 interrupt
 value rather than a signal value.  Fortunately, the Scsh procedure
-<tt>signal->interrupt</tt> can be used to convert its argument
+<code>signal->interrupt</code> can be used to convert its argument
 from a signal value to an interrupt value.
 </p></li>
 <li><p>
-  Scsh provides a complete set of <tt>termios.h</tt> operations, from which the
-  <tt>with-raw-mode</tt>, <tt>without-echo</tt>, and <tt>without-interrupt-chars</tt>
+  Scsh provides a complete set of <code>termios.h</code> operations, from which the
+  <code>with-raw-mode</code>, <code>without-echo</code>, and <code>without-interrupt-chars</code>
   procedures can be implemented along the lines specified by the definitions.
-  For <tt>with-raw-mode</tt>, it's important to preserve and restore the
-  <tt>eof</tt> and <tt>eol</tt> control characters, as these may occupy the same
-  memory locations in cooked mode as the <tt>min</tt> and <tt>time</tt> settings in raw mode.
+  For <code>with-raw-mode</code>, it's important to preserve and restore the
+  <code>eof</code> and <code>eol</code> control characters, as these may occupy the same
+  memory locations in cooked mode as the <code>min</code> and <code>time</code> settings in raw mode.
 </p></li>
 <li><p>
-  Scsh does not provide <tt>posix-time</tt>, but it is easily defined using the procedures
-  <tt>time+ticks</tt> and <tt>ticks/sec</tt>.  The first returns two values, the Posix
+  Scsh does not provide <code>posix-time</code>, but it is easily defined using the procedures
+  <code>time+ticks</code> and <code>ticks/sec</code>.  The first returns two values, the Posix
   second and the subsecond time in ticks; the second procedure specifies how many ticks
   a second contains.  These are easily converted to seconds and nanoseconds.
 </p></li>
 <li><p>
-  Scsh does not provide the <tt>current-timezone</tt> and <tt>current-locale</tt> functions.
-  The first gets the value of the <tt>TZ</tt> environment variable, or failing that
-  the contents of a OS-specific file such as <tt>/etc/timezone</tt> 
-  or <tt>/etc/localtime</tt> or some other implementation-specific source.
-  The second gets the value of the <tt>LANG</tt> environment variable,
-  or failing that an OS-specific file such as <tt>/etc/locale.conf</tt>
-  or <tt>/etc/sysconfig/i18n</tt> or some other implementation-specific source.
+  Scsh does not provide the <code>current-timezone</code> and <code>current-locale</code> functions.
+  The first gets the value of the <code>TZ</code> environment variable, or failing that
+  the contents of a OS-specific file such as <code>/etc/timezone</code> 
+  or <code>/etc/localtime</code> or some other implementation-specific source.
+  The second gets the value of the <code>LANG</code> environment variable,
+  or failing that an OS-specific file such as <code>/etc/locale.conf</code>
+  or <code>/etc/sysconfig/i18n</code> or some other implementation-specific source.
 </p></li>
 </ul>
 
@@ -1441,7 +1452,7 @@ Copyright &copy; 2019 by John Cowan.
 
 <p>This SRFI is derived from the documentation for
   <a href="https://scsh.net/">Scsh</a>, whose copyright notice, from
-  the <tt>COPYING</tt> file, is reprinted here:</p>
+  the <code>COPYING</code> file, is reprinted here:</p>
 
 <blockquote>
   <p>Copyright (c) 1993-2003 Richard Kelsey and Jonathan Rees</p>
