@@ -1187,13 +1187,20 @@ is sometimes turned either forward or backward.
 </p>
 </blockquote><p>
 </p>
-<div align="left"><code>(time-difference <i>timespec<sub>1</sub> timespec<sub>2</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>timespec</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(timespec-difference <i>timespec<sub>1</sub> timespec<sub>2</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>timespec</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 Returns a timespec that represents the difference in
 seconds and nanoseconds between
 <i>timespec<sub>1</sub></i> and
 <i>timespec<sub>2</sub></i>.
 </blockquote>
+</p>
+<p></p>
+<div align="left"><code>(timespec=? <i>timespec<sub>1</sub> timespec<sub>2</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>timespec</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>
+Compares two timespecs for exact equality.
+</blockquote>
+</p>
 <p></p>
 <p>You can convert a timespec to an inexact number of seconds with the expression
 <blockquote>
