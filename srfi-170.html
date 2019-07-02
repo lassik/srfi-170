@@ -63,12 +63,7 @@ functions of this SRFI are available on all operating systems.
     <code>sched_{get,set}scheduler</code> and friends.
     None are provided by Scsh.</li>
   <li>(Resolved)</li>
-  <li>Should <code>start-file</code> be added to open arbitrary files using
-    an appropriate application?  This is native on Windows, but can be
-    done on Linux and MacOS by spawning the <code>xdg-open</code>
-    and <code>open</code> programs respectively.  The procedure returns
-    as soon as the application is launched with an unspecified value, so
-    there is no access to the pid of the new process.</li>
+  <li>(Resolved)</li>
 </ol>
 
 <h1>Rationale</h1>
@@ -114,29 +109,39 @@ This SRFI makes no effort to provide all 81 headers, 1191 interfaces, and 51
 data types of full P<small>OSIX</small>.  Instead it provides a reasonable number of
 highly portable interfaces (many of them even available on Windows)
 with wrappers to make them more Scheme-like.
+In particular, this SRFI excludes:
 </p>
-
-<p>
-  This SRFI excludes most operations on ports and file descriptors
+<ul>
+<li><p>Most operations on ports and file descriptors
   other than converting between them.  For such operations, see SRFI FIXME,
   which is currently in pre-SRFI format at
   <a href="https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md">
     https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md</a>.
-Networking operations are not provided by this SRFI: see
+</p></li><li><p>
+Networking operations: see
 <a href="http://srfi.schemers.org/srfi-106/srfi-106.html">SRFI 106</a>.
-Date and time operations will be provided by a future SRFI, as the
-P<small>OSIX</small> date and time operations are irregular and awkward,
-so this SRFI provides only the current timezone and locale.
+</p></li><li><p>
+Date and time operations, as the
+P<small>OSIX</small> date and time operations are irregular and awkward.
+This SRFI provides only the current timezone and locale.
+</p></li><li><p>
 Access to command-line arguments and environment variables, as well
-as provisions for exiting a process, are already provided by R7RS.
+as provisions for exiting a process, as they are already provided by R7RS.
+</p></li><li><p>
 P<small>OSIX</small> file locking, which is notoriously broken as
-designed, is omitted; consider the use of dot files (or if necessary
+designed.  Consider the use of dot files (or if necessary
 non-portable facilities) instead.
-Facilities such as memory-mapped I/O, locales, syslog, System V message
-queues, and pseudo-TTYs are considered specialized and out of scope;
-future SRFIs may provide interfaces for them.
+</p></li><li><p>
+All provisions for signal handling, as they are complex and require deep
+integration with the Scheme implementation.
+</p></li><li><p>
+Memory-mapped I/O, locales, syslog, System V message
+queues, and pseudo-TTYs, as they are considered specialized and out of scope.
+</p></li>
+</ul>
+<p>
+Future SRFIs may provide interfaces for them.
 </p>
-
 <p>
 The use of colons to join record names and fields into the name of a
 record accessor is a convention of Scheme 48, on which Scsh is built.
@@ -164,11 +169,20 @@ concurrently running ones.
 <p>This SRFI's procedures never return error codes, and do not use a global
 <code>errno</code> variable to report errors.
 Errors are consistently reported by raising exceptions.
+In addition, this SRFI requires that no error
+based on the error code EINTR is ever raised.  Instead, the system call
+that failed is retried.  This means that if a system call is interrupted
+because a signal was received by the process, the system call will be
+automatically retried, thus eliminating what is traditionally known as
+<a href="https://www.dreamsongs.com/RiseOfWorseIsBetter.html">
+the PC loser-ing problem<a/>.
+</p><p>
 This frees up the procedures to return useful values,
 and allows the programmer to assume that
 <i>if a procedure returns, it succeeded.</i>
 This greatly simplifies the flow of the code from the programmer's point
 of view.
+</p><p>
 For reference purposes, the P<small>OSIX</small> <code>errno</code> numbers
 are bound to the variables <code>errno/perm</code>, <code>errno/noent</code>, etc.
 See <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/errno.h.html">
@@ -260,7 +274,9 @@ descriptors.</p>
 <div align="left"><code>(fdes->binary-output-port <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>These procedures wrap a newly created port around the specified file descriptor,
-effectively importing it into the Scheme world.</p>
+effectively importing it into the Scheme world.
+In particular, the textual ports use the same encoding applied
+by default in the underlying implemenation.</p>
 </blockquote>
 
 <div align="left"><code>(port-fdes <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -318,13 +334,14 @@ computer's file system.
 These procedures create objects of various kinds in the file system.</p>
 <p>
 The <i>override?</i> argument controls the action if there is already an
-object in the file system with the new name:
-</p>
-<blockquote><table border="0"><tbody><tr><td valign="top"><code>#f</code></td><td valign="top">signal an error (default) </td></tr>
-<tr><td valign="top"><code>#t</code></td><td valign="top">
-delete the old object (with <code>delete-file</code>
-or <code>delete-directory,</code> as appropriate) before
-creating the new object.<p>
+object in the file system with the new name.
+If it is <code>#f</code>, which is the default, then an
+error is signaled.  If it is <code>#t</code>,
+the old object is deleted with <code>delete-file</code>
+or <code>delete-directory</code> as appropriate before
+creating the new object.
+The effect of passing any other value is
+implementation-dependent.</p>
 </p>
 </td></tr></tbody></table></blockquote><p>
 <i>Perms</i> defaults to <code>#o777</code> (but is masked by the current umask).</p>
@@ -509,9 +526,9 @@ Finally, <code>close-directory</code> closes a directory object.</p>
 Glob each pattern against the filesystem and return the sorted list.
 Duplicates are not removed. Patterns matching nothing are <i>not</i> included
 literally, as they are in the shell.
-Shell <tt class="verbatim">{a,b,c}</code> patterns are expanded. Backslash quotes
+Shell <code>{a,b,c}</code> patterns are expanded. Backslash quotes
 characters, turning off the special meaning of
-<tt class="verbatim">{</code>, <tt class="verbatim">}</code>, <code>*</code>, <tt class="verbatim">[</code>, <tt class="verbatim">]</code>, and <tt class="verbatim">?</code>. <p>
+<code>{</code>, <code class="verbatim">}</code>, <code>*</code>, <code class="verbatim">[</code>, <code class="verbatim">]</code>, and <code class="verbatim">?</code>. <p>
 Note that the rules of backslash for Scheme strings and glob patterns
 work together to require four backslashes in a row to specify a
 single literal backslash. Fortunately, it is very rare that a backslash
@@ -527,7 +544,7 @@ with the simple glob pattern <code>".*"</code>.</p>
 Some examples:
 </p>
 <blockquote>
-<pre class="verbatim">(glob "*.c" "*.h")
+<pre>(glob "*.c" "*.h")
     ;; All the C and #include files in my directory.
 
 (glob "*.c" "*/*.c")
@@ -629,7 +646,7 @@ allocated when the file is opened. This will work if the file
 only needs to be opened once.
 </p>
 </li><li><p>If the file needs to be opened twice or more, create it in a
-protected directory, <i>e.g.</i>, <tt class="verbatim">$HOME</code>.</p>
+protected directory, <i>e.g.</i>, <code>$HOME</code>.</p>
 </li><li><p>Ensure that <code>/var/tmp</code> has its sticky bit set. This
 requires system administrator privileges.
 </p>
@@ -719,32 +736,41 @@ and whose resolution does not involve <code>.</code>, <code>..</code>, or symbol
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(spawn <i>mode prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn-path <i>mode prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn/env <i>mode prog env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn-path/env <i>mode prog env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn0 <i>mode prog arg0 <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn0-path <i>mode prog arg0 <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn0/env <i>mode prog arg0 env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn0-path/env <i>mode prog arg0 env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn <i>mode</i> [<i>config</i>] prog arg</i><sub>1</sub> <code>...</code>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn-path <i>mode</i> [<i>config</i>] prog arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn/env <i>mode</i> [<i>config</i>] prog env arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn-path/env <i>mode</i> [<i>config</i>] prog env arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn0 <i>mode</i> [<i>config</i>] prog arg0 arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn0-path <i>mode</i> [<i>config</i>] prog arg0 arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn0/env <i>mode</i> [<i>config</i>] prog arg0 env arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn0-path/env <i>mode</i> [<i>config</i>] prog arg0 env arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>
 These procedures cause a new process to be created running
 <i>prog</i>, passing it the specified arguments and environment.
-They are part of a P<small>OSIX</small> extension (they are easily
-defined if not provided), and also exist in Windows.
-They may work even when a combination of <code>fork</code> and <code>exec</code>
+Their C counterparts are part of a P<small>OSIX</small> extension
+(they are easily defined if not provided), and also exist in Windows.
+They may work even when a combination
+of <code>fork</code> and <code>exec</code>
 will not (as on Windows), and are therefore preferred in portable code
 wherever possible.
 </p>
 <p>The <i>mode</i> argument is one of the values
-<code>spawn/wait</code>, <code>spawn/nowait</code>, or <code>spawn/detach</code>.
+<code>spawn/wait</code>, <code>spawn/nowait</code>,
+or <code>spawn/detach</code>.
   <code>Spawn/wait</code> causes the procedure to wait until the new process
-  terminates, and then returns its exit code (see <code>wait</code> for details).
+  terminates, and then returns its exit code as an exact integer
+  (see <code>wait</code> for details).
   The other two values cause the procedure to return immediately
-  with an unspecified exact integer.  <code>Spawn/detach</code> will cause the new
+  with an unspecified object.  <code>Spawn/detach</code> will cause the new
   process to run detached from any control terminal; on Windows it will have no
   access to the terminal at all.
+</p>
+<p>The <i>config</i> argument is an optional list
+whose meaning is implementation-dependent.
+It is meant to provide access to further variants of
+the <code>spawn</code> functions
+that are not standardized in this SRFI.
 </p>
 <p>
 The <code><code>...</code>/env</code> variants take an environment specified as a
@@ -752,14 +778,16 @@ string&rarr;string alist.
 An environment of <code>#t</code> is taken to mean the current process's environment
 (i.e., the value of the external char <code>**environ</code>).</p>
 <p>
-The path-searching variants search the directories in the
+The <code>...-path</code> variants search the directories in the
 value of the environment variable <code>PATH</code>.
-A path-search is not performed if the program name contains
-a slash character &mdash; it is used directly. So a program with a name like
-<code>"bin/prog"</code> always executes the program <code>bin/prog</code> in the current working
-directory. See <code>exec-path-list</code> below.</p>
+A path search is not performed if the program name contains
+a slash character &mdash; it is used directly.
+So a <i>prog</i> like <code>"bin/prog"</code>
+always executes the program <code>bin/prog</code>
+in the current working directory.
+See <code>exec-path-list</code> below.</p>
 <p>
-The variants without <code>0</code> in their names pass the <i>prog</i> as the zeroth argument of
+The variants without <code>0</code> in their names pass the <i>prog</i> as the zeroth element of
 the argument vector, which is normally the right thing.  The variants with <code>0</code> require it
 as a separate argument.
 </p>
@@ -767,6 +795,14 @@ as a separate argument.
 All of these procedures may flush buffered output.
 </blockquote>
 </p><p>
+<div align="left"><code>(file-spawn <i>file</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>
+    Opens an appropriate viewer or editor, depending on the OS,
+    for <i>file</i>.  This is a system call on Windows, but can be
+    done on Linux and MacOS by spawning the <code>xdg-open</code>
+    and <code>open</code> programs respectively.  The procedure returns
+    as soon as the application is launched with an unspecified value, so
+    there is no access to the pid of the new process.</blockquote>
 <p></p>
 <p></p>
 <div align="left"><code>(exec <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -785,12 +821,6 @@ to be replaced in the current process.
 Consequently, these procedures never return under any circumstances.
 As with any other procedure in this SRFI, if there is an error, they raise
 an exception.
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><code>(suspend<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Suspend the current process with a SIGSTOP signal.
 </blockquote><p>
 </p>
 <p></p>
@@ -1106,6 +1136,10 @@ Returns the current locale as a string, or <code>#f</code> if is not known.
 </p>
 <a name="node_sec_3.9"></a>
 <h2><a href="#node_toc_node_sec_3.9">3.9&nbsp;&nbsp;Signal system</a></h2>
+<p>This SRFI deals only with signaling other processes.
+Signal <i>handling</i> is so complex and so intertwined
+with the Scheme implementation that this SRFI
+does not provide it.</p>
 <p>Signal numbers are bound to the variables <code>signal/hup</code>, <code>signal/int</code>, etc.
 See <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html">
 the P<small>OSIX</small> specification of <code>signal.h</code></a> for the complete list.
@@ -1123,59 +1157,58 @@ or exact integer process ids.
 </blockquote><p>
 </p>
 <p></p>
-<p></p>
-<p>
-<div align="left"><code>(set-signal-handler <i>signal handler</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>old-handler</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-Assigns a handler for a given signal
-and returns the signal's old handler.
-The <i>handler</i> argument is <code>#f</code> (ignore), <code>#t</code> (default), or a
-procedure taking an exact integer argument representing the signal number;
-the return value follows the same conventions.
-It is an error to provide a procedure for a synchronous signal.
-</blockquote>
-</p>
-<div align="left"><code>(signal-handler <i>signal</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>handler</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-Return the handler for a given interrupt.
-A handler is either <code>#f</code> (ignore), <code>#t</code> (default), or a
-procedure taking an exact integer argument.
-</blockquote><p>
-<div align="left"><code>(ignore-signal <i><i>integer</i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<div align="left"><code>(handle-signal-default <i><i>integer</i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-The procedure <code>ignore-signal</code> tells the process to ignore the
-given signal. The procedure <code>handle-signal-default</code> resets the
-signal handler to the default handler.<p>
-</blockquote><p>
-</p>
 <p>
 </p>
 <a name="node_sec_3.10"></a>
 <h2><a href="#node_toc_node_sec_3.10">3.10&nbsp;&nbsp;Time</a></h2>
 <div align=left><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align=left><code>(timespec:seconds <i>timespec</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align=left><code>(timespec:nanoseconds <i>timespec</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-<p>The <code>posix-time</code> procedure returns the current time as a <code>timespec</code>.
-This may or may not be a disjoint type; for example, a pair would work as well
-and may be more efficient to allocate.
-The <code>timespec:seconds</code> procedure extracts the number of 
-elapsed seconds since the P<small>OSIX</small> epoch
-(midnight January 1, 1970 Universal Time) excluding leap seconds.
-The <code>timespec:nanoseconds</code> procedure extracts the number of
-elapsed nanoseconds since the beginning of the current second.
-The system clock is not required to report time at
-full nanosecond resolution, nor is anything guaranteed about accuracy.
-</p>
-<p>You can convert seconds and nanoseconds to an inexact number of seconds with the expression
-</p>
-<blockquote><code>(+ (timespec:seconds <i>timespec</i> (/ (timespec:nanoseconds <i>timespec</i> 1000000000))</code></blockquote>
+<p>The <code>posix-time</code> procedure returns the current time as a
+<i>timespec</i>, a pair whose car is the number of elapsed seconds
+since the P<small>OSIX</small> epoch (midnight January 1, 1970 Universal
+Time) excluding leap seconds, and whose cdr is the number of elapsed
+nanoseconds since the beginning of the current second.  The system
+clock is not required to report time at full nanosecond resolution,
+nor is anything guaranteed about accuracy.
 </blockquote>
 </blockquote><p>
+</p>
+<div align=left><code>(monotonic-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+
+<blockquote>
+<p>The same as <code>posix-time</code>, except that the epoch is arbitrary.
+This epoch cannot change after the current
+program begins to run.
+It is guaranteed that a call to <code>monotonic-time</code>
+cannot return a time earlier than a previous call to <i>monotonic-time</i>.
+This is not guaranteed for <code>posix-time</code>
+because the system's P<small>OSIX</small> clock
+is sometimes turned either forward or backward.
+</p>
+</blockquote><p>
+</p>
+<div align="left"><code>(timespec-difference <i>timespec<sub>1</sub> timespec<sub>2</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>timespec</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>
+Returns a timespec that represents the difference in
+seconds and nanoseconds between
+<i>timespec<sub>1</sub></i> and
+<i>timespec<sub>2</sub></i>.
+</blockquote>
+</p>
+<p></p>
+<div align="left"><code>(timespec=? <i>timespec<sub>1</sub> timespec<sub>2</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>timespec</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>
+Compares two timespecs for exact equality.
+</blockquote>
+</p>
+<p></p>
+<p>You can convert a timespec to an inexact number of seconds with the expression
+<blockquote>
+<code>(+ (car <i>timespec</i> (/ (cdr <i>timespec</i> 1000000000.0))</code>
+</blockquote>
+In the case of P<small>OSIX</small> time,
+some precision is unavoidably lost.</p>
 </p>
 <h2><a href="#node_toc_node_sec_3.11">3.11&nbsp;&nbsp;Environment variables</a></h2>
 <p>Most support for environment variables is provided in R7RS-small.
@@ -1382,16 +1415,6 @@ the argument vector as a list, including the zeroth argument.
 </p></li>
 <li><p>
 Scsh specifies, but does not implement, the procedures for getting or setting process priorities.
-</p></li>
-<li><p>
-In Scsh <code>set-signal-handler</code>
-and <code>signal-handler</code> are called
-<code>set-interrupt-handler</code>
-and <code>interrupt-handler</code> respectively.
-They accept a Scheme 48 interrupt
-value rather than a signal value.  Fortunately, the Scsh procedure
-<code>signal->interrupt</code> can be used to convert its argument
-from a signal value to an interrupt value.
 </p></li>
 <li><p>
   Scsh provides a complete set of <code>termios.h</code> operations, from which the
