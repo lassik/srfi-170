@@ -202,7 +202,7 @@ It is an error to pass an <code>errno</code> that is not provided by the OS.</p>
 <div align="left"><code>(syscall-error? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
   Returns <code>#t</code> if <i>obj</i> is an object created by a call to <code>errno-error</code>
-  and possibly on an implementation-defined set of other objects, and <code>#f</code> otherwise.
+  or one of an implementation-defined set of other objects, and <code>#f</code> otherwise.
 </blockquote><p>
 </p>
 <div align="left"><code>(syscall-error:errno <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -241,7 +241,7 @@ compute a 3. This is difficult at best.</p>
 <p>
 If a Scheme program only used Scheme ports, and never actually used
 file descriptors, this would not be a problem. But Scheme code
-must descend to the file descriptor level in at least two circumstances:
+needs to descend to the file descriptor level in at least two circumstances:
 when interfacing to foreign code, and
 when interfacing to a subprocess.
 </p><p>
@@ -336,7 +336,7 @@ The <i>override?</i> argument controls the action if there is already an
 object in the file system with the new name.
 If it is <code>#f</code>, which is the default, then an
 error is signaled.  If it is <code>#t</code>,
-the old object is deleted with <code>delete-file</code>
+the old object is deleted with R7RS-small <code>delete-file</code>
 or <code>delete-directory</code> as appropriate before
 creating the new object.
 The effect of passing any other value is
@@ -381,7 +381,7 @@ This procedure sets the access and modified times for the file
 <i>fname</i> to the supplied values (see section&nbsp;<a href="#node_sec_3.10">3.10</a>
 for this SRFI's representation of time).
 If neither time argument is supplied, they are both taken to be
-the current time. You must provides both times or neither.
+the current time. It is an error if exactly one time is provided.
 If the procedure completes successfully, the file's time of last
 status-change (<code>ctime</code>) is set to the current time.
 </blockquote><p>
@@ -443,8 +443,6 @@ for this SRFI's representation of time).
 </blockquote>
 
 </blockquote>
-<table border="0"><tbody><tr><td valign="top"></td></tr></tbody></table>
-</blockquote>
 <p></p>
 <div align="left"><code>(file-info-directory? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
@@ -493,8 +491,7 @@ result list. That is,
 <blockquote><code>("chown" "exports" "fstab" <code>...</code>)</code></blockquote><i>not</i>
 <blockquote><code>("/etc/chown" "/etc/exports" "/etc/fstab" <code>...</code>)</code></blockquote>To use the files in returned list, the programmer can either manually
 prepend the directory,
-change to the directory before using the file names,
-or use the <code>glob</code> procedure, defined below.
+change to the directory before using the file names.
 </p>
 </blockquote><p>
 </p>
@@ -518,90 +515,6 @@ Finally, <code>close-directory</code> closes a directory object.</p>
 <p>
 </p>
 <p></p>
-<p></p>
-<div align="left"><code>(glob <i><i>pat</i><sub>1</sub> <code>...</code></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-Glob each pattern against the filesystem and return the sorted list.
-Duplicates are not removed. Patterns matching nothing are <i>not</i> included
-literally, as they are in the shell.
-Shell <code>{a,b,c}</code> patterns are expanded. Backslash quotes
-characters, turning off the special meaning of
-<code>{</code>, <code class="verbatim">}</code>, <code>*</code>, <code class="verbatim">[</code>, <code class="verbatim">]</code>, and <code class="verbatim">?</code>. <p>
-Note that the rules of backslash for Scheme strings and glob patterns
-work together to require four backslashes in a row to specify a
-single literal backslash. Fortunately, it is very rare that a backslash
-occurs in a P<small>OSIX</small> file name.</p>
-<p>
-A glob subpattern will not match against dot files unless the first
-character of the subpattern is a literal "<code>.</code>".
-Further, a dot subpattern will not match the files <code>.</code> or <code>..</code>
-unless it is a constant pattern, as in <code>(glob "../*/*.c")</code>.
-So a directory's dot files can be reliably generated
-with the simple glob pattern <code>".*"</code>.</p>
-<p>
-Some examples:
-</p>
-<blockquote>
-<pre>(glob "*.c" "*.h")
-    ;; All the C and #include files in my directory.
-
-(glob "*.c" "*/*.c")
-    ;; All the C files in this directory and
-    ;; its immediate subdirectories.
-
-(glob "lexer/*.c" "parser/*.c")
-(glob "{lexer,parser}/*.c")
-    ;; All the C files in the lexer and parser dirs.
-
-(glob "\\{lexer,parser\\}/*.c")
-    ;; All the C files in the strange
-    ;; directory "{lexer,parser}".
-
-(glob "*\\*")
-    ;; All the files ending in "*", e.g.
-    ;; ("foo*" "bar*")
-
-(glob "*lexer*")
-    ("mylexer.c" "lexer1.notes")
-    ;; All files whose names contain the string "lexer".
-
-(glob "lexer")
-    ;; Either ("lexer") or ().</pre><p>
-</p>
-</blockquote>
-If the first character of the pattern (after expanding braces) is a slash,
-the search begins at root; otherwise, the search begins in the current
-working directory.<p>
-If the last character of the pattern (after expanding braces) is a slash,
-then the result matches must be directories, <i>e.g.</i>,
-</p>
-<blockquote><code><br>
-(glob&nbsp;"/usr/man/man?/")&nbsp;==>&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("/usr/man/man1/"&nbsp;"/usr/man/man2/"&nbsp;<code>...</code>)</code></blockquote><p>
-Globbing can sometimes be useful when we need a list of a directory's files
-where each element in the list includes the pathname for the file.
-Compare:
-</p>
-<blockquote><code><br>
-(directory-files&nbsp;"../include")&nbsp;==>&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;("cig.h"&nbsp;"decls.h"&nbsp;<code>...</code>)<br>
-<br>
-(glob&nbsp;"../include/*")&nbsp;==>&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;("../include/cig.h"&nbsp;"../include/decls.h"&nbsp;<code>...</code>)</code></blockquote>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><code>(glob-quote <i>str</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-Returns a constant glob pattern that exactly matches <i>str</i>.
-All wild-card characters in <i>str</i> are quoted with a backslash.
-<blockquote><code><br>
-(glob-quote&nbsp;"Any&nbsp;*.c&nbsp;files?")<br>
-&nbsp;&nbsp;&nbsp;&nbsp;==>&nbsp;"Any&nbsp;\*.c&nbsp;files\?"</code></blockquote>
-</blockquote><p>
-</p>
 <p></p>
 <p></p>
 <div align="left"><code>temp-file-prefix</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>string parameter</i>&nbsp;</div>
@@ -640,15 +553,13 @@ will then give you his file, to which he has access rights. There are
 several ways to defeat this attack:
 </p>
 <ol>
-<li><p>Use <code>temp-file-iterate</code>, below, to return the file descriptor
+<li>Use <code>temp-file-iterate</code>, below, to return the file descriptor
 allocated when the file is opened. This will work if the file
 only needs to be opened once.
-</p>
-</li><li><p>If the file needs to be opened twice or more, create it in a
-protected directory, <i>e.g.</i>, <code>$HOME</code>.</p>
-</li><li><p>Ensure that <code>/var/tmp</code> has its sticky bit set. This
+</li><li>If the file needs to be opened twice or more, create it in a
+protected directory, <i>e.g.</i>, <code>$HOME</code>.
+</li><li>Ensure that <code>/var/tmp</code> has its sticky bit set. This
 requires system administrator privileges.
-</p>
 </li></ol>
 </blockquote><p>
 </p>
@@ -658,12 +569,9 @@ requires system administrator privileges.
 This procedure can be used to perform certain atomic transactions on
 the file system involving filenames. Some examples:
 <ul>
-<li><p>Linking a file to a fresh backup temp name.
-</p>
-</li><li><p>Creating and opening an unused, secure temp file.
-</p>
-</li><li><p>Creating an unused temporary directory.
-</p>
+<li>Linking a file to a fresh backup temp name.
+</li><li>Creating and opening an unused, secure temp file.
+</li><li>Creating an unused temporary directory.
 </li></ul><p></p>
 <p>
 This procedure uses <i>prefix</i> to generate a series of trial
@@ -683,16 +591,6 @@ return value is true, the loop is terminated, returning whatever value(s)
 After a number of unsuccessful trials, <code>temp-file-iterate</code> may give up
 and signal an error.</p>
 <p>
-Thus, if we ignore its optional <i>prefix</i> argument,
-<code>create-temp-file</code> could be defined as:
-</p>
-<blockquote><code><br>
-(define&nbsp;(create-temp-file)<br>
-&nbsp;&nbsp;(let&nbsp;((flags&nbsp;(bitwise-ior&nbsp;open/create&nbsp;open/exclusive)))<br>
-&nbsp;&nbsp;&nbsp;&nbsp;(temp-file-iterate&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(f)&nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(close&nbsp;(open-output-file&nbsp;f&nbsp;flags&nbsp;#o600))<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f))))</code></blockquote><p>
 To rename a file to a temporary name:
 </p>
 <blockquote><code><br>
@@ -737,12 +635,6 @@ and whose resolution does not involve <code>.</code>, <code>..</code>, or symbol
 <p></p>
 <div align="left"><code>(spawn <i>mode</i> [<i>config</i>] prog arg</i><sub>1</sub> <code>...</code>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(spawn-path <i>mode</i> [<i>config</i>] prog arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn/env <i>mode</i> [<i>config</i>] prog env arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn-path/env <i>mode</i> [<i>config</i>] prog env arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn0 <i>mode</i> [<i>config</i>] prog arg0 arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn0-path <i>mode</i> [<i>config</i>] prog arg0 arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn0/env <i>mode</i> [<i>config</i>] prog arg0 env arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn0-path/env <i>mode</i> [<i>config</i>] prog arg0 env arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>
 These procedures cause a new process to be created running
@@ -765,33 +657,41 @@ or <code>spawn/detach</code>.
   process to run detached from any control terminal; on Windows it will have no
   access to the terminal at all.
 </p>
-<p>The <i>config</i> argument is an optional list
-whose meaning is implementation-dependent.
-It is meant to provide access to further variants of
+<p>The <i>config</i> argument is an optional plist
+(a list of alternating symbols and values).
+The symbols <code>arg0</code> and <code>env</code>
+are defined by this SRFI;
+the meaning of all other symbols is implementation-dependent.
+They are meant to provide access to further variants of
 the <code>spawn</code> functions
 that are not standardized in this SRFI.
 </p>
 <p>
-The <code><code>...</code>/env</code> variants take an environment specified as a
+The value of the key <code>env</code> is a
 string&rarr;string alist.
-An environment of <code>#t</code> is taken to mean the current process's environment
+If omitted, the environment of the current
+process is used.
 (i.e., the value of the external char <code>**environ</code>).</p>
 <p>
-The <code>...-path</code> variants search the directories in the
+The value of the key <code>arg0</code> is a string
+which is passed to the OS as the zeroth command-line
+argument.
+If omitted, <i>prog</i> is used as the zeroth argument,
+which is normally the Right Thing.  Some operating systems
+and programming languages discard the zeroth argument.
+</p>
+<p>
+The <code>spawn-path</code> variant searches the directories in the
 value of the environment variable <code>PATH</code>.
 A path search is not performed if the program name contains
 a slash character &mdash; it is used directly.
 So a <i>prog</i> like <code>"bin/prog"</code>
 always executes the program <code>bin/prog</code>
 in the current working directory.
-See <code>exec-path-list</code> below.</p>
+See also <code>exec-path-list</code> below.</p>
+<p>Both of these procedures may flush buffered output
+before creating the next process.
 <p>
-The variants without <code>0</code> in their names pass the <i>prog</i> as the zeroth element of
-the argument vector, which is normally the right thing.  The variants with <code>0</code> require it
-as a separate argument.
-</p>
-<p>
-All of these procedures may flush buffered output.
 </blockquote>
 </p><p>
 <div align="left"><code>(file-spawn <i>file</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -806,12 +706,6 @@ All of these procedures may flush buffered output.
 <p></p>
 <div align="left"><code>(exec <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(exec-path <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(exec/env <i>prog env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(exec-path/env <i>prog env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(exec0 <i>prog arg0 <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(exec0-path <i>prog arg0 <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(exec0/env <i>prog arg0 env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(exec0-path/env <i>prog arg0 env <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>
 These procedures do the same things as the corresponding <code>spawn</code> procedures,
@@ -900,8 +794,8 @@ When a child process dies (or is suspended), its parent can call the <code>wait<
 procedure to recover the exit (or suspension) status of the child.
 The exit status is a small exact integer that encodes information
 describing how the child terminated.
-The bit-level format of the exit status is not defined by P<small>OSIX</small>;
-you must use the following three functions to decode one.
+The bit-level format of the exit status is not defined by P<small>OSIX</small>,
+so use the following three functions to decode one.
 However, if a child terminates normally with exit code 0,
 P<small>OSIX</small> does require <code>wait</code> to return an exit status that is exactly
 zero.
@@ -981,14 +875,15 @@ process.
 <div align=left><code>(priority <i>which who</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>fixnum</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
   <p>These procedures modify and access the niceness of processes.</p>
-  <ul><li>The <i>which</i> argument is one of the constants <code>priority/process</code>,
+  <ul><li><p>The <i>which</i> argument is one of the constants <code>priority/process</code>,
   <code>priority/process-group</code>, or <code>priority/user</code>, indicating whether
   the priority of a single process, all processes in a process group, or all
   processes with the same effective uid are being set or retrieved.</li>
-  <li>The <i>who</i> argument is the process object or pid, the process group, or the
+  <li><p>The <i>who</i> argument is the process object or pid, the process group, or the
   effective uid respectively.  If it is 0, the current pid, process group, or
   effective uid is used.</li>
-  <li>The lower the <i>niceness</i> value is, the more the process is favored during scheduling.</li>
+  <li><p>The lower the <i>niceness</i> value is, the more the process is favored during scheduling.</li>
+</ul>
   <p>Real-time processes are not affected by <code>set-priority</code>.</p>
 </blockquote>
 <div align=left><code>(nice <i>[proc/pid delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -1119,7 +1014,7 @@ fully-qualified domain name.
 <div align="left"><code>(current-timezone<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-Returns the current timezone as a string, or <code>#f</code> if is not known.
+Returns the current timezone as a string, or <code>#f</code> if it is not known.
 </blockquote>
 
 </blockquote><p>
@@ -1128,7 +1023,7 @@ Returns the current timezone as a string, or <code>#f</code> if is not known.
 <div align="left"><code>(current-locale<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-Returns the current locale as a string, or <code>#f</code> if is not known.
+Returns the current locale as a string, or <code>#f</code> if it is not known.
 </blockquote>
 
 </blockquote><p>
@@ -1138,7 +1033,7 @@ Returns the current locale as a string, or <code>#f</code> if is not known.
 <p>This SRFI deals only with signaling other processes.
 Signal <i>handling</i> is so complex and so intertwined
 with the Scheme implementation that this SRFI
-does not provide it.</p>
+does not standardize it.</p>
 <p>Signal numbers are bound to the variables <code>signal/hup</code>, <code>signal/int</code>, etc.
 See <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html">
 the P<small>OSIX</small> specification of <code>signal.h</code></a> for the complete list.
@@ -1202,10 +1097,16 @@ Compares two timespecs for exact equality.
 </blockquote>
 </p>
 <p></p>
-<p>You can convert a timespec to an inexact number of seconds with the expression
+<p>You can convert between a timespec and an inexact number of seconds with the expression
 <blockquote>
-<code>(+ (car <i>timespec</i> (/ (cdr <i>timespec</i> 1000000000.0))</code>
+<code>(+ (car <i>timespec</i>) (/ (cdr <i>timespec</i>) 1000000000.0))</code>
 </blockquote>
+and in the reverse direction with:
+<blockquote>
+<code>(let-values (((secs nanos))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(floor/ <i>seconds</i> 10E9))<br/>
+&nbsp;&nbsp;(cons secs nanos))
+</code> </blockquote>
 In the case of P<small>OSIX</small> time,
 some precision is unavoidably lost.</p>
 </p>
@@ -1324,7 +1225,7 @@ and disassociates the process from any previous control terminal.
 You may subsequently use <code>open-control-tty</code> to open a new control
 terminal.<p>
 It is an error to call this procedure if the current process is already
-a process-group leader.
+a session leader.
 One way to guarantee this is not the case is only to call this procedure
 after forking.
 </p>
