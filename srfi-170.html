@@ -528,7 +528,7 @@ Finally, <code>close-directory</code> closes a directory object.</p>
 A SRFI 39 or R7RS parameter that returns a string when invoked.  Its initial value is
 the value of the environment variable <code>TMPDIR</code> concatenated with <code>"/<i>pid</i>"</code>
 if <code>TMPDIR</code> is set and to
-<code>"/var/tmp/<i>pid</i>"</code> otherwise, where <i>pid</i> is the id of the current process.
+<code>"/tmp/<i>pid</i>"</code> otherwise, where <i>pid</i> is the id of the current process.
 </blockquote>
 <div align="left"><code>(create-temp-file <i>[prefix]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote><code>Create-temp-file</code> creates a new temporary file and returns its name.
@@ -614,7 +614,7 @@ To create a unique temporary directory:
 </p>
 <blockquote><code><br>
 (temp-file-iterate&nbsp;(lambda&nbsp;(dir)&nbsp;(create-directory&nbsp;dir)&nbsp;dir)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/var/tmp/tempdir.")</code></blockquote>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/tmp/tempdir.")</code></blockquote>
 Similar operations can be used to generate unique symlinks and fifos,
 or to return values other than the new filename (<i>e.g.</i>, an open file
 descriptor or port).<p>
