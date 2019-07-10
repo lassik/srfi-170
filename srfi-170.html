@@ -44,11 +44,11 @@ Olin Shivers (original author), John Cowan (editor and shepherd)
 
 <p>
 The host environment is the set of resources, such as the filesystem,
-network and processes, that are managed by the operating system within
+network and processes, that are managed by the operating system on top of
 which a Scheme program is executing. This SRFI specifies how the host
 environment can be accessed from within a Scheme program.  It does so by
 leveraging widespread support for P<small>OSIX</small>, the Portable
-Operating System Interface standardized by the IEEE.  Not all the
+Operating System Interface standardized by the IEEE.  Not all of the
 functions of this SRFI are available on all operating systems.
 </p>
 
@@ -84,7 +84,7 @@ or part of P<small>OSIX</small>, so the use of this SRFI is mostly
 portable, but implementations are definitely not portable.  However,
 an implementation of this SRFI can be layered over many existing
 implementation-specific interfaces, or directly over a C FFI.  It is
-even possible to implement it in part on top of the JVM or CLR virtual
+even possible to implement it on top of the JVM or CLR virtual
 machines.
 </p>
 
@@ -285,7 +285,7 @@ by default in the underlying implemenation.</p>
 This procedure exposes the file descriptor of a port,
 effectively exporting it from the Scheme world.
 Alternatively, <code>#f</code> is returned if <i>port</i> does not have a
-file descriptor (a string port, e.g.),
+file descriptor (a string port, e.g.).
 </blockquote><p>
 </p>
 <div align="left"><code>(dup->fdes <i>port [fd]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -342,16 +342,15 @@ or <code>delete-directory</code> as appropriate before
 creating the new object.
 The effect of passing any other value is
 implementation-dependent.</p>
-</p>
-</td></tr></tbody></table></blockquote><p>
+</p><p>
 <i>Perms</i> defaults to <code>#o777</code> (but is masked by the current umask).</p>
 <p>
-</p>
+</p><p>
 If you try to create a hard or symbolic link
 and <i>oldname</i> and <i>newname</i> refer to the same file, it is an error
 (and your file may be destroyed).
-</blockquote><p>
-</p>
+</p></blockquote>
+</td></tr></tbody></table>
 <p></p>
 <p></p>
 <div align="left"><code>(delete-directory <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -483,7 +482,7 @@ such as a CD-ROM.</p>
 <div align="left"><code>(directory-files <i>[dir dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-Return the list of files in directory <i>dir</i>,
+Return a list of file names in directory <i>dir</i>,
 which defaults to the current working directory.
 The <i>dotfiles?</i> flag (default <code>#f</code>) causes dot files to be
 included in the list.
@@ -494,9 +493,9 @@ result list. That is,
 </p>
 <blockquote><code>(directory-files "/etc")</code></blockquote>returns
 <blockquote><code>("chown" "exports" "fstab" <code>...</code>)</code></blockquote><i>not</i>
-<blockquote><code>("/etc/chown" "/etc/exports" "/etc/fstab" <code>...</code>)</code></blockquote>To use the files in returned list, the programmer can either manually
+<blockquote><code>("/etc/chown" "/etc/exports" "/etc/fstab" <code>...</code>)</code></blockquote>To use the file names in the returned list, the programmer can either manually
 prepend the directory,
-change to the directory before using the file names.
+or change to the directory before using the file names.
 </p>
 </blockquote><p>
 </p>
@@ -1161,7 +1160,7 @@ Return true if the argument is a tty.
 
 <blockquote>
 The argument <i>port</i> must be open on a tty.
-Return the file-name of the tty.
+Return the file name of the tty.
 </blockquote><p>
 </p>
 <p>The following procedures use <code>dynamic-wind</code> magic when executing
@@ -1252,7 +1251,7 @@ terminal.
 <div align="left"><code>(control-tty-file-name<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-Return the file-name of the process's control tty.
+Return the file name of the process's control tty.
 </blockquote><p>
 </p>
 </p>
