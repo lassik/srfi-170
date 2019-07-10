@@ -508,11 +508,12 @@ These functions implement a direct interface to the
 <code>readdir()</code>/
 <code>closedir()</code>
 family of functions for processing directories.
+</p><p>
 The <code>open-directory</code> procedure opens the
 directory with the specified pathname for reading, returning an opaque directory object.
 Then <code>read-directory</code>
 returns the name of the next available file
-(including all files whose names begin with dot, and
+(including all files whose names begin with dot except for <code>.</code> and <code>..</code>, and
 without <i>dir</i> present) in a <i>directory-object</i>,
 or an end of file object if there are no more files.
 Finally, <code>close-directory</code> closes a directory object.</p>
