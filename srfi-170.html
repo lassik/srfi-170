@@ -60,7 +60,7 @@ functions of this SRFI are available on all operating systems.
     <code>posix_fallocate</code>, <code>posix_fadvise</code>,
     <code>readv</code>, <code>writev</code>, <code>sendfile</code>,
     <code>sched_{get,set}scheduler</code> and friends.
-    None are provided by Scsh.</li>
+    None are provided by scsh.</li>
   <li>(Resolved)</li>
   <li>(Resolved)</li>
 </ol>
@@ -91,7 +91,7 @@ machines.
 <p>
 This SRFI describes a specific P<small>OSIX</small> API for Scheme.
 Rather than attempting to compromise between existing implementations,
-the Scsh system call specification was chosen as a base document.
+the scsh system call specification was chosen as a base document.
 Consequently, this SRFI is a reduced version of
 <a href="https://scsh.net/docu/html/man-Z-H-4.html#node_chap_3">Chapter 3, "System Calls"</a>
 of version 0.6.7 of the <i>Scsh Reference Manual</i>.
@@ -144,7 +144,7 @@ Future SRFIs may provide interfaces for them.
 </p>
 <p>
 The use of colons to join record names and fields into the name of a
-record accessor is a convention of Scheme 48, on which Scsh is built.
+record accessor is a convention of Scheme 48, on which scsh is built.
 </p>
 
 <h1>Specification</h1>
@@ -1269,7 +1269,7 @@ constitutes an implementation of this SRFI, with the following exceptions and de
 <ul>
 <li><p>
   Scsh defines the procedure <code>syscall-error?</code> but unfortunately does not expose it.
-  A syscall-error object in Scsh is a list whose second, third, and fourth elements
+  A syscall-error object in scsh is a list whose second, third, and fourth elements
   are the errno, the error message, and the procedure respectively,
   and whose remaining elements (if any) are the data passed to <code>errno-error</code>.
   Therefore, the procedures <code>syscall-error:errno</code>, <code>syscall-error:message</code>,
@@ -1278,7 +1278,7 @@ constitutes an implementation of this SRFI, with the following exceptions and de
 </p></li>
 <li><p>
 It's likely that not all of the error and signal numbers supported
-by P<small>OSIX</small> are available in Scsh.
+by P<small>OSIX</small> are available in scsh.
 </p></li>
 <li><p>
 Scsh does not distinguish between textual and binary ports,
@@ -1288,11 +1288,11 @@ and <code>fdes->binary-input-port</code>, and
 <code>fdes->outport</code> in place of <code>fdes->textual-output-port</code>
 and <code>fdes->binary-output-port</code>.
 </p></li>
-<li><p>The <code>port-fdes</code> procedure is called <code>port->fdes</code> in Scsh.
+<li><p>The <code>port-fdes</code> procedure is called <code>port->fdes</code> in scsh.
 The name was changed because the use of the arrow suggests a conversion of the
 port to a file descriptor, which is not the case.
 </p></li>
-<li><p>There is no <code>close-fdes</code> procedure in Scsh, as the standard <code>close-port</code>
+<li><p>There is no <code>close-fdes</code> procedure in scsh, as the standard <code>close-port</code>
 procedure suffices.
 </p></li>
 <li><p>
@@ -1315,7 +1315,7 @@ Scsh does not provide the <code>spawn</code> functions, but they are easily prov
 <code>fork</code> and the corresponding <code>exec</code> procedures.
 </p></li>
 <li><p>
-In Scsh the <code>exec0</code> procedures are called <code>%exec</code> and accept the elements of
+In scsh the <code>exec0</code> procedures are called <code>%exec</code> and accept the elements of
 the argument vector as a list, including the zeroth argument.
 </p></li>
 <li><p>
@@ -1380,7 +1380,7 @@ Copyright &copy; 2019 by John Cowan.
   SOFTWARE.
 
 <p>This SRFI is derived from the documentation for
-  <a href="https://scsh.net/">Scsh</a>, whose copyright notice, from
+  <a href="https://scsh.net/">scsh</a>, whose copyright notice, from
   the <code>COPYING</code> file, is reprinted here:</p>
 
 <blockquote>
