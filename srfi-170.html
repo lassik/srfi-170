@@ -388,19 +388,6 @@ status-change (<code>ctime</code>) is set to the current time.
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(sync-file <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(sync-file-system<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-Calling <code>sync-file</code>
-causes P<small>OSIX</small> to update the disk data structures for a given file.
-Any buffered data that <i>port</i> may have is first flushed.
-Calling <code>sync-file-system</code> synchronises the kernel's entire file
-system with the disk.<p>
-</p>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
 <p></p>
 <div align="left"><code>(truncate-file <i>fname/port len</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>The specified file is truncated to <i>len</i> bytes in length.
