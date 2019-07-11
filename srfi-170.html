@@ -1300,7 +1300,8 @@ an end of file object.
 <li><p>
 Scsh does not support parameters, so <code>temp-file-prefix</code> does not exist.
 Instead, there is a fluid variable named <code>*temp-file-template*</code> whose
-value is as defined in this SRFI with <code>"~a"</code> appended to it.
+value is as defined in this SRFI with <code>/var</code> added in front of <code>/tmp</code>,
+and <code>"~a"</code> appended to it, e.g., <code>/var/tmp/6812~a</code>.
 </p></li>
 <li><p>
 Scsh does not support the <code>real-path</code> procedure, but it would be trivial to add
