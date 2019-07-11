@@ -1285,6 +1285,14 @@ port to a file descriptor, which is not the case.
 procedure suffices.
 </p></li>
 <li><p>
+The <code>create-directory</code>, <code>create-fifo</code>,
+and <code>set-file-mode</code> procedures were changed in 0.7 to take
+a file-mode record instead of traditional permission bits.  A work
+around is to manually set the mode of a file, and use
+<code>file-info</code> and <code>file-info:mode</code> to get a record
+with the desired permission bits.
+</p></li>
+<li><p>
 The <code>open-directory</code>, <code>read-directory</code>, and <code>close-directory</code>
 procedures are called <code>open-directory-stream</code> etc.  The <code>read-directory-stream</code>
 functions returns <code>#f</code> at the end of the directory instead of
