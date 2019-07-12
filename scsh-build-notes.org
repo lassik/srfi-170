@@ -1,5 +1,7 @@
 The scsh sample implementation for [[https://srfi.schemers.org/srfi-170/][SRFI 170]]: POSIX API is based on the latest [[http://www.s48.org/][version 1.9.2 release of Scheme 48]].  It is labeled version 0.7, and can be found in [[https://github.com/scheme/scsh][this GitHub repository]].
 
+Be warned neither programs have uninstall make targets, you may want to save the output of "make install" and/or copies of the /usr/local directory tree.
+
 The following recipe has successfully built it in /usr/local on an x86-64 machine running stock Ubuntu 18.04 Bionic Beaver Linux:
 
 Download [[http://www.s48.org/1.9.2/scheme48-1.9.2.tgz][the source tarball]] (the stock version 1.9 Scheme 48 on this Ubuntu distribution will not work).
@@ -21,7 +23,7 @@ You can test it before installation with "make test".  The final output should b
 ALL TESTS SUCCEEDED
 ()
 
-You can install it in /usr/local with "make install".  I like to keep all of /usr/local writable by my user id, but if it's limited to writing by root, you'll need something like "sudo make install".
+You can install it in /usr/local with "make install", but be warned it has no uninstall target.  I like to keep all of /usr/local writable by my user id, but if it's limited to writing by root, you'll need something like "sudo make install".
 
 Change to another directory and make sure it can be found and run:
 
@@ -82,7 +84,7 @@ Testing process-state:with-umask ... OK
 #{Unspecific}
 > 
 
-It can then be installed in /usr/local with "make install" or "sudo make install".
+It can then be installed in /usr/local with "make install" or "sudo make install", but be warned it has no uninstall target.
 
 When invoked, it should look like this:
 
