@@ -1306,11 +1306,19 @@ The <code>open-directory</code>, <code>read-directory</code>, and <code>close-di
 procedures are called <code>open-directory-stream</code> etc.  The <code>read-directory-stream</code>
 functions returns <code>#f</code> at the end of the directory instead of
 an end of file object.
+</p></li>
 <li><p>
 Scsh does not support parameters, so <code>temp-file-prefix</code> does not exist.
 Instead, there is a fluid variable named <code>*temp-file-template*</code> whose
 value is as defined in this SRFI with <code>/var</code> added in front of <code>/tmp</code>,
 and <code>"~a"</code> appended to it, e.g., <code>/var/tmp/6812~a</code>.
+</p></li>
+<li><p>
+The scsh fluid variable <code>*temp-file-template*</code> described
+above includes the substring "<code>~a</code>", which is required in
+an optional <code><i>prefix</i></code> argument
+to <code>temp-file-iterate</code> (the iteration strings are inserted
+there with <code>format</code>).
 </p></li>
 </ul>
 
