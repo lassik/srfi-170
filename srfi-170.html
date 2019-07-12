@@ -1238,6 +1238,7 @@ Return the file name of the process's control tty.
 (see build notes <a href="https://github.com/scheme-requests-for-implementation/srfi-170">here</a>)),
 constitutes an implementation of this SRFI, with the following exceptions and deviations:
 
+<h3><a href="#node_imp_node_sec_3.1">3.1&nbsp;&nbsp;Errors</a></h3>
 <ul>
 <li><p>
   Scsh defines the procedure <code>syscall-error?</code> but unfortunately does not expose it.
@@ -1252,6 +1253,10 @@ constitutes an implementation of this SRFI, with the following exceptions and de
 It's likely that not all of the error and signal numbers supported
 by P<small>OSIX</small> are available in scsh.
 </p></li>
+</ul>
+
+<h3><a href="#node_imp_node_sec_3.2">3.2&nbsp;&nbsp;I/O</a></h3>
+<ul>
 <li><p>
 Scsh does not distinguish between textual and binary ports,
 so there are only two procedures to convert file descriptors to ports,
@@ -1267,6 +1272,10 @@ port to a file descriptor, which is not the case.
 <li><p>There is no <code>close-fdes</code> procedure in scsh, as the standard <code>close-port</code>
 procedure suffices.
 </p></li>
+</ul>
+
+<h3><a href="#node_imp_node_sec_3.3">3.3&nbsp;&nbsp;File system</a></h3>
+<ul>
 <li><p>
 The <code>create-directory</code>, <code>create-fifo</code>,
 and <code>set-file-mode</code> procedures were changed in 0.7 to take
@@ -1297,6 +1306,10 @@ Instead, there is a fluid variable named <code>*temp-file-template*</code> whose
 value is as defined in this SRFI with <code>/var</code> added in front of <code>/tmp</code>,
 and <code>"~a"</code> appended to it, e.g., <code>/var/tmp/6812~a</code>.
 </p></li>
+</ul>
+
+<h3><a href="#node_imp_node_sec_3.4">3.4&nbsp;&nbsp;Processes</a></h3>
+<ul>
 <li><p>
 Scsh does not support the <code>real-path</code> procedure, but it would be trivial to add
 it to the source by cloning <code>read-symlink</code> and making it invoke the P<small>OSIX</small>
@@ -1310,17 +1323,25 @@ Scsh does not provide the <code>spawn</code> functions, but they are easily prov
 In scsh the <code>exec0</code> procedures are called <code>%exec</code> and accept the elements of
 the argument vector as a list, including the zeroth argument.
 </p></li>
+</ul>
+
+<h3><a href="#node_imp_node_sec_3.5">3.5&nbsp;&nbsp;Process state</a></h3>
+<ul>
 <li><p>
 Scsh specifies, but does not implement, the procedures for getting or setting process priorities.
 </p></li>
-<li><p>
-  Scsh provides a complete set of <code>termios.h</code> operations, from which the
-  <code>with-raw-mode</code>, <code>without-echo</code>, and <code>without-interrupt-chars</code>
-  procedures can be implemented along the lines specified by the definitions.
-  For <code>with-raw-mode</code>, it's important to preserve and restore the
-  <code>eof</code> and <code>eol</code> control characters, as these may occupy the same
-  memory locations in cooked mode as the <code>min</code> and <code>time</code> settings in raw mode.
-</p></li>
+</ul>
+
+<h3><a href="#node_imp_node_sec_3.6">3.6&nbsp;&nbsp;User and group database access</a></h3>
+
+<h3><a href="#node_imp_node_sec_3.7">3.7&nbsp;&nbsp;[Intentionally omitted]</a></h3>
+
+<h3><a href="#node_imp_node_sec_3.8">3.8&nbsp;&nbsp;System parameters</a></h3>
+
+<h3><a href="#node_imp_node_sec_3.9">3.9&nbsp;&nbsp;Signal system</a></h3>
+
+<h3><a href="#node_imp_node_sec_3.10">3.10&nbsp;&nbsp;Time</a></h3>
+<ul>
 <li><p>
   Scsh does not provide <code>posix-time</code>, but it is easily defined using the procedures
   <code>time+ticks</code> and <code>ticks/sec</code>.  The first returns two values, the Posix
@@ -1335,6 +1356,20 @@ Scsh specifies, but does not implement, the procedures for getting or setting pr
   The second gets the value of the <code>LANG</code> environment variable,
   or failing that an OS-specific file such as <code>/etc/locale.conf</code>
   or <code>/etc/sysconfig/i18n</code> or some other implementation-specific source.
+</p></li>
+</ul>
+
+<h3><a href="#node_imp_node_sec_3.11">3.11&nbsp;&nbsp;Environment variables</a></h3>
+
+<h3><a href="#node_imp_node_sec_3.12">3.12&nbsp;&nbsp;Terminal device control</a></h3>
+<ul>
+<li><p>
+  Scsh provides a complete set of <code>termios.h</code> operations, from which the
+  <code>with-raw-mode</code>, <code>without-echo</code>, and <code>without-interrupt-chars</code>
+  procedures can be implemented along the lines specified by the definitions.
+  For <code>with-raw-mode</code>, it's important to preserve and restore the
+  <code>eof</code> and <code>eol</code> control characters, as these may occupy the same
+  memory locations in cooked mode as the <code>min</code> and <code>time</code> settings in raw mode.
 </p></li>
 </ul>
 
