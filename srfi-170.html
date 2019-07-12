@@ -536,23 +536,6 @@ for the uniqueness guarantees to hold. The pid component of the default
 prefix simply serves to scatter the name searches into sparse regions, so
 that collisions are less likely to occur. This speeds things up, but does
 not affect correctness.</p>
-<p>
-Security note: doing I/O to files created this way in <code>/var/tmp/</code> is
-not necessarily secure. General users have write access to <code>/var/tmp/</code>,
-so even if an attacker cannot access the new temp file, he can delete it
-and replace it with one of his own. A subsequent open of this filename
-will then give you his file, to which he has access rights. There are
-several ways to defeat this attack:
-</p>
-<ol>
-<li>Use <code>temp-file-iterate</code>, below, to return the file descriptor
-allocated when the file is opened. This will work if the file
-only needs to be opened once.
-</li><li>If the file needs to be opened twice or more, create it in a
-protected directory, <i>e.g.</i>, <code>$HOME</code>.
-</li><li>Ensure that <code>/var/tmp</code> has its sticky bit set. This
-requires system administrator privileges.
-</li></ol>
 </blockquote><p>
 </p>
 <div align="left"><code>(temp-file-iterate <i>maker [prefix]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i><sup>+</sup></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
