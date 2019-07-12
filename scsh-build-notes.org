@@ -1,0 +1,94 @@
+The scsh sample implementation for [[https://srfi.schemers.org/srfi-170/][SRFI 170]]: POSIX API is based on the latest [[http://www.s48.org/][version 1.9.2 release of Scheme 48]].  It is labeled version 0.7, and can be found in [[https://github.com/scheme/scsh][this GitHub repository]].
+
+The following recipe has successfully built it in /usr/local on an x86-64 machine running stock Ubuntu 18.04 Bionic Beaver Linux:
+
+Download [[http://www.s48.org/1.9.2/scheme48-1.9.2.tgz][the source tarball]] (the stock version 1.9 Scheme 48 on this Ubuntu distribution will not work).
+
+cd /usr/local/src
+
+tar zxf ~/Downloads/scheme48-1.9.2.tgz 
+
+cd scheme48-1.9.2/
+
+./configure
+
+make
+
+It should build without any warnings.
+
+You can test it before installation with "make test".  The final output should be:
+
+ALL TESTS SUCCEEDED
+()
+
+You can install it in /usr/local with "make install".  I like to keep all of /usr/local writable by my user id, but if it's limited to writing by root, you'll need something like "sudo make install".
+
+Change to another directory and make sure it can be found and run:
+
+scheme48
+
+Welcome to Scheme 48 1.9.2 (made by hga on 2019-07-06)
+See http://s48.org/ for more information.
+Please report bugs to scheme-48-bugs@s48.org.
+Get more information at http://www.s48.org/.
+Type ,? (comma question-mark) for help.
+> ^D
+Exit Scheme 48 (y/n)? y
+
+Change back to /usr/local/src, and clone the 0.7 scsh repository; if you have a GitHub account:
+
+git clone git@github.com:scheme/scsh.git
+
+If not:
+
+git clone https://github.com/scheme/scsh.git
+
+cd scsh
+
+git submodule update --init
+
+autoreconf
+
+./configure
+
+make
+
+It should make with two apparently harmless warnings:
+
+gcc -g -O2 -fPIC -I/usr/local/include -rdynamic -shared  -rdynamic -o c/syscalls.so c/syscalls.c -lutil
+c/syscalls.c: In function ‘sleep_until’:
+c/syscalls.c:711:18: warning: implicit declaration of function ‘time’; did you mean ‘utime’? [-Wimplicit-function-declaration]
+     time_t now = time(0);
+                  ^~~~
+                  utime
+gcc -g -O2 -fPIC -I/usr/local/include -rdynamic -shared  -rdynamic -o c/tty.so c/tty.c -lutil
+c/tty.c: In function ‘allocate_master’:
+c/tty.c:398:14: warning: implicit declaration of function ‘openpty’; did you mean ‘openat’? [-Wimplicit-function-declaration]
+         rc = openpty (&master_fd, &slave_fd, NULL, NULL, NULL);
+              ^~~~~~~
+              openat
+
+You can then test it with "make test"; the output should be like this:
+
+./build/test.sh .
+Welcome to scsh 0.7
+Type ,? for help.
+> Testing file-system:file-type-symlink ... OK
+Testing file-system:create-temp-file ... OK
+Testing file-system:directory-files-3 ... OK
+[...]
+Testing process-state:set-umask ... OK
+Testing process-state:with-umask ... OK
+#{Unspecific}
+> 
+
+It can then be installed in /usr/local with "make install" or "sudo make install".
+
+When invoked, it should look like this:
+
+scsh
+Welcome to scsh 0.7
+Type ,? for help.
+>
+
+Be sure to check the SRFI's Implementation section for the many differences and workarounds between this sample implementation and the SRFI.
