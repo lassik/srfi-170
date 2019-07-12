@@ -1285,6 +1285,12 @@ port to a file descriptor, which is not the case.
 procedure suffices.
 </p></li>
 <li><p>
+<code>set-file-timespecs</code> is <code>set-file-times</code> in scsh,
+and <code>access-timespec</code> and <code>mod-timespec</code> are rational numbers,
+which are cooerced to exact integers, and treated as the number of elapsed seconds
+since the POSIX epoch of midnight January 1, 1970.
+</p></li>
+<li><p>
 The <code>create-directory</code>, <code>create-fifo</code>,
 and <code>set-file-mode</code> procedures were changed in 0.7 to take
 a file-mode record instead of traditional permission bits.  A work
