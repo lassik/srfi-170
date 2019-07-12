@@ -1,0 +1,84 @@
+<blockquote><code><br>
+(glob&nbsp;"/usr/man/man?/")&nbsp;==>&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("/usr/man/man1/"&nbsp;"/usr/man/man2/"&nbsp;<code>...</code>)</code></blockquote><p>
+Globbing can sometimes be useful when we need a list of a directory's files
+where each element in the list includes the pathname for the file.
+Compare:
+</p>
+<blockquote><code><br>
+(directory-files&nbsp;"../include")&nbsp;==>&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;("cig.h"&nbsp;"decls.h"&nbsp;<code>...</code>)<br>
+<br>
+(glob&nbsp;"../include/*")&nbsp;==>&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;("../include/cig.h"&nbsp;"../include/decls.h"&nbsp;<code>...</code>)</code></blockquote>
+</blockquote><p>
+</p>
+<p></p>
+<p></p>
+<div align="left"><code>(glob-quote <i>str</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>
+Returns a constant glob pattern that exactly matches <i>str</i>.
+All wild-card characters in <i>str</i> are quoted with a backslash.
+<blockquote><code><br>
+(glob-quote&nbsp;"Any&nbsp;*.c&nbsp;files?")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;==>&nbsp;"Any&nbsp;\*.c&nbsp;files\?"</code></blockquote>
+</blockquote><p>
+</p>
+<p></p>
+<div align="left"><code>(glob <i><i>pat</i><sub>1</sub> <code>...</code></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+
+<blockquote>
+Glob each pattern against the filesystem and return the sorted list.
+Duplicates are not removed. Patterns matching nothing are <i>not</i> included
+literally, as they are in the shell.
+Shell <code>{a,b,c}</code> patterns are expanded. Backslash quotes
+characters, turning off the special meaning of
+<code>{</code>, <code class="verbatim">}</code>, <code>*</code>, <code class="verbatim">[</code>, <code class="verbatim">]</code>, and <code class="verbatim">?</code>. <p>
+Note that the rules of backslash for Scheme strings and glob patterns
+work together to require four backslashes in a row to specify a
+single literal backslash. Fortunately, it is very rare that a backslash
+occurs in a P<small>OSIX</small> file name.</p>
+<p>
+A glob subpattern will not match against dot files unless the first
+character of the subpattern is a literal "<code>.</code>".
+Further, a dot subpattern will not match the files <code>.</code> or <code>..</code>
+unless it is a constant pattern, as in <code>(glob "../*/*.c")</code>.
+So a directory's dot files can be reliably generated
+with the simple glob pattern <code>".*"</code>.</p>
+<p>
+Some examples:
+</p>
+<blockquote>
+<pre>(glob "*.c" "*.h")
+    ;; All the C and #include files in my directory.
+
+(glob "*.c" "*/*.c")
+    ;; All the C files in this directory and
+    ;; its immediate subdirectories.
+
+(glob "lexer/*.c" "parser/*.c")
+(glob "{lexer,parser}/*.c")
+    ;; All the C files in the lexer and parser dirs.
+
+(glob "\\{lexer,parser\\}/*.c")
+    ;; All the C files in the strange
+    ;; directory "{lexer,parser}".
+
+(glob "*\\*")
+    ;; All the files ending in "*", e.g.
+    ;; ("foo*" "bar*")
+
+(glob "*lexer*")
+    ("mylexer.c" "lexer1.notes")
+    ;; All files whose names contain the string "lexer".
+
+(glob "lexer")
+    ;; Either ("lexer") or ().</pre><p>
+</p>
+</blockquote>
+If the first character of the pattern (after expanding braces) is a slash,
+the search begins at root; otherwise, the search begins in the current
+working directory.<p>
+If the last character of the pattern (after expanding braces) is a slash,
+then the result matches must be directories, <i>e.g.</i>,
+</p>
