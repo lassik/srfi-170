@@ -2,7 +2,7 @@ The scsh sample implementation for [[https://srfi.schemers.org/srfi-170/][SRFI 1
 
 Be warned neither programs have uninstall make targets, you may want to save the output of "make install" and/or copies of the /usr/local directory tree.
 
-The following recipe has successfully built it in /usr/local on an x86-64 machine running stock Ubuntu 18.04 Bionic Beaver Linux, although you may have to load some standard packages not currently on your system.
+The following recipe has successfully built it in /usr/local on an x86-64 machine running stock Ubuntu 18.04 Bionic Beaver Linux, although you may have to load some standard packages not currently on your system.  Feel free to email hga at scsh-build@ancell-ent.com if you need help in building it on your UNIX-like or based system.
 
 Download [[http://www.s48.org/1.9.2/scheme48-1.9.2.tgz][the source tarball]] (the stock version 1.9 Scheme 48 on this Ubuntu distribution will not work).
 
