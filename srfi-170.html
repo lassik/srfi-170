@@ -577,8 +577,8 @@ To rename a file to a temporary name:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".temp.")&nbsp;;&nbsp;Keep&nbsp;link&nbsp;in&nbsp;cwd.<br>
 (delete-file&nbsp;old-file)</code></blockquote>
 Recall that this SRFI reports procedure failure by raising an error
-exception, not by returning an error code. This is critical to
-to this example &mdash; the programmer can assume that if the
+exception, not by returning an error code. This is critical for
+this example &mdash; the programmer can assume that if the
 <code>temp-file-iterate</code> call returns, it returns successfully.
 So the following <code>delete-file</code> call can be reliably invoked,
 safe in the knowledge that the backup link has definitely been established.<p>
