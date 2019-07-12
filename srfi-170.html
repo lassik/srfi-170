@@ -1287,6 +1287,10 @@ is to manually set the mode of a file, and use
 with the desired permission bits.
 </p></li>
 <li><p>
+When <code>create-hard-link</code> is asked to make a link across file systems,
+rather than erroring it creates a copy of the file at <i>newname</i>.
+</p></li>
+<li><p>
 <code>set-file-timespecs</code> is <code>set-file-times</code> in scsh,
 and <code>access-timespec</code> and <code>mod-timespec</code> are rational numbers,
 which are cooerced to exact integers, and treated as the number of elapsed seconds
