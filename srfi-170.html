@@ -1297,9 +1297,14 @@ which are cooerced to exact integers, and treated as the number of elapsed secon
 since the POSIX epoch of midnight January 1, 1970.
 </p></li>
 <li><p>
-The scsh file-info record <code>atime</code>, <code>mtime</code>, and <code>ctime</code>
-fields are exact integers, the number of elapsed seconds since the POSIX epoch of midnight January 1, 1970.
+The scsh <code>file-info</code> record fields <code>atime</code>, <code>mtime</code>, and <code>ctime</code>
+fields are exact integers instead of <code><i>timespecs</i></code>, and are the number of elapsed seconds
+since the POSIX epoch of midnight January 1, 1970.
 It does not implement the <code>rdev</code>, <code>blksize</code>, and <code>blocks</code> fields.
+</p></li>
+<li><p>
+On Ubuntu 18.04 Bionic Beaver, x86-64 kernel 4.15.0, the scsh <code>file-info-symlink?</code>
+reports <code>#f</code>, <code>file-info-regular?</code> reports <code>#t</code>.
 </p></li>
 <li><p>
 The <code>open-directory</code>, <code>read-directory</code>, and <code>close-directory</code>
@@ -1311,7 +1316,7 @@ an end of file object.
 Scsh does not support parameters, so <code>temp-file-prefix</code> does not exist.
 Instead, there is a fluid variable named <code>*temp-file-template*</code> whose
 value is as defined in this SRFI with <code>/var</code> added in front of <code>/tmp</code>,
-and <code>"~a"</code> appended to it, e.g., <code>/var/tmp/6812~a</code>.
+and <code>"~a"</code> appended to it, <i>e.g.</i>, <code>/var/tmp/6812~a</code>.
 </p></li>
 <li><p>
 The scsh fluid variable <code>*temp-file-template*</code> described
