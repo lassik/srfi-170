@@ -1324,15 +1324,15 @@ If trying the &#34To rename a file to a temporary name&#34 example,
 beware of the cross file system <code>create-hard-link</code> bug
 mentioned above.
 </p></li>
-</ul>
-
-<h3><a href="#node_imp_node_sec_3.4">3.4&nbsp;&nbsp;Processes</a></h3>
-<ul>
 <li><p>
 Scsh does not support the <code>real-path</code> procedure, but it would be trivial to add
 it to the source by cloning <code>read-symlink</code> and making it invoke the P<small>OSIX</small>
 <code>realpath()</code> function.
 </p></li>
+</ul>
+
+<h3><a href="#node_imp_node_sec_3.4">3.4&nbsp;&nbsp;Processes</a></h3>
+<ul>
 <li><p>
 Scsh does not provide the <code>spawn</code> functions, but they are easily provided using
 <code>fork</code> and the corresponding <code>exec</code> procedures.
