@@ -1316,9 +1316,13 @@ and <code>"~a"</code> appended to it, e.g., <code>/var/tmp/6812~a</code>.
 <li><p>
 The scsh fluid variable <code>*temp-file-template*</code> described
 above includes the substring "<code>~a</code>", which is required in
-an optional <code><i>prefix</i></code> argument
+the optional <code><i>prefix</i></code> argument
 to <code>temp-file-iterate</code> (the iteration strings are inserted
-there with <code>format</code>).
+there with <code>format</code>, instead of being concatenated with
+<code><i>prefix</i></code>).
+If trying the &#34To rename a file to a temporary name&#34 example,
+beware of the cross file system <code>create-hard-link</code> bug
+mentioned above.
 </p></li>
 </ul>
 
