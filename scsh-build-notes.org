@@ -1,0 +1,315 @@
+The scsh sample implementation for [[https://srfi.schemers.org/srfi-170/][SRFI 170]]: POSIX API is based on the latest [[http://www.s48.org/][version 1.9.2 release of Scheme 48]].  It is labeled version 0.7, and can be found in [[https://github.com/scheme/scsh][this GitHub repository]].
+
+Be warned neither programs have uninstall make targets, you may want to save the output of "make install" and/or copies of the /usr/local directory tree.
+
+The following recipe has successfully built it in /usr/local on an x86-64 machine running stock Ubuntu 18.04 Bionic Beaver Linux, although you may have to load some standard packages not currently on your system.  Feel free to email hga at scsh-build@ancell-ent.com if you need help in building it on your UNIX-like or based system.
+
+Download [[http://www.s48.org/1.9.2/scheme48-1.9.2.tgz][the source tarball]] (the stock version 1.9 Scheme 48 on this Ubuntu distribution will not work).
+
+cd /usr/local/src
+
+tar zxf ~/Downloads/scheme48-1.9.2.tgz
+
+cd scheme48-1.9.2/
+
+./configure
+
+This is the output from configure on hga's system:
+
+#+BEGIN_EXAMPLE
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... x86_64-unknown-linux-gnu
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking whether we must build a 32bit binary... no
+checking bits per byte... 8
+checking size of void *... 8
+checking for BIT_SUFFIX... 64
+checking whether we are building a Universal Binary... no
+checking how to compile position independent code... -fPIC
+checking -rdynamic... yes
+checking LDFLAGS_VM... 
+checking for library containing strerror... none required
+checking for special C compiler options needed for large files... no
+checking for _FILE_OFFSET_BITS value needed for large files... no
+checking for inline keyword... yes
+checking for a BSD-compatible install... /usr/bin/install -c
+checking for main in -lm... yes
+checking for main in -ldl... yes
+checking for main in -lmld... no
+checking for main in -lnsl... yes
+checking for main in -lgen... no
+checking for main in -lsocket... no
+checking for getpwnam in -lsun... no
+checking for RISC/OS POSIX library lossage
+checking for struct tm.tm_gmtoff... yes
+checking for an ANSI C-conforming const... yes
+checking for socklen_t... yes
+checking return type of signal handlers... void
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking for uintptr_t... yes
+checking for uint16_t... yes
+checking libgen.h usability... yes
+checking libgen.h presence... yes
+checking for libgen.h... yes
+checking sys/timeb.h usability... yes
+checking sys/timeb.h presence... yes
+checking for sys/timeb.h... yes
+checking posix/time.h usability... no
+checking posix/time.h presence... no
+checking for posix/time.h... no
+checking sys/select.h usability... yes
+checking sys/select.h presence... yes
+checking for sys/select.h... yes
+checking sysexits.h usability... yes
+checking sysexits.h presence... yes
+checking for sysexits.h... yes
+checking langinfo.h usability... yes
+checking langinfo.h presence... yes
+checking for langinfo.h... yes
+checking for nl_langinfo... yes
+checking for gettimeofday... yes
+checking for ftime... yes
+checking for select... yes
+checking for setitimer... yes
+checking for sigaction... yes
+checking for execvpe... yes
+checking poll.h usability... yes
+checking poll.h presence... yes
+checking for poll.h... yes
+checking for poll... yes
+checking for pkg-config... /usr/bin/pkg-config
+checking pkg-config is at least version 0.9.0... yes
+checking for dlopen... yes
+checking for socket... yes
+checking for chroot... yes
+checking for strerror... yes
+checking environ... using environ
+checking IEEE floating-point endianness... least first
+checking native-code compiler support... no
+checking for ld... ld
+checking compile and link flags for dynamic externals... -fPIC, -shared  -rdynamic
+checking pthread.h usability... yes
+checking pthread.h presence... yes
+checking for pthread.h... yes
+checking Pthreads support... -pthread (compile) -pthread (link)
+checking -munaligned-doubles... no
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating c/sysdep.h
+config.status: creating c/scheme48arch.h
+#+END_EXAMPLE
+
+make
+
+It should build without any warnings.
+
+You can test it before installation with "make test", that took a few minutes on hga's system.  The final output should be:
+
+#+BEGIN_EXAMPLE
+ALL TESTS SUCCEEDED
+()
+#+END_EXAMPLE
+
+You can install it in /usr/local with "make install", but be warned it has no uninstall target.  I like to keep all of /usr/local writable by my user id, but if it's limited to writing by root, you'll need something like "sudo make install".
+
+Change to another directory and make sure it can be found and run:
+
+scheme48
+
+#+BEGIN_EXAMPLE
+Welcome to Scheme 48 1.9.2 (made by hga on 2019-07-06)
+See http://s48.org/ for more information.
+Please report bugs to scheme-48-bugs@s48.org.
+Get more information at http://www.s48.org/.
+Type ,? (comma question-mark) for help.
+> ^D
+Exit Scheme 48 (y/n)? y
+#+END_EXAMPLE
+
+Change your working directory back to /usr/local/src, and clone the 0.7 scsh repository; if you have a GitHub account:
+
+git clone git@github.com:scheme/scsh.git
+
+If not:
+
+git clone https://github.com/scheme/scsh.git
+
+cd scsh
+
+git submodule update --init
+
+autoreconf
+
+./configure
+
+This is the output from configure on hga's system:
+
+#+BEGIN_EXAMPLE
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... x86_64-unknown-linux-gnu
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking for a BSD-compatible install... /usr/bin/install -c
+checking for scheme48... /usr/local/bin/scheme48
+SCHEME48=/usr/local/bin/scheme48,  S48DIR=/usr/local
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking fcntl.h usability... yes
+checking fcntl.h presence... yes
+checking for fcntl.h... yes
+checking limits.h usability... yes
+checking limits.h presence... yes
+checking for limits.h... yes
+checking netdb.h usability... yes
+checking netdb.h presence... yes
+checking for netdb.h... yes
+checking sgtty.h usability... yes
+checking sgtty.h presence... yes
+checking for sgtty.h... yes
+checking for stdlib.h... (cached) yes
+checking for string.h... (cached) yes
+checking sys/ioctl.h usability... yes
+checking sys/ioctl.h presence... yes
+checking for sys/ioctl.h... yes
+checking sys/param.h usability... yes
+checking sys/param.h presence... yes
+checking for sys/param.h... yes
+checking sys/time.h usability... yes
+checking sys/time.h presence... yes
+checking for sys/time.h... yes
+checking termios.h usability... yes
+checking termios.h presence... yes
+checking for termios.h... yes
+checking for unistd.h... (cached) yes
+checking utime.h usability... yes
+checking utime.h presence... yes
+checking for utime.h... yes
+checking scheme48.h usability... yes
+checking scheme48.h presence... yes
+checking for scheme48.h... yes
+checking for pid_t... yes
+checking for size_t... yes
+checking for ssize_t... yes
+checking for uid_t in sys/types.h... yes
+checking for unistd.h... (cached) yes
+checking for working chown... yes
+checking vfork.h usability... no
+checking vfork.h presence... no
+checking for vfork.h... no
+checking for fork... yes
+checking for vfork... yes
+checking for working fork... yes
+checking for working vfork... (cached) yes
+checking whether lstat correctly handles trailing slash... yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible malloc... yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible realloc... yes
+checking for dup2... yes
+checking for ftruncate... yes
+checking for gethostname... yes
+checking for memset... yes
+checking for select... yes
+checking for utime... yes
+checking for openpty... no
+checking for openpty in -lutil... yes
+checking libutil.h usability... no
+checking libutil.h presence... no
+checking for libutil.h... no
+checking util.h usability... no
+checking util.h presence... no
+checking for util.h... no
+checking how to compile position independent code... -fPIC
+checking -rdynamic... yes
+checking for ld... ld
+checking compile and link flags for dynamic externals... -fPIC, -shared  -rdynamic
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating c/config.h
+#+END_EXAMPLE
+
+make
+
+It should make with two apparently harmless warnings:
+
+#+BEGIN_EXAMPLE
+gcc -g -O2 -fPIC -I/usr/local/include -rdynamic -shared  -rdynamic -o c/syscalls.so c/syscalls.c -lutil
+c/syscalls.c: In function ‘sleep_until’:
+c/syscalls.c:711:18: warning: implicit declaration of function ‘time’; did you mean ‘utime’? [-Wimplicit-function-declaration]
+     time_t now = time(0);
+                  ^~~~
+                  utime
+gcc -g -O2 -fPIC -I/usr/local/include -rdynamic -shared  -rdynamic -o c/tty.so c/tty.c -lutil
+c/tty.c: In function ‘allocate_master’:
+c/tty.c:398:14: warning: implicit declaration of function ‘openpty’; did you mean ‘openat’? [-Wimplicit-function-declaration]
+         rc = openpty (&master_fd, &slave_fd, NULL, NULL, NULL);
+              ^~~~~~~
+              openat
+#+END_EXAMPLE
+
+You can then test it with "make test", which should only take a few seconds; the output should be like this:
+
+#+BEGIN_EXAMPLE
+./build/test.sh .
+Welcome to scsh 0.7
+Type ,? for help.
+> Testing file-system:file-type-symlink ... OK
+Testing file-system:create-temp-file ... OK
+Testing file-system:directory-files-3 ... OK
+[ Lots more tests. ]
+Testing process-state:set-umask ... OK
+Testing process-state:with-umask ... OK
+#{Unspecific}
+> 
+#+END_EXAMPLE
+
+It can then be installed in /usr/local with "make install" or "sudo make install", but be warned it has no uninstall target.
+
+When invoked, it should look like this:
+
+#+BEGIN_EXAMPLE
+scsh
+Welcome to scsh 0.7
+Type ,? for help.
+>
+#+END_EXAMPLE
+
+Be sure to check the SRFI's Implementation section for the many differences and workarounds between this sample implementation and the SRFI.
