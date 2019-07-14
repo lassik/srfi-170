@@ -1316,12 +1316,14 @@ value is as defined in this SRFI with <code>/var</code> added in front of <code>
 and <code>"~a"</code> appended to it, <i>e.g.</i>, <code>/var/tmp/6812~a</code>.
 </p></li>
 <li><p>
-The scsh fluid variable <code>*temp-file-template*</code> described
-above includes the substring "<code>~a</code>", which is required in
-the optional <code><i>prefix</i></code> argument
-to <code>call-with-temporary-filename</code> (the varying strings it
-iterates through are inserted there with <code>format</code>, instead
-of being concatenated with <code><i>prefix</i></code>).
+In scsh <code>call-with-temporary-filename</code> is implemented with
+<code>temp-file-iterate</code> with the following difference:
+The scsh fluid variable <code>*temp-file-template*</code> described above
+includes the substring "<code>~a</code>", which is required in the optional
+<code><i>prefix</i></code> argument to <code>temp-file-iterate</code> (the
+varying strings it iterates through are inserted there with <code>format</code>,
+instead of being concatenated with <code><i>prefix</i></code> as in
+<code>call-with-temporary-filename</code>).
 If trying the &#34To rename a file to a temporary name&#34 example,
 beware of the cross file system <code>create-hard-link</code> bug
 mentioned above.
