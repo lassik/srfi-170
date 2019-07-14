@@ -610,8 +610,8 @@ and whose resolution does not involve <code>.</code>, <code>..</code>, or symbol
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(spawn <i>mode</i> [<i>config</i>] prog arg</i><sub>1</sub> <code>...</code>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn-path <i>mode</i> [<i>config</i>] prog arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn <i>mode</i> [<i>config</i>] <i>prog arg<sub>1</sub> ...arg<sub>n</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(spawn-path <i>mode</i> [<i>config</i>] <i>prog arg<sub>1</sub> ...arg<sub>n</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>
 These procedures cause a new process to be created running
@@ -628,7 +628,7 @@ wherever possible.
 or <code>spawn/detach</code>.
   <code>Spawn/wait</code> causes the procedure to wait until the new process
   terminates, and then returns its exit code as an exact integer
-  (see <code>wait</code> for details).
+  (see <code>wait</code> below for details).
   The other two values cause the procedure to return immediately
   with an unspecified object.  <code>Spawn/detach</code> will cause the new
   process to run detached from any control terminal; on Windows it will have no
@@ -654,7 +654,7 @@ The value of the key <code>arg0</code> is a string
 which is passed to the OS as the zeroth command-line
 argument.
 If omitted, <i>prog</i> is used as the zeroth argument,
-which is normally the Right Thing.  Some operating systems
+which is normally The Right Thing.  Some operating systems
 and programming languages discard the zeroth argument.
 </p>
 <p>
@@ -695,14 +695,14 @@ an exception.
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(fork <i>[thunk or <code>#f</code>]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>proc or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(fork <i>[thunk or <code>#f</code>]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>process-object or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 
 <blockquote>
 <code>fork</code> with no arguments or <code>#f</code> instead of a thunk is like
 <code>fork()</code>.
 In the parent process, it returns the child's <i>process object</i>
-(see below for more information on process objects).  In the child
+(see below for more information).  In the child
 process, it returns <code>#f</code>.<p>
 <code>fork</code> with an argument only returns in the parent process, returning
 the child's process object.
