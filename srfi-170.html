@@ -1006,7 +1006,7 @@ Returns the current locale as a string, or <code>#f</code> if it is not known.
 <h2><a href="#node_toc_node_sec_3.9">3.9&nbsp;&nbsp;Signal system</a></h2>
 <p>This SRFI deals only with signaling other processes.
 Signal <i>handling</i> is so complex and so intertwined
-with the Scheme implementation that this SRFI
+with Scheme implementations that this SRFI
 does not standardize it.</p>
 <p>Signal numbers are bound to the variables <code>signal/hup</code>, <code>signal/int</code>, etc.
 See <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html">
@@ -1142,7 +1142,7 @@ is re-entered, the action of the procedure is re-enabled.</p>
 <blockquote>
 The argument <i>port</i> must be open on a tty.
 The tty is set to raw mode during the dynamic execution of <code>thunk</code>
-and then is restored to canonical ("cooked") mode.  The effect of the
+and then is restored to canonical "cooked" mode.  The effect of the
   <i>min</i> and <i>time</i> arguments is that any reads done on the tty
   while raw mode is in effect will return to the caller after <i>min</i>
   bytes have been read or <i>time</i> seconds have elapsed, whichever
@@ -1200,7 +1200,7 @@ You may subsequently use <code>open-control-tty</code> to open a new control
 terminal.<p>
 It is an error to call this procedure if the current process is already
 a session leader.
-One way to guarantee this is not the case is only to call this procedure
+One way to guarantee this is not the case is to only call this procedure
 after forking.
 </p>
 </blockquote><p>
@@ -1209,7 +1209,7 @@ after forking.
 <p></p>
 <div align="left"><code>(tty-process-group <i>port/fname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><code>(set-tty-process-group <i>port/fname pgrp</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-tty-process-group <i>port/fname process-group</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This pair of procedures gets and sets the process group of a given
