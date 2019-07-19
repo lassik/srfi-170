@@ -663,7 +663,7 @@ So a <i>prog</i> like <code>"bin/prog"</code>
 always executes the program <code>bin/prog</code>
 in the current working directory.
 See also <code>exec-path-list</code> below.</p>
-<p>Both of these procedures may flush buffered output
+<p>Both of these procedures should flush buffered output
 before creating the next process.
 <p>
 </blockquote>
@@ -676,20 +676,6 @@ before creating the next process.
     and <code>open</code> programs respectively.  The procedure returns
     as soon as the application is launched with an unspecified value, so
     there is no access to the pid of the new process.</blockquote>
-<p></p>
-<p></p>
-<div align="left"><code>(exec <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(exec-path <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-<p>
-These procedures do the same things as the corresponding <code>spawn</code> procedures,
-except that no new process is created.  Instead, they cause the current program
-to be replaced in the current process.
-Consequently, these procedures never return under any circumstances.
-As with any other procedure in this SRFI, if there is an error, they raise
-an exception.
-</blockquote><p>
-</p>
 <p></p>
 <p></p>
 <div align="left"><code>(fork <i>[thunk or <code>#f</code>]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>process-object or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -705,8 +691,22 @@ process, it returns <code>#f</code>.<p>
 the child's process object.
 The child process calls <i>thunk</i> and then exits.</p>
 <p>
-<code>fork</code> may or may not flush buffered output before forking.
+<code>fork</code> should flush buffered output before forking.
 </p>
+</blockquote><p>
+</p>
+<p></p>
+<p></p>
+<div align="left"><code>(exec [<i>config</i>] <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(exec-path [<i>config</i>] <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>
+<p>
+These procedures do the same things as the corresponding <code>spawn</code> procedures,
+except that no new process is created.  Instead, they cause the current program
+to be replaced in the current process.
+Consequently, these procedures never return under any circumstances.
+As with any other procedure in this SRFI, if there is an error, they raise
+an exception.
 </blockquote><p>
 </p>
 <p></p>
@@ -721,11 +721,11 @@ are opaque objects wrapping the pid of the process, the exact id
 assigned by the kernel to the process.
 No constructor is exposed, but any procedure that accepts a process object
 also accepts a pid.
-<div align="left"><code>(proc? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(process-object? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns <code>#t</code> if <i>obj</i> is a process object and <code>#f</code> otherwise.
 </blockquote>
-<div align="left"><code>(proc:pid <i>proc</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns the pid of <i>proc</i>.
+<div align="left"><code>(process-object:pid <i>process-object</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>Returns the pid of <i>process-object</i>.
 </blockquote>
 <a name="node_sec_3.4.2"></a>
 <h3><a href="#node_toc_node_sec_3.4.2">3.4.2&nbsp;&nbsp;Process waiting</a></h3>
@@ -1029,16 +1029,34 @@ or exact integer process ids.
 </p>
 <a name="node_sec_3.10"></a>
 <h2><a href="#node_toc_node_sec_3.10">3.10&nbsp;&nbsp;Time</a></h2>
+<p>
+A <i>timespec</i> is a pair whose car is the number of elapsed seconds
+since a P<small>OSIX</small> epoch, and whose cdr is the number of
+elapsed nanoseconds since the beginning of the current second.  The
+system clock is not required to report time at full nanosecond
+resolution, nor is anything guaranteed about accuracy.
+</p>
+<p>
+You can convert between a timespec and an inexact number of seconds with the expression
+<blockquote>
+<code>(+ (car <i>timespec</i>) (/ (cdr <i>timespec</i>) 1000000000.0))</code>
+</blockquote>
+and in the reverse direction with:
+<blockquote>
+<code>(let-values (((secs nanos))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(floor/ <i>seconds</i> 10E9))<br/>
+&nbsp;&nbsp;(cons secs nanos))
+</code> </blockquote>
+In the case of P<small>OSIX</small> time,
+some precision is unavoidably lost.</p>
+</p>
+
 <div align=left><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 <p>The <code>posix-time</code> procedure returns the current time as a
-<i>timespec</i>, a pair whose car is the number of elapsed seconds
-since the P<small>OSIX</small> epoch (midnight January 1, 1970 Universal
-Time) excluding leap seconds, and whose cdr is the number of elapsed
-nanoseconds since the beginning of the current second.  The system
-clock is not required to report time at full nanosecond resolution,
-nor is anything guaranteed about accuracy.
+<i>timespec</i> since the P<small>OSIX</small> epoch (midnight January
+1, 1970 Universal Time), excluding leap seconds.
 </blockquote>
 </blockquote><p>
 </p>
@@ -1071,19 +1089,7 @@ Compares two timespecs for exact equality.
 </blockquote>
 </p>
 <p></p>
-<p>You can convert between a timespec and an inexact number of seconds with the expression
-<blockquote>
-<code>(+ (car <i>timespec</i>) (/ (cdr <i>timespec</i>) 1000000000.0))</code>
-</blockquote>
-and in the reverse direction with:
-<blockquote>
-<code>(let-values (((secs nanos))<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(floor/ <i>seconds</i> 10E9))<br/>
-&nbsp;&nbsp;(cons secs nanos))
-</code> </blockquote>
-In the case of P<small>OSIX</small> time,
-some precision is unavoidably lost.</p>
-</p>
+
 <h2><a href="#node_toc_node_sec_3.11">3.11&nbsp;&nbsp;Environment variables</a></h2>
 <p>Most support for environment variables is provided in R7RS-small.
 </p>
@@ -1093,11 +1099,11 @@ This variable contains the contents of the <code>PATH</code> environment variabl
 a list of strings, where each string contains a single directory pathname.  It is an
 error to change the value of this variable or
 to mutate this list or any of the strings.
-On Windows, the pathnames are separated by semicolons rather than by colons.
 Changing the value of <code>PATH</code> may or may not not change the value
 of this variable.  In any case, this SRFI provides no mechanism to change
 the values of environment variables or to add new ones, operations which
 may in any case fail if there is not enough space in the environment.
+Note to implementors: on Windows, the pathnames are separated by semicolons rather than by colons.
 </blockquote>
 <a name="node_sec_3.12"></a>
 <h2><a href="#node_toc_node_sec_3.12">3.12&nbsp;&nbsp;Terminal device control</a></h2>
@@ -1177,7 +1183,7 @@ It is opened for both input and output.<p>
 This procedure guarantees that it will make the opened terminal the
 process's control terminal only if the process does not have
 an assigned control terminal at the time of the call.
-If the SRFI process already has a control terminal, the results are undefined.</p>
+If the process already has a control terminal, the results are undefined.</p>
 <p>
 To arrange for the process to have no control terminal prior to calling
 this procedure, use the <code>become-session-leader</code> procedure.</p>
