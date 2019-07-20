@@ -809,11 +809,11 @@ Otherwise, this function returns false.
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(umask<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(umask<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(P<small>OSIX</small> umask)&nbsp;</div>
+<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(P<small>OSIX</small> umask)&nbsp;</div>
 <blockquote>
 The process's current umask is retrieved with <code>umask</code>, and set with
-<code>(set-umask <i>perms</i>)</code>.
+<code>(set-umask <i>perms</i>)</code>, <i>e.g.</i>, (set-umask #o2).
 </blockquote><p>
 </p>
 <p></p>
@@ -1355,6 +1355,9 @@ the argument vector as a list, including the zeroth argument.
 
 <h3><a href="#node_imp_node_sec_3.5">3.5&nbsp;&nbsp;Process state</a></h3>
 <ul>
+<li><p>
+Scsh <code>umask</code> and <code>set-umask</code> use the file-mode record described above.
+</p></li>
 <li><p>
 Scsh specifies, but does not implement, the procedures for getting or setting process priorities.
 </p></li>
