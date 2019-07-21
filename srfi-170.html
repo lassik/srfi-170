@@ -336,7 +336,7 @@ creating the new object.
 The effect of passing any other value is
 implementation-dependent.</p>
 </p><p>
-The <i>permission-bits</i> default to <code>#o777</code>, but are masked by the current umask.
+The <i>permission-bits</i> for <code>create-directory</code> default to <code>#o775</code>, and for <code>create-fifo</code> <code>#o664</code>, but are masked by the current umask.
 <p>
 </p><p>
 If you try to create a hard or symbolic link
@@ -815,10 +815,10 @@ Otherwise, this function returns false.
 <p></p>
 <p></p>
 <div align="left"><code>(umask<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(P<small>OSIX</small> umask)&nbsp;</div>
-<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(P<small>OSIX</small> umask)&nbsp;</div>
+<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(P<small>OSIX</small> umask)&nbsp;</div>
 <blockquote>
 The process's current umask is retrieved with <code>umask</code>, and set with
-<code>(set-umask <i>perms</i>)</code>, <i>e.g.</i>, (set-umask #o2).
+<code>(set-umask <i>perms</i>)</code>, <i>e.g.</i>, (set-umask #o2), which returns the previous umask.
 </blockquote><p>
 </p>
 <p></p>
@@ -1361,7 +1361,7 @@ the argument vector as a list, including the zeroth argument.
 <h3><a href="#node_imp_node_sec_3.5">3.5&nbsp;&nbsp;Process state</a></h3>
 <ul>
 <li><p>
-Scsh <code>umask</code> and <code>set-umask</code> use the file-mode record described above.
+Scsh <code>umask</code> and <code>set-umask</code> use the file-mode record described above, and <code>set-umask</code> does not return the previous umask.
 </p></li>
 <li><p>
 Scsh specifies, but does not implement, the procedures for getting or setting process priorities.
