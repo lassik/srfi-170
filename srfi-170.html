@@ -56,16 +56,7 @@ functions of this SRFI are available on all operating systems.
 
 <h1>Issues</h1>
 
-<ol>
-  <li>Candidates for additional procedures from the Python <code>os</code> module:
-    <code>pathconf</code>, <code>sysconf</code>, <code>statvfs</code>,
-    <code>posix_fallocate</code>, <code>posix_fadvise</code>,
-    <code>readv</code>, <code>writev</code>, <code>sendfile</code>,
-    <code>sched_{get,set}scheduler</code> and friends.
-    None are provided by scsh.</li>
-  <li>(Resolved)</li>
-  <li>(Resolved)</li>
-</ol>
+<p>None at present.</p>
 
 <h1>Rationale</h1>
 
@@ -103,12 +94,12 @@ The numbered headers are aligned with those used in the Reference Manual.
 even those which were non-Posix at the time (2006) are now included in Posix, and it has
 few or no operations that aren't Posix at all.  In addition, it is politically fairly neutral,
 being tied to an obsolete version of Scheme 48, which is not being actively developed.
-There is an updated version on Github, which has been patched to work with the latest (2006)
-version of Scheme 48.
+Scsh 0.7 exists (see Implementation section), but was
+not used in creating this SRFI because it is incompletely documented.
 </p>
 <p>
 This SRFI makes no effort to provide all 81 headers, 1191 interfaces, and 51
-data types of full P<small>OSIX</small>.  Instead it provides a reasonable number of
+data types of full P<small>OSIX</small>.  Instead it provides access to a reasonable number of
 highly portable interfaces (many of them even available on Windows)
 with wrappers to make them more Scheme-like.
 In particular, this SRFI excludes:
@@ -135,7 +126,7 @@ designed.  Consider the use of dot files (or if necessary
 non-portable facilities) instead.
 </p></li><li><p>
 All provisions for signal handling, as they are complex and require deep
-integration with the Scheme implementation.
+integration with the particular Scheme implementation.
 </p></li><li><p>
 Memory-mapped I/O, locales, syslog, System V message
 queues, and pseudo-TTYs, as they are considered specialized and out of scope.
@@ -277,7 +268,7 @@ descriptors.</p>
 <blockquote>
 <p>These procedures wrap a newly created port around the specified file descriptor,
 effectively importing it into the Scheme world.
-In particular, the textual ports use the same encoding applied
+In particular, the textual ports use the same character encoding applied
 by default in the underlying implemenation.</p>
 </blockquote>
 
@@ -354,6 +345,22 @@ and <i>oldname</i> and <i>newname</i> refer to the same file, it is an error
 </p></blockquote>
 </td></tr></tbody></table>
 <p></p>
+<div align=left><code>(rename-file <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>If you override an existing object, then <i>old-fname</i> 
+and <i>new-fname</i> must type-match -- either both directories, 
+or both non-directories. 
+This is required by the semantics of Unix <code>rename()</code>.<p>
+</p>
+<blockquote><i>Remark: </i> 
+There is an unfortunate atomicity problem with the <code>rename-file</code> 
+procedure: if you do not
+specify <i>override?</i>, but create file <code>new-fname</code> sometime between
+<code>rename-file</code>'s existence check and the actual rename operation,
+your file will be clobbered with <code>old-fname</code>. There is no way to 
+prevent this problem; at least it is highly unlikely to occur in practice.
+</blockquote>
+</blockquote><p>
+</p>
 <p></p>
 <div align="left"><code>(delete-directory <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>This procedure deletes directories from the file system.
@@ -369,8 +376,8 @@ and <i>oldname</i> and <i>newname</i> refer to the same file, it is an error
 <blockquote>
 These procedures set the permission bits, owner id, and group id of a
 file, respectively.
-The file can be specified by giving the file name, or either an
-integer file descriptor or a port open on the file.
+The file can be specified by giving either the file name or
+a port open on the file.
 Setting file user ownership usually requires root privileges.
 </blockquote><p>
 </p>
@@ -406,8 +413,7 @@ there is to know about a file. If the <i>chase?</i> flag is true
 (the default), then the procedure chases symlinks and reports on
 the files to which they refer. If <i>chase?</i> is false, then
 the procedure checks the actual file itself, even if it's a symlink.
-The <i>chase?</i> flag is ignored if the file argument is a file descriptor
-or port.<p>
+The <i>chase?</i> flag is ignored if the file argument is a port.
 </blockquote>
 <div align="left"><code>(file-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns <code>#t</code> if <i>obj</i> is a file-info object and <code>#f</code> otherwise.
@@ -588,8 +594,7 @@ To create a unique temporary directory:
 (call-with-temporary-filename&nbsp;(lambda&nbsp;(dir)&nbsp;(create-directory&nbsp;dir)&nbsp;dir)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/tmp/tempdir.")</code></blockquote>
 Similar operations can be used to generate unique symlinks and fifos,
-or to return values other than the new filename (<i>e.g.</i>, an open file
-descriptor or port).<p>
+or to return values other than the new filename (<i>e.g.</i>, an open port.</p>
 </p>
 </blockquote><p>
 </p>
