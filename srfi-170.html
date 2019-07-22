@@ -1298,6 +1298,11 @@ is to manually set the mode of a file, and use
 with the desired permission bits.
 </p></li>
 <li><p>
+Attempting <code>create-directory</code> with <code><i>override?</i></code> as
+<code>#t</code> when the target <code><i>fname</i></code> is a directory with
+contents causes a stack consuming infinite loop.
+</p></li>
+<li><p>
 When <code>create-hard-link</code> is asked to make a link across file systems,
 rather than erroring it creates a copy of the file at <i>newname</i>.
 </p></li>
