@@ -179,7 +179,10 @@ of view.
 For reference purposes, the P<small>OSIX</small> <code>errno</code> numbers
 are bound to the variables <code>errno/perm</code>, <code>errno/noent</code>, etc.
 See <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/errno.h.html">
-the P<small>OSIX</small> specification of <code>errno.h</code></a> for the complete list.
+the P<small>OSIX</small> specification of <code>errno.h</code></a> for the complete
+list, and note at the bottom "XSH Error Numbers", that link provides explanations
+about each error.
+
 <p>
 </p>
 <p></p>
@@ -336,7 +339,7 @@ creating the new object.
 The effect of passing any other value is
 implementation-dependent.</p>
 </p><p>
-The <i>permission-bits</i> default to <code>#o777</code>, but are masked by the current umask.
+The <i>permission-bits</i> for <code>create-directory</code> default to <code>#o775</code>, and for <code>create-fifo</code> <code>#o664</code>, but are masked by the current umask.
 <p>
 </p><p>
 If you try to create a hard or symbolic link
@@ -815,10 +818,10 @@ Otherwise, this function returns false.
 <p></p>
 <p></p>
 <div align="left"><code>(umask<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(P<small>OSIX</small> umask)&nbsp;</div>
-<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(P<small>OSIX</small> umask)&nbsp;</div>
+<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(P<small>OSIX</small> umask)&nbsp;</div>
 <blockquote>
 The process's current umask is retrieved with <code>umask</code>, and set with
-<code>(set-umask <i>perms</i>)</code>, <i>e.g.</i>, (set-umask #o2).
+<code>(set-umask <i>perms</i>)</code>, <i>e.g.</i>, (set-umask #o2), which returns the previous umask.
 </blockquote><p>
 </p>
 <p></p>
@@ -1294,6 +1297,11 @@ is to manually set the mode of a file, and use
 with the desired permission bits.
 </p></li>
 <li><p>
+Attempting <code>create-directory</code> with <code><i>override?</i></code> as
+<code>#t</code> when the target <code><i>fname</i></code> is a directory with
+contents causes a stack consuming infinite loop.
+</p></li>
+<li><p>
 When <code>create-hard-link</code> is asked to make a link across file systems,
 rather than erroring it creates a copy of the file at <i>newname</i>.
 </p></li>
@@ -1360,7 +1368,7 @@ the argument vector as a list, including the zeroth argument.
 <h3><a href="#node_imp_node_sec_3.5">3.5&nbsp;&nbsp;Process state</a></h3>
 <ul>
 <li><p>
-Scsh <code>umask</code> and <code>set-umask</code> use the file-mode record described above.
+Scsh <code>umask</code> and <code>set-umask</code> use the file-mode record described above, and <code>set-umask</code> does not return the previous umask.
 </p></li>
 <li><p>
 Scsh specifies, but does not implement, the procedures for getting or setting process priorities.
