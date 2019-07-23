@@ -455,7 +455,9 @@ for this SRFI's representation of time).
 
 <div align="left"><code>(file-info-socket? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><code>(file-info-special? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info-block-special? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+
+<div align="left"><code>(file-info-character-special? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <div align="left"><code>(file-info-symlink? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
@@ -1317,6 +1319,9 @@ The scsh <code>file-info</code> record fields <code>atime</code>, <code>mtime</c
 fields are exact integers instead of <code><i>timespecs</i></code>, and are the number of elapsed seconds
 since the POSIX epoch of midnight January 1, 1970.
 It does not implement the <code>rdev</code>, <code>blksize</code>, and <code>blocks</code> fields.
+</p></li>
+<li><p>
+Scsh does not distinguish between block and character special files, only offering <code>file-info-special?</code>
 </p></li>
 <li><p>
 On Ubuntu 18.04 Bionic Beaver, x86-64 kernel 4.15.0, the scsh <code>file-info-symlink?</code>
