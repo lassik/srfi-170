@@ -1315,6 +1315,9 @@ which are cooerced to exact integers, and treated as the number of elapsed secon
 since the POSIX epoch of midnight January 1, 1970.
 </p></li>
 <li><p>
+The scsh <code>file-info mode</code> record field is masked to only return the last three permission bits
+bytes, omitting the top byte for <code>set-user-ID</code>, <code>set-group-ID</code>, and the save text
+or "sticky" bit.
 The scsh <code>file-info</code> record fields <code>atime</code>, <code>mtime</code>, and <code>ctime</code>
 fields are exact integers instead of <code><i>timespecs</i></code>, and are the number of elapsed seconds
 since the POSIX epoch of midnight January 1, 1970.
