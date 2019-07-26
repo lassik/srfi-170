@@ -845,14 +845,15 @@ the user's home directory.
 <p></p>
 <div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(parent-pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(process-group<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-process-group <i>[proc/pid] pgrp</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(process-group <i>[process-object/pid]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-process-group <i>[process-object/pid] pgrp</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <code>(pid)</code> and <code>(parent-pid)</code> retrieve the process id for the
 current process and its parent.
-<code>(process-group)</code> returns the process group of the current process.
+<code>(process-group)</code> returns the process group of the current process
+if no <i>process-object/pid</i> is specified.
 A process's process group can be set with <code>set-process-group</code>;
-the value <i>proc/pid</i> specifies the affected process. It may be either
+the value <i>process-object/pid</i> specifies the affected process. It may be either
 a process object or an exact integer process id, and defaults to the current
 process.
 </blockquote><p>
@@ -1386,6 +1387,9 @@ the argument vector as a list, including the zeroth argument.
 <ul>
 <li><p>
 Scsh <code>umask</code> and <code>set-umask</code> use the file-mode record described above, and <code>set-umask</code> does not return the previous umask.
+</p></li>
+<li><p>
+Scsh <code>process-group</code> does not take the optional argument <code><i>process-object/pid</i></code>.
 </p></li>
 <li><p>
 Scsh specifies, but does not implement, the procedures for getting or setting process priorities.
