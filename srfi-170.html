@@ -391,7 +391,7 @@ The <i>chase?</i> flag is ignored if the file argument is a port.
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(set-file-timespecs <i>fname/port [access-timespec mod-timespec]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-timespecs <i>fname/port [access-timespec mod-timespec] [chase?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure sets the access and modified times for the file
@@ -1317,7 +1317,7 @@ Scsh does not implement the <code><i>chase?</i></code> option for <code>set-file
 </p></li>
 <li><p>
 <code>set-file-timespecs</code> is <code>set-file-times</code> in scsh,
-does not take a port as well as a filename,
+does not take a port, does not have the <code><i>chase?</i></code> option,
 and <code>access-timespec</code> and <code>mod-timespec</code> are rational numbers,
 which are cooerced to exact integers, and treated as the number of elapsed seconds
 since the POSIX epoch of midnight January 1, 1970.
