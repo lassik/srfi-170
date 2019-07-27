@@ -875,11 +875,11 @@ process.
 </ul>
   <p>Real-time processes are not affected by <code>set-priority</code>.</p>
 </blockquote>
-<div align=left><code>(nice <i>[process-group/pid] [delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(nice <i>[process-object/pid] [delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
   Increments the niceness of the single process specified by
   a process object or pid by <i>delta</i>.
-  If <code><i>process-group/pid</i></code> is not specified, the
+  If <code><i>process-object/pid</i></code> is not specified, the
   current process will be niced.  If <code><i>delta</i></code> is
   not specified, the increment is 1.
   </p>
