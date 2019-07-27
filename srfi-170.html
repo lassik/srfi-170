@@ -860,8 +860,8 @@ process.
 </p>
 <p></p>
 <p></p>
-<div align=left><code>(set-priority <i>which who niceness</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align=left><code>(priority <i>which who</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>fixnum</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(set-priority <i>which who niceness</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
   <p>These procedures modify and access the niceness of processes.</p>
   <ul><li><p>The <i>which</i> argument is one of the constants <code>priority/process</code>,
@@ -875,10 +875,14 @@ process.
 </ul>
   <p>Real-time processes are not affected by <code>set-priority</code>.</p>
 </blockquote>
-<div align=left><code>(nice <i>[proc/pid delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(nice <i>[process-group/pid] [delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
   Increments the niceness of the single process specified by
-  a process object or pid by <i>delta</i>.</p>
+  a process object or pid by <i>delta</i>.
+  If <code><i>process-group/pid</i></code> is not specified, the
+  current process will be niced.  If <code><i>delta</i></code> is
+  not specified, the increment is 1.
+  </p>
   <p>Real-time processes are not affected by <code>nice</code>.</p>
 </blockquote><p>
 </p>
