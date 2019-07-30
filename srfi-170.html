@@ -505,11 +505,11 @@ or change to the directory before using the file names.
 </p>
 </blockquote><p>
 </p>
-<div align="left"><code>(open-directory <i>dir</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>directory-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(open-directory <i>dir [dot-files?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>directory-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(read-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(close-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <p>
-These functions implement a direct interface to the
+These functions implement an interface to the
 <code>opendir()</code>/
 <code>readdir()</code>/
 <code>closedir()</code>
@@ -518,10 +518,10 @@ family of functions for processing directories.
 The <code>open-directory</code> procedure opens the
 directory with the specified pathname for reading, returning an opaque directory object.
 Then <code>read-directory</code>
-returns the name of the next available file
-(including all files whose names begin with dot including <code>.</code> and <code>..</code>, and
-without <i>dir</i> present) in a <i>directory-object</i>,
-or an end of file object if there are no more files.
+returns the name of the next available file,
+or <code>#f</code> if there are no more files.
+The <code><i>dot-files?</i></code> argument controls whether file names beginning with &quot;<code>.</code>&quot; are returned.
+If it is <code>#f</code>, which is the default, they are not.  The file names <code>.</code> and <code>..</code> are <i>never</i> returned.
 Finally, <code>close-directory</code> closes a directory object.</p>
 <p>
 </p>
