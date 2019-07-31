@@ -416,8 +416,8 @@ status-change (<code>ctime</code>) is set to the current time.
 <div align="left"><code>(file-info <i>fname/port [chase?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 The <code>file-info</code> procedure
-returns a file-info record containing everything
-there is to know about a file. If the <i>chase?</i> flag is true
+returns a file-info record containing useful
+information about a file. If the <i>chase?</i> flag is true
 (the default), then the procedure chases symlinks and reports on
 the files to which they refer. If <i>chase?</i> is false, then
 the procedure checks the actual file itself, even if it's a symlink.
@@ -489,7 +489,6 @@ such as a CD-ROM.</p>
 <blockquote>
 Return a list of file names in directory <i>dir</i>,
 which defaults to the current working directory.
-If <code><i>dir</i></code> is not a directory, returns <code>&#39;()</code>.
 The <i>dotfiles?</i> flag (default <code>#f</code>) causes dot files to be
 included in the list.
 Regardless of the value of <i>dotfiles?</i>, the two files <code>.</code> and
