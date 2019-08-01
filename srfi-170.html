@@ -391,14 +391,20 @@ The <i>chase?</i> flag is ignored if the file argument is a port.
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(set-file-timespecs <i>fname/port [access-timespec modify-timespec [chase?]]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-timespecs <i>fname/port [access-timespec modify-timespec] [chase?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure sets the access and modified times for the file
-<i>fname</i> to the supplied values (see section&nbsp;<a href="#node_sec_3.10">3.10</a>
-for this SRFI's representation of time).
+<i>fname</i> to the supplied SRFI-FIXME timespec values.
 If neither time argument is supplied, they are both taken to be
-the current time. It is an error if exactly one time is provided.
+the current time.
+The special values <code>timespect/now</code> and <code>timespec/omit</code>
+set their respective times to the current time, or do not change the time.
+It is an error if exactly one time is provided.
+If the <i>chase?</i> flag is true (the default), then the procedure
+chases symlinks and sets the times of the file to which it refers.
+If <i>chase?</i> is false, then procedure sets actual file itself,
+even if it's a symlink.
 If the procedure completes successfully, the file's time of last
 status-change (<code>ctime</code>) is set to the current time.
 </blockquote><p>
