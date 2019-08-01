@@ -450,7 +450,7 @@ The <i>chase?</i> flag is ignored if the file argument is a port.
 number of hard links, user id, group id, device ID if file is special,
 size in bytes, optimal blocksize for I/O, number of 512B blocks allocated,
 last access time, last modification time, and
-last change of status time stored in <i>file-info</i> respectively
+last change of status times in SRFI-FIXME timespecs stored in <i>file-info</i> respectively
 (see section&nbsp;<a href="#node_sec_3.10">3.10</a>
 for this SRFI's representation of time).
 </blockquote>
@@ -1076,25 +1076,11 @@ Process ids less that 1 have special meanings, please consult a relevant referen
 <a name="node_sec_3.10"></a>
 <h2><a href="#node_toc_node_sec_3.10">3.10&nbsp;&nbsp;Time</a></h2>
 <p>
-A <i>timespec</i> is a pair whose car is the number of elapsed seconds
+A SRFI-FIXME <i>timespec</i> is a pair whose car is the number of elapsed seconds
 since a P<small>OSIX</small> epoch, and whose cdr is the number of
 elapsed nanoseconds since the beginning of the current second.  The
 system clock is not required to report time at full nanosecond
 resolution, nor is anything guaranteed about accuracy.
-</p>
-<p>
-You can convert between a timespec and an inexact number of seconds with the expression
-<blockquote>
-<code>(+ (car <i>timespec</i>) (/ (cdr <i>timespec</i>) 1000000000.0))</code>
-</blockquote>
-and in the reverse direction with:
-<blockquote>
-<code>(let-values (((secs nanos))<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(floor/ <i>seconds</i> 10E9))<br/>
-&nbsp;&nbsp;(cons secs nanos))
-</code> </blockquote>
-In the case of P<small>OSIX</small> time,
-some precision is unavoidably lost.</p>
 </p>
 
 <div align=left><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -1118,25 +1104,11 @@ This is not guaranteed for <code>posix-time</code>
 because the system's P<small>OSIX</small> clock
 is sometimes turned either forward or backward.
 </p>
-</blockquote><p>
-</p>
-<div align="left"><code>(timespec-difference <i>timespec<sub>1</sub> timespec<sub>2</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>timespec</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-Returns a timespec that represents the difference in
-seconds and nanoseconds between
-<i>timespec<sub>1</sub></i> and
-<i>timespec<sub>2</sub></i>.
 </blockquote>
-</p>
-<p></p>
-<div align="left"><code>(timespec=? <i>timespec<sub>1</sub> timespec<sub>2</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>timespec</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-Compares two timespecs for exact equality.
-</blockquote>
-</p>
-<p></p>
+
 
 <h2><a href="#node_toc_node_sec_3.11">3.11&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+
 
 <a name="node_sec_3.12"></a>
 <h2><a href="#node_toc_node_sec_3.12">3.12&nbsp;&nbsp;Terminal device control</a></h2>
