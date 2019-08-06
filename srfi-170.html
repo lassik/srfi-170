@@ -528,11 +528,15 @@ or the end of file object if there are no more files.
 The <code><i>dot-files?</i></code> argument controls whether file names beginning with &quot;<code>.</code>&quot; are returned.
 If it is <code>#f</code>, which is the default, they are not.  The file names <code>.</code> and <code>..</code> are <i>never</i> returned.
 Finally, <code>close-directory</code> closes a directory object.</p>
-<p>
-</p>
-<p></p>
-<p></p>
-<p></p>
+
+<div align="left"><code>(real-path <i>path</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+
+<blockquote>
+Returns an absolute pathname
+derived from <i>pathname</i> that names the same file
+and whose resolution does not involve <code>.</code>, <code>..</code>, or symbolic links.
+</blockquote>
+
 <div align="left"><code>temp-file-prefix</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>string parameter</i>&nbsp;</div>
 <p></p>
 <blockquote>
@@ -612,17 +616,8 @@ To create a unique temporary directory:
 Similar operations can be used to generate unique symlinks and fifos,
 or to return values other than the new filename (<i>e.g.</i>, an open port).</p>
 </p>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><code>(real-path <i>path</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-Returns an absolute pathname
-derived from <i>pathname</i> that names the same file
-and whose resolution does not involve <code>.</code>, <code>..</code>, or symbolic links.
 </blockquote>
+
 <a name="node_sec_3.4"></a>
 <h2><a href="#node_toc_node_sec_3.4">3.4&nbsp;&nbsp;Processes</a></h2>
 <p></p>
