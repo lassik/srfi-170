@@ -316,16 +316,13 @@ if the implementation permits them.
 <p>The following procedures allow access to the
 computer's file system.
 <p>
-</p>
-<p></p>
-<p></p>
+
 <div align="left"><code>(create-directory <i>fname [permission-bits override?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <div align="left"><code>(create-fifo <i>fname [permission-bits override?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <div align="left"><code>(create-hard-link <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><code>(create-symlink <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote><p>
 These procedures create objects of various kinds in the file system.</p>
 <p>
@@ -342,7 +339,7 @@ implementation-dependent.</p>
 The <i>permission-bits</i> for <code>create-directory</code> default to <code>#o775</code>, and for <code>create-fifo</code> <code>#o664</code>, but are masked by the current umask.
 <p>
 </p><p>
-If you try to create a hard or symbolic link
+If you try to create a hard link
 and <i>old-fname</i> and <i>new-fname</i> refer to the same file, it is an error
 (and your file may be destroyed).
 </p></blockquote>
@@ -373,8 +370,8 @@ It is an error if <i>fname</i> is not a non-empty directory.
 </p>
 <p></p>
 <div align="left"><code>(set-file-mode <i>fname/port permission-bits</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-file-owner <i>fname/port uid [chase?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-file-group <i>fname/port gid [chase?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-owner <i>fname/port uid</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-group <i>fname/port gid</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 These procedures set the permission bits, owner id, and group id of a
@@ -382,16 +379,13 @@ file, respectively.
 The file can be specified by giving either the file name or
 a port open on the file.
 Setting file user ownership usually requires root privileges.
-If the <i>chase?</i> flag is true
-(the default), then the procedure chases symlinks and changes
-the files to which they refer. If <i>chase?</i> is false, then
-the procedure changes the actual file itself, even if it's a symlink.
-The <i>chase?</i> flag is ignored if the file argument is a port.
+This procedure chases symlinks and changes
+the files to which they refer.
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(set-file-timespecs <i>fname/port [access-timespec modify-timespec] [chase?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-timespecs <i>fname/port [access-timespec modify-timespec]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure sets the access and modified times for the file
@@ -401,10 +395,8 @@ the current time.
 The special values <code>timespect/now</code> and <code>timespec/omit</code>
 set their respective times to the current time, or do not change the time.
 It is an error if exactly one time is provided.
-If the <i>chase?</i> flag is true (the default), then the procedure
+This procedure
 chases symlinks and sets the times of the file to which it refers.
-If <i>chase?</i> is false, then procedure sets actual file itself,
-even if it's a symlink.
 If the procedure completes successfully, the file's time of last
 status-change (<code>ctime</code>) is set to the current time.
 </blockquote><p>
@@ -419,15 +411,13 @@ status-change (<code>ctime</code>) is set to the current time.
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(file-info <i>fname/port [chase?]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info <i>fname/port</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 The <code>file-info</code> procedure
 returns a file-info record containing useful
-information about a file. If the <i>chase?</i> flag is true
-(the default), then the procedure chases symlinks and reports on
-the files to which they refer. If <i>chase?</i> is false, then
-the procedure checks the actual file itself, even if it's a symlink.
-The <i>chase?</i> flag is ignored if the file argument is a port.
+information about a file.
+This procedure chases symlinks and reports on
+the files to which they refer.
 </blockquote>
 <div align="left"><code>(file-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns <code>#t</code> if <i>obj</i> is a file-info object and <code>#f</code> otherwise.
@@ -469,7 +459,6 @@ for this SRFI's representation of time).
 
 <div align="left"><code>(file-info-character-special? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><code>(file-info-symlink? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 These procedures are file-type predicates that test the
 file type stored in <i>file-info</i>.
@@ -613,7 +602,7 @@ To create a unique temporary directory:
 <blockquote><code><br>
 (call-with-temporary-filename&nbsp;(lambda&nbsp;(dir)&nbsp;(create-directory&nbsp;dir)&nbsp;dir)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/tmp/tempdir.")</code></blockquote>
-Similar operations can be used to generate unique symlinks and fifos,
+Similar operations can be used to generate unique fifos,
 or to return values other than the new filename (<i>e.g.</i>, an open port).</p>
 </p>
 </blockquote>
@@ -1302,11 +1291,8 @@ When scsh <code>create-hard-link</code> is asked to make a link across file syst
 rather than erroring it creates a copy of the file at <i>newname</i>.
 </p></li>
 <li><p>
-Scsh does not implement the <code><i>chase?</i></code> option for <code>set-file-owner</code> and <code>set-file-group</code>.
-</p></li>
-<li><p>
 <code>set-file-timespecs</code> is <code>set-file-times</code> in scsh,
-does not take a port, does not have the <code><i>chase?</i></code> option,
+does not take a port,
 and <code>access-timespec</code> and <code>mod-timespec</code> are rational numbers,
 which are cooerced to exact integers, and treated as the number of elapsed seconds
 since the POSIX epoch of midnight January 1, 1970.
