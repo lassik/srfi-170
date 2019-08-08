@@ -334,7 +334,7 @@ object in the file system with the new name.
 If it is <code>#f</code>, which is the default, then an
 error is signaled.  If it is <code>#t</code>,
 the old object is deleted with R7RS-small <code>delete-file</code>
-or <code>delete-directory</code> as appropriate before
+or this SRFI's <code>delete-directory</code> as appropriate before
 creating the new object.
 The effect of passing any other value is
 implementation-dependent.</p>
