@@ -881,48 +881,11 @@ process.
 <div align="left"><code>(user-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(user-supplementary-gids<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i> list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><code>(set-uid <i>uid</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-gid <i>gid</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-For the calling process, these routines get the specified data, and set the real ID, effective ID, and saved set-user-ID or set-group-ID.  Without proper privileges, only the effective ID is changed if the process ID is equal to the real ID, or the saved set-user-ID or set-group-ID.
+For the calling process, these routines get the specified data.
 </blockquote><p>
 </p>
-<div align="left"><code>(user-effective-uid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(user-effective-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><code>(set-user-effective-uid <i><i>uid</i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-user-effective-gid <i><i>gid</i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<p>
-</p>
-<blockquote>
-If the ID is equal to the real or effective user or group ID, or if the
-process has sufficient privileges, the effective ID will be changed,
-the real and saved IDs will not be changed.
-</blockquote><p>
-</p>
-<div align="left"><code>(set-user-real-and-effective-uid <i><i>ruid euid</i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-user-real-and-effective-gid <i><i>rgid euid</i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<p>
-</p>
-<blockquote>
-<p>
-These proceedures can change either the real or effective user or group IDs;
-if a supplied IDs is -1, the corresponding ID will not be changed.
-</p>
-<p>
-Either ID can be set to any value with sufficient privileges. Without,
-only the effective ID can be set, if the supplied effective ID is
-equal to the real, effective, or saved ID of the process.
-</p>
-<p>
-If the real ID is being set, or the effective ID is being set to a
-value other than the real ID, the saved ID of the current process will
-be set to the new effective ID.
-</p>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
 <a name="node_sec_3.6"></a>
 <h2><a href="#node_toc_node_sec_3.6">3.6&nbsp;&nbsp;User and group database access</a></h2>
 <p>These procedures are used to access the user and group databases
