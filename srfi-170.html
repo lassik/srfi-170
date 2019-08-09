@@ -1273,9 +1273,6 @@ It does not implement the <code>rdev</code>, <code>blksize</code>, and <code>blo
 Scsh does not distinguish between block and character special files, only offering <code>file-info-special?</code>
 </p></li>
 <li><p>
-On Bionic Beaver, the scsh <code>file-info-regular?</code> reports <code>#t</code> for symbolic links.
-</p></li>
-<li><p>
 The scsh <code>open-directory</code>, <code>read-directory</code>, and <code>close-directory</code>
 procedures are called <code>open-directory-stream</code> etc.  The <code>read-directory-stream</code>
 functions returns <code>#f</code> at the end of the directory instead of
