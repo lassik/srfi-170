@@ -903,7 +903,6 @@ rather than erroring it creates a copy of the file at <i>newname</i>.
 </p></li>
 <li><p>
 <code>set-file-timespecs</code> is <code>set-file-times</code> in scsh,
-does not take a port,
 and <code>access-timespec</code> and <code>mod-timespec</code> are rational numbers,
 which are cooerced to exact integers, and treated as the number of elapsed seconds
 since the POSIX epoch of midnight January 1, 1970.
@@ -918,13 +917,15 @@ since the POSIX epoch of midnight January 1, 1970.
 It does not implement the <code>rdev</code>, <code>blksize</code>, and <code>blocks</code> fields.
 </p></li>
 <li><p>
-Scsh does not distinguish between block and character special files, only offering <code>file-info-special?</code>
-</p></li>
-<li><p>
 The scsh <code>open-directory</code>, <code>read-directory</code>, and <code>close-directory</code>
 procedures are called <code>open-directory-stream</code> etc.  The <code>read-directory-stream</code>
 functions returns <code>#f</code> at the end of the directory instead of
 an end of file object.
+</p></li>
+<li><p>
+Scsh does not support the <code>real-path</code> procedure, but it would be trivial to add
+it to the source by cloning <code>read-symlink</code> and making it invoke the P<small>OSIX</small>
+<code>realpath()</code> function.
 </p></li>
 <li><p>
 Scsh does not support parameters, so <code>temp-file-prefix</code> does not exist.
@@ -945,24 +946,9 @@ If trying the &quot;To rename a file to a temporary name&quot; example,
 beware of the cross file system <code>create-hard-link</code> bug
 mentioned above.
 </p></li>
-<li><p>
-Scsh does not support the <code>real-path</code> procedure, but it would be trivial to add
-it to the source by cloning <code>read-symlink</code> and making it invoke the P<small>OSIX</small>
-<code>realpath()</code> function.
-</p></li>
 </ul>
 
-<h3><a href="#node_imp_node_sec_3.4">3.4&nbsp;&nbsp;Processes</a></h3>
-<ul>
-<li><p>
-Scsh does not provide the <code>spawn</code> functions, but they are easily provided using
-<code>fork</code> and the corresponding <code>exec</code> procedures.
-</p></li>
-<li><p>
-In scsh the <code>exec0</code> procedures are called <code>%exec</code> and accept the elements of
-the argument vector as a list, including the zeroth argument.
-</p></li>
-</ul>
+<h3><a href="#node_imp_node_sec_3.4">3.4&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 
 <h3><a href="#node_imp_node_sec_3.5">3.5&nbsp;&nbsp;Process state</a></h3>
 <ul>
@@ -970,13 +956,7 @@ the argument vector as a list, including the zeroth argument.
 Scsh <code>umask</code> and <code>set-umask</code> use the file-mode record described above, and <code>set-umask</code> does not return the previous umask.
 </p></li>
 <li><p>
-Scsh <code>process-group</code> does not take the optional argument <code><i>process-object/pid</i></code>.
-</p></li>
-<li><p>
-Scsh specifies, but does not implement, the procedures for getting or setting process priorities.
-</p></li>
-<li><p>
-Scsh does not implement <code>set-user-real-and-effective-uid</code> and <code>set-user-real-and-effective-gid</code>.
+Scsh specifies but does not implement <code>nice</code>.
 </p></li>
 </ul>
 
