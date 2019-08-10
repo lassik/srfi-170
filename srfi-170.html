@@ -284,24 +284,6 @@ Alternatively, <code>#f</code> is returned if <i>port</i> does not have a
 file descriptor (a string port, e.g.).
 </blockquote><p>
 </p>
-<div align="left"><code>(dup->fdes <i>port [fd]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-This procedure replicates the file descriptor that underlies
-<i>port</i> onto another file descriptor.
-This allows what is open on <i>port</i> to be exported from the Scheme
-world in such a way that the port and the file descriptor can be
-manipulated semi-independently (although they will still share the
-same file pointer and other things).
-If the particular file descriptor to be used is important,
-as before doing a <code>spawn</code> or <code>fork</code>, then
-it can be specified as the second argument.
-Otherwise, an unused file descriptor will be selected.
-In either case, the newly modified file descriptor is returned.
-</p>
-<p>If <i>fd</i> is a file descriptor underlying some existing
-port, and operations have already been done on that port,
-it is an error to perform further operations on it.</p>
-</blockquote>
 <div align="left"><code>(close-fdes <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <p></p>
 <blockquote>
@@ -600,207 +582,8 @@ or to return values other than the new filename (<i>e.g.</i>, an open port).</p>
 </blockquote>
 
 <a name="node_sec_3.4"></a>
-<h2><a href="#node_toc_node_sec_3.4">3.4&nbsp;&nbsp;Processes</a></h2>
+<h2><a href="#node_toc_node_sec_3.4">3.4&nbsp;&nbsp;[Intentionally omitted]</a></h2>
 <p></p>
-<p></p>
-<p></p>
-<div align="left"><code>(spawn <i>mode</i> [<i>config</i>] <i>prog arg<sub>1</sub> ...arg<sub>n</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(spawn-path <i>mode</i> [<i>config</i>] <i>prog arg<sub>1</sub> ...arg<sub>n</sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-<p>
-These procedures cause a new process to be created running
-<i>prog</i>, passing it the specified arguments and environment.
-Their C counterparts are part of a P<small>OSIX</small> extension
-(they are easily defined if not provided), and also exist in Windows.
-They may work even when a combination
-of <code>fork</code> and <code>exec</code>
-will not (as on Windows), and are therefore preferred in portable code
-wherever possible.
-</p>
-<p>The <i>mode</i> argument is one of the values
-<code>spawn/wait</code>, <code>spawn/nowait</code>,
-or <code>spawn/detach</code>.
-  <code>Spawn/wait</code> causes the procedure to wait until the new process
-  terminates, and then returns its exit code as an exact integer
-  (see <code>wait</code> below for details).
-  The other two values cause the procedure to return immediately
-  with an unspecified object.  <code>Spawn/detach</code> will cause the new
-  process to run detached from any control terminal; on Windows it will have no
-  access to the terminal at all.
-</p>
-<p>The <i>config</i> argument is an optional plist
-(a list of alternating symbols and values).
-The symbols <code>arg0</code> and <code>env</code>
-are defined by this SRFI;
-the meaning of all other symbols is implementation-dependent.
-They are meant to provide access to further variants of
-the <code>spawn</code> functions
-that are not standardized in this SRFI.
-</p>
-<p>
-The value of the key <code>env</code> is a
-string&rarr;string alist.
-If omitted, the environment of the current
-process is used.
-(i.e., the value of the external char <code>**environ</code>).</p>
-<p>
-The value of the key <code>arg0</code> is a string
-which is passed to the OS as the zeroth command-line
-argument.
-If omitted, <i>prog</i> is used as the zeroth argument,
-which is normally The Right Thing.  Some operating systems
-and programming languages discard the zeroth argument.
-</p>
-<p>
-The <code>spawn-path</code> variant searches the directories in the
-value of the environment variable <code>PATH</code>.
-A path search is not performed if the program name contains
-a slash character &mdash; it is used directly.
-So a <i>prog</i> like <code>"bin/prog"</code>
-always executes the program <code>bin/prog</code>
-in the current working directory.
-See also <code>exec-path-list</code> below.</p>
-<p>Both of these procedures should flush buffered output
-before creating the next process.
-<p>
-</blockquote>
-</p><p>
-<div align="left"><code>(file-spawn <i>file</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>object</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-    Opens an appropriate viewer or editor, depending on the OS,
-    for <i>file</i>.  This is a system call on Windows, but can be
-    done on Linux and MacOS by spawning the <code>xdg-open</code>
-    and <code>open</code> programs respectively.  The procedure returns
-    as soon as the application is launched with an unspecified value, so
-    there is no access to the pid of the new process.</blockquote>
-<p></p>
-<p></p>
-<div align="left"><code>(fork <i>[thunk or <code>#f</code>]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>process-object or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-
-<blockquote>
-<code>fork</code> with no arguments or <code>#f</code> instead of a thunk is like
-<code>fork()</code>.
-In the parent process, it returns the child's <i>process object</i>
-(see below for more information).  In the child
-process, it returns <code>#f</code>.<p>
-<code>fork</code> with an argument only returns in the parent process, returning
-the child's process object.
-The child process calls <i>thunk</i> and then exits.</p>
-<p>
-<code>fork</code> should flush buffered output before forking.
-</p>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><code>(exec [<i>config</i>] <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(exec-path [<i>config</i>] <i>prog <i>arg</i><sub>1</sub> <code>...</code><i>arg</i><sub><i>n</i></sub></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-<p>
-These procedures do the same things as the corresponding <code>spawn</code> procedures,
-except that no new process is created.  Instead, they cause the current program
-to be replaced in the current process.
-Consequently, these procedures never return under any circumstances.
-As with any other procedure in this SRFI, if there is an error, they raise
-an exception.
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-</p>
-<a name="node_sec_3.4.1"></a>
-<h3><a href="#node_toc_node_sec_3.4.1">3.4.1&nbsp;&nbsp;Process objects</a></h3>
-<p>
-This SRFI uses <i>process objects</i> to represent P<small>OSIX</small> processes.
-They are created by the <code>fork</code> procedure, and
-are opaque objects wrapping the pid of the process, the exact id
-assigned by the kernel to the process.
-No constructor is exposed, but any procedure that accepts a process object
-also accepts a pid.
-<div align="left"><code>(process-object? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns <code>#t</code> if <i>obj</i> is a process object and <code>#f</code> otherwise.
-</blockquote>
-<div align="left"><code>(process-object:pid <i>process-object</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns the pid of <i>process-object</i>.
-</blockquote>
-<a name="node_sec_3.4.2"></a>
-<h3><a href="#node_toc_node_sec_3.4.2">3.4.2&nbsp;&nbsp;Process waiting</a></h3>
-<p></p>
-<p></p>
-<p></p>
-<div align="left"><code>(wait <i>proc/pid [flags]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>status</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-This procedure waits until a child process exits, and returns its
-exit code. The <i>proc/pid</i> argument is either a process object
-(section <a href="#node_sec_3.4.1">3.4.1</a>) or an exact integer process id.
-<code>wait</code> returns the child's exit status code (or suspension code,
-if the <code>wait/stopped-children</code> option is used; see below).
-Status values can be queried with the procedures in section
-<a href="#node_sec_3.4.3">3.4.3</a>.<p>
-The <i>flags</i> argument is an exact integer whose bits specify
-additional options. It is composed by adding together either or both of the
-flags <code>wait/poll</code> and <code>wait/stopped-children</code>.
-The first causes <code>wait</code> to return <code>#f</code> immediately if
-a child is still active; the second causes <code>wait</code> to
-wait for suspended as well as terminated children.
-</p>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<p></p>
-<div align="left"><code>(wait-process-group <i>pgrp [flags]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>[proc status]</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-This procedure waits for any child whose process group is <i>pgrp</i>
-(an exact integer).
-The <i>flags</i> argument is as for <code>wait</code>.
-</blockquote><p>
-</p>
-<a name="node_sec_3.4.3"></a>
-<h3><a href="#node_toc_node_sec_3.4.3">3.4.3&nbsp;&nbsp;Analysing process status codes</a></h3>
-<p>
-When a child process dies (or is suspended), its parent can call the <code>wait</code>
-procedure to recover the exit (or suspension) status of the child.
-The exit status is a small exact integer that encodes information
-describing how the child terminated.
-The bit-level format of the exit status is not defined by P<small>OSIX</small>,
-so use the following three functions to decode one.
-However, if a child terminates normally with exit code 0,
-P<small>OSIX</small> does require <code>wait</code> to return an exit status that is exactly
-zero.
-So <code>(zero? <i>status</i>)</code> is a correct way to test for non-error,
-normal termination.
-</p>
-<p></p>
-<div align="left"><code>(status:exit-val <i>status</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i> or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<div align="left"><code>(status:stop-sig <i>status</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i> or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<div align="left"><code>(status:term-sig <i>status</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i> or <code>#f</code></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-For a given status value produced by calling <code>wait</code>,
-exactly one of these routines will return a true value.<p>
-If the child process exited normally, <code>status:exit-val</code> returns the
-exit code for the child process (i.e., the value the child passed to <code>exit</code>
-or returned from <code>main</code>). Otherwise, this function returns false.</p>
-<p>
-If the child process was suspended by a signal, <code>status:stop-sig</code>
-returns the signal that suspended the child.
-Otherwise, this function returns false.</p>
-<p>
-If the child process terminated abnormally, <code>status:term-sig</code>
-returns the signal that terminated the child.
-Otherwise, this function returns false.
-</p>
-</blockquote><p>
-</p>
-<p>
-</p>
-<p>
-</p>
 <a name="node_sec_3.5"></a>
 <h2><a href="#node_toc_node_sec_3.5">3.5&nbsp;&nbsp;Process state</a></h2>
 <p></p>
@@ -826,46 +609,17 @@ the user's home directory.
 <p></p>
 <p></p>
 <div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(parent-pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(process-group <i>[process-object/pid]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-process-group <i>[process-object/pid] pgrp</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-<code>(pid)</code> and <code>(parent-pid)</code> retrieve the process id for the
-current process and its parent.
-<code>(process-group)</code> returns the process group of the current process
-if no <i>process-object/pid</i> is specified.
-A process's process group can be set with <code>set-process-group</code>;
-the value <i>process-object/pid</i> specifies the affected process. It may be either
-a process object or an exact integer process id, and defaults to the current
-process.
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align=left><code>(priority <i>which who</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>fixnum</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align=left><code>(set-priority <i>which who niceness</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-  <p>These procedures modify and access the niceness of processes.</p>
-  <ul><li><p>The <i>which</i> argument is one of the constants <code>priority/process</code>,
-  <code>priority/process-group</code>, or <code>priority/user</code>, indicating whether
-  the priority of a single process, all processes in a process group, or all
-  processes with the same effective uid are being set or retrieved.</li>
-  <li><p>The <i>who</i> argument is the process object or pid, the process group, or the
-  effective uid respectively.  If it is 0, the current pid, process group, or
-  effective uid is used.</li>
-  <li><p>The lower the <i>niceness</i> value is, the more the process is favored during scheduling.</li>
-</ul>
-  <p>Real-time processes are not affected by <code>set-priority</code>.</p>
+<code>(pid)</code> retrieves the process id for the current process.
 </blockquote>
-<div align=left><code>(nice <i>[process-object/pid] [delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-  Increments the niceness of the single process specified by
-  a process object or pid by <i>delta</i>.
-  If <code><i>process-object/pid</i></code> is not specified, the
-  current process will be niced.  If <code><i>delta</i></code> is
-  not specified, the increment is 1.
-  </p>
-  <p>Real-time processes are not affected by <code>nice</code>.</p>
+
+<div align=left><code>(nice <i>[delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote><p>
+Increments the niceness of the current process by <i>delta</i>.
+The lower the <i>niceness</i> value is, the more the process is favored during scheduling.
+If <code><i>delta</i></code> is not specified, the increment is 1.
+</p>
+<p>Real-time processes are not affected by <code>nice</code>.</p>
 </blockquote><p>
 </p>
 <div align="left"><code>(user-login-name<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -931,18 +685,7 @@ stored in <i>group-info</i> respectively.</blockquote>
 <h2><a href="#node_toc_node_sec_3.7">3.7&nbsp;&nbsp;[Intentionally omitted]</a></h2>
 <a name="node_sec_3.8"></a>
 <h2><a href="#node_toc_node_sec_3.8">3.8&nbsp;&nbsp;System parameters</a></h2>
-<p></p>
-<p></p>
-<p></p>
-<div align="left"><code>(system-name<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-Returns the name of the host on which we are executing.
-This may be a local name, such as "solar", as opposed to a
-fully-qualified domain name such as "example.com".
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
+
 <div align="left"><code>(uname<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>uname-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
@@ -984,34 +727,11 @@ Returns the current timezone as a string, or <code>#f</code> if it is not known.
 Returns the current locale as a string, or <code>#f</code> if it is not known.
 </blockquote>
 
-</blockquote><p>
-</p>
+</blockquote>
+
 <a name="node_sec_3.9"></a>
-<h2><a href="#node_toc_node_sec_3.9">3.9&nbsp;&nbsp;Signal system</a></h2>
-<p>This SRFI deals only with signaling other processes.
-Signal <i>handling</i> is so complex and so intertwined
-with Scheme implementations that this SRFI
-does not standardize it.</p>
-<p>Signal numbers are bound to the variables <code>signal/hup</code>, <code>signal/int</code>, etc.
-See <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html">
-the P<small>OSIX</small> specification of <code>signal.h</code></a> for the complete list.
-<p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><code>(signal-process <i>proc sig</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(signal-process-group <i>prgrp sig</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>
-These two procedures send signals to a specific process and all the processes
-in a specific process group, respectively.
-The <i>proc</i> and <i>prgrp</i> arguments are either process objects
-or exact integer process ids.
-Process ids less that 1 have special meanings, please consult a relevant reference.
-</blockquote><p>
-</p>
-<p></p>
-<p>
-</p>
+<h2><a href="#node_toc_node_sec_3.9">3.9&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+
 <a name="node_sec_3.10"></a>
 <h2><a href="#node_toc_node_sec_3.10">3.10&nbsp;&nbsp;Time</a></h2>
 <p>
@@ -1115,70 +835,6 @@ The detection of interrupt (^C), quit (^\), and suspend (^Z) characters
 on the tty is disabled during the execution of <code>thunk</code> and then is re-enabled.
 </blockquote><p>
 </p>
-<div align="left"><code>(open-control-tty <i>tty-name</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-This procedure opens terminal device <i>tty-name</i> as the process's
-control terminal
-(see the <code>termios</code> man page for more information on control terminals).
-The <i>tty-name</i> argument is a filename such as <code>/dev/ttya</code>.
-It is opened for both input and output.<p>
-<p>
-This procedure guarantees that it will make the opened terminal the
-process's control terminal only if the process does not have
-an assigned control terminal at the time of the call.
-If the process already has a control terminal, the results are undefined.</p>
-<p>
-To arrange for the process to have no control terminal prior to calling
-this procedure, use the <code>become-session-leader</code> procedure.</p>
-<p>
-</p>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><code>(become-session-leader<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-This is the C <code>setsid()</code> call.
-P<small>OSIX</small> job-control has a three-level hierarchy:
-session/process-group/process.
-Every session has an associated control terminal.
-This procedure places the current process into a brand new session,
-and disassociates the process from any previous control terminal.
-You may subsequently use <code>open-control-tty</code> to open a new control
-terminal.<p>
-It is an error to call this procedure if the current process is already
-a session leader.
-One way to guarantee this is not the case is to only call this procedure
-after forking.
-</p>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><code>(tty-process-group <i>port/fname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<div align="left"><code>(set-tty-process-group <i>port/fname process-group</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-This pair of procedures gets and sets the process group of a given
-terminal.
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><code>(control-tty-file-name<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-Return the file name of the process's control tty.
-</blockquote><p>
-</p>
-</p>
-<p>
-</p>
-<p></p>
-<p></p>
 
 <h1>Implementation</h1>
 
