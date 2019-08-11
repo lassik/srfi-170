@@ -675,9 +675,7 @@ The <i>gid/name</i> argument is either an exact integer gid or a string group na
 </blockquote>
 <div align="left"><code>(group-info:name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(group-info:gid <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(group-info:members <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns the group name, group id, and group member names
-stored in <i>group-info</i> respectively.</blockquote>
+<blockquote>Returns the group name and group id stored in <i>group-info</i>.  The list of group member ids can be retrieved with the above <code>(user-supplementary-gids)</code></blockquote>
 </p>
 
 <a name="node_sec_3.7"></a>
