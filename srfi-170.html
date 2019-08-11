@@ -622,13 +622,12 @@ If <code><i>delta</i></code> is not specified, the increment is 1.
 <p>Real-time processes are not affected by <code>nice</code>.</p>
 </blockquote><p>
 </p>
-<div align="left"><code>(user-login-name<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(user-uid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(user-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(user-supplementary-gids<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>exact integer</i> list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-For the calling process, these routines get the specified data.
+For the calling process, these routines get the specified data.  The scsh proceedure <code>user-login-name</code> that uses getlogin() or getlogin_r() can be simulated with <code>(user-info:name (user-info (user-uid)))</code>, the outer procedures are described in the next section:
 </blockquote><p>
 </p>
 
@@ -679,55 +678,13 @@ The <i>gid/name</i> argument is either an exact integer gid or a string group na
 <div align="left"><code>(group-info:members <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the group name, group id, and group member names
 stored in <i>group-info</i> respectively.</blockquote>
-
 </p>
+
 <a name="node_sec_3.7"></a>
 <h2><a href="#node_toc_node_sec_3.7">3.7&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+
 <a name="node_sec_3.8"></a>
-<h2><a href="#node_toc_node_sec_3.8">3.8&nbsp;&nbsp;System parameters</a></h2>
-
-<div align="left"><code>(uname<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>uname-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-Returns a uname record.
-</blockquote>
-
-<div align="left"><code>(uname? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns <code>#t</code> if <i>obj</i> is a uname record and <code>#f</code> otherwise.
-</blockquote>
-
-<div align="left"><code>(uname:os-name <i>uname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(uname:node-name <i>uname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(uname:release-name <i>uname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(uname:version <i>uname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(uname:machine <i>uname</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns the OS name, node name, OS release name,
-OS version, and machine name stored in <i>uname</i> respectively.
-Each of the fields contains a string.
-Be aware that P<small>OSIX</small> limits the length of all entries to 32 characters,
-and that the node name does not necessarily correspond to the
-fully-qualified domain name.
-</p>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><code>(current-timezone<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-Returns the current timezone as a string, or <code>#f</code> if it is not known.
-</blockquote>
-
-</blockquote><p>
-</p>
-<p></p>
-<div align="left"><code>(current-locale<i></i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-Returns the current locale as a string, or <code>#f</code> if it is not known.
-</blockquote>
-
-</blockquote>
+<h2><a href="#node_toc_node_sec_3.8">3.8&nbsp;&nbsp;[Intentionally omitted]</a></h2>
 
 <a name="node_sec_3.9"></a>
 <h2><a href="#node_toc_node_sec_3.9">3.9&nbsp;&nbsp;[Intentionally omitted]</a></h2>
