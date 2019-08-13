@@ -202,13 +202,13 @@ It is an error to pass an <code>errno</code> that is not provided by the OS.</p>
   or one of an implementation-defined set of other objects, and <code>#f</code> otherwise.
 </blockquote><p>
 </p>
-<div align="left"><code>(syscall-error:errno <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(syscall-error:message <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(syscall-error:errno <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>errno</code>&nbsp;</div>
+<div align="left"><code>(syscall-error:message <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>strerror()</code>&nbsp;</div>
 <div align="left"><code>(syscall-error:procedure <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>procedure</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(syscall-error:data <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>list</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
   Returns a value equal to the Posix error number,
-  the corresponding error message as determined by the Posix interface <code>strerror()</code>,
+  the corresponding error message,
   the procedure passed to <code>errno-error</code>,
   and  a list containing the data packaged in in the <i>syscall-error</i> object respectively.
   All of these, with the possible exception of the error message, are
@@ -284,7 +284,7 @@ Alternatively, <code>#f</code> is returned if <i>port</i> does not have a
 file descriptor (a string port, e.g.).
 </blockquote><p>
 </p>
-<div align="left"><code>(close-fdes <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(close-fdes <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code>&nbsp;</div>
 <p></p>
 <blockquote>
 <p>Closes the file descriptor <i>fd</i>.</p>
@@ -294,16 +294,14 @@ The same is true of calls to <code>close-port</code> on a file descriptor,
 if the implementation permits them.
 </p>
 </blockquote>
+
 <h2><a href="#node_toc_node_sec_3.3">3.3&nbsp;&nbsp;File system</a></h2>
 <p>The following procedures allow access to the
 computer's file system.
 <p>
-
-<div align="left"><code>(create-directory <i>fname [permission-bits override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<div align="left"><code>(create-fifo <i>fname [permission-bits override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<div align="left"><code>(create-hard-link <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(create-directory <i>fname [permission-bits override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>mkdir()</code>&nbsp;</div>
+<div align="left"><code>(create-fifo <i>fname [permission-bits override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>mkfifo()</code>&nbsp;</div>
+<div align="left"><code>(create-hard-link <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>link()</code>&nbsp;</div>
 
 <blockquote><p>
 These procedures create objects of various kinds in the file system.</p>
@@ -327,7 +325,7 @@ and <i>old-fname</i> and <i>new-fname</i> refer to the same file, it is an error
 </p></blockquote>
 </td></tr></tbody></table>
 <p></p>
-<div align=left><code>(rename-file <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(rename-file <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rename()</code>&nbsp;</div>
 <blockquote>If you override an existing object, then <i>old-fname</i> 
 and <i>new-fname</i> must type-match -- either both directories, 
 or both non-directories. 
@@ -344,16 +342,16 @@ prevent this problem; at least it is highly unlikely to occur in practice.
 </blockquote><p>
 </p>
 <p></p>
-<div align="left"><code>(delete-directory <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(delete-directory <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rmdir()</code>&nbsp;</div>
 <blockquote>This procedure deletes directories from the file system.
 It is an error if <i>fname</i> is not a non-empty directory.
 </p>
 </blockquote><p>
 </p>
 <p></p>
-<div align="left"><code>(set-file-mode <i>fname mode-bits</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-file-owner <i>fname uid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-file-group <i>fname gid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-mode <i>fname mode-bits</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chmod()</code>&nbsp;</div>
+<div align="left"><code>(set-file-owner <i>fname uid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
+<div align="left"><code>(set-file-group <i>fname gid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
 
 <blockquote>
 These procedures set the mode bits, owner id, and group id of a
@@ -365,7 +363,7 @@ the files to which they refer.
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(set-file-timespecs <i>fname [access-timespec modify-timespec]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(set-file-timespecs <i>fname [access-timespec modify-timespec]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>utimensat()</code>&nbsp;</div>
 
 <blockquote>
 This procedure sets the access and modified times for the file
@@ -384,14 +382,14 @@ status-change (<code>ctime</code>) is set to the current time.
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(truncate-file <i>fname/port len</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(truncate-file <i>fname/port len</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>truncate()</code>&nbsp;</div>
 <blockquote>The specified file is truncated to <i>len</i> bytes in length.
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(file-info <i>fname/port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info <i>fname/port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stat()</code>&nbsp;</div>
 <blockquote>
 The <code>file-info</code> procedure
 returns a file-info record containing useful
@@ -427,11 +425,9 @@ for this SRFI's representation of time).
 
 </blockquote>
 <p></p>
-<div align="left"><code>(file-info-directory? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<div align="left"><code>(file-info-fifo? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<div align="left"><code>(file-info-regular? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(file-info-directory? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISDIR()</code>&nbsp;</div>
+<div align="left"><code>(file-info-fifo? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISFIFO()</code>&nbsp;</div>
+<div align="left"><code>(file-info-regular? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISREG()</code>&nbsp;</div>
 
 <blockquote>
 These procedures are file-type predicates that test the
@@ -473,9 +469,9 @@ or change to the directory before using the file names.
 </p>
 </blockquote><p>
 </p>
-<div align="left"><code>(open-directory <i>dir [dot-files?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>directory-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(read-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string or eof-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(close-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(open-directory <i>dir [dot-files?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>directory-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>opendir()</code>&nbsp;</div>
+<div align="left"><code>(read-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string or eof-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>readdir()</code>&nbsp;</div>
+<div align="left"><code>(close-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>closedir()</code>&nbsp;</div>
 <p>
 These functions implement an interface to the
 <code>opendir()</code>/
@@ -492,7 +488,7 @@ The <code><i>dot-files?</i></code> argument controls whether file names beginnin
 If it is <code>#f</code>, which is the default, they are not.  The file names <code>.</code> and <code>..</code> are <i>never</i> returned.
 Finally, <code>close-directory</code> closes a directory object.</p>
 
-<div align="left"><code>(real-path <i>path</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(real-path <i>path</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>realpath()</code>&nbsp;</div>
 
 <blockquote>
 Returns an absolute pathname
@@ -589,8 +585,8 @@ or to return values other than the new filename (<i>e.g.</i>, an open port).</p>
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(umask<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(P<small>OSIX</small> umask)&nbsp;</div>
-<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(P<small>OSIX</small> umask)&nbsp;</div>
+<div align="left"><code>(umask<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
+<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
 <blockquote>
 The process's current umask is retrieved with <code>umask</code>, and set with
 <code>(set-umask <i>perms</i>)</code>, <i>e.g.</i>, (set-umask #o2), which returns the previous umask.
@@ -598,8 +594,8 @@ The process's current umask is retrieved with <code>umask</code>, and set with
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(working-directory<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(set-working-directory <i>[fname]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(working-directory<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getcwd()</code>&nbsp;</div>
+<div align="left"><code>(set-working-directory <i>[fname]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chdir()</code>&nbsp;</div>
 <blockquote>
 Get and set the current working directory.
 If <code>set-working-directory</code> is called with no arguments, it changes the current working directory to
@@ -608,12 +604,12 @@ the user's home directory.
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpid()</code>&nbsp;</div>
 <blockquote>
 <code>(pid)</code> retrieves the process id for the current process.
 </blockquote>
 
-<div align=left><code>(nice <i>[delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(nice <i>[delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>nice()</code>&nbsp;</div>
 <blockquote><p>
 Increments the niceness of the current process by <i>delta</i>.
 The lower the <i>niceness</i> value is, the more the process is favored during scheduling.
@@ -622,9 +618,9 @@ If <code><i>delta</i></code> is not specified, the increment is 1.
 <p>Real-time processes are not affected by <code>nice</code>.</p>
 </blockquote><p>
 </p>
-<div align="left"><code>(user-uid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(user-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(user-supplementary-gids<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i> list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-uid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getuid()</code>&nbsp;</div>
+<div align="left"><code>(user-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgid()</code>&nbsp;</div>
+<div align="left"><code>(user-supplementary-gids<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i> list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgroups()</code>&nbsp;</div>
 
 <blockquote>
 For the calling process, these routines get the specified data.  The scsh proceedure <code>user-login-name</code> that uses getlogin() or getlogin_r() can be simulated with <code>(user-info:name (user-info (user-uid)))</code>, the outer procedures are described in the next section:
@@ -639,7 +635,7 @@ For the calling process, these routines get the specified data.  The scsh procee
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(user-info <i>uid/name</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(user-info <i>uid/name</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpwuid/getpwnam()</code>&nbsp;</div>
 
 <blockquote>
 Return a <code>user-info</code> record giving the recorded information for a
@@ -662,7 +658,7 @@ and shell path stored in <i>user-info</i> respectively.</blockquote>
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(group-info <i>gid/name</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(group-info <i>gid/name</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgrgid/getgrnam()</code>&nbsp;</div>
 
 <blockquote>
 Return a <code>group-info</code> record giving the recorded information for a
@@ -697,7 +693,7 @@ system clock is not required to report time at full nanosecond
 resolution, nor is anything guaranteed about accuracy.
 </p>
 
-<div align=left><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
 
 <blockquote>
 <p>The <code>posix-time</code> procedure returns the current time as a
@@ -706,7 +702,7 @@ resolution, nor is anything guaranteed about accuracy.
 </blockquote>
 </blockquote><p>
 </p>
-<div align=left><code>(monotonic-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align=left><code>(monotonic-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
 
 <blockquote>
 <p>The same as <code>posix-time</code>, except that the epoch is arbitrary.
@@ -741,7 +737,7 @@ suspend characters; and the ability to put a terminal into
 raw mode, in which no characters are specially recognized.
 </p>
 
-<div align="left"><code>(tty? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(tty? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
 
 <blockquote>
 Return true if the argument is a tty.
@@ -749,7 +745,7 @@ Return true if the argument is a tty.
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(tty-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(tty-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>&nbsp;</div>
 
 <blockquote>
 The argument <i>port</i> must be open on a tty.
@@ -760,7 +756,7 @@ Return the file name of the tty.
 their <code>thunk</code> arguments; if the thunk's dynamic extent is escaped,
 the action of the procedure is undone, but if the thunk's dynamic extent
 is re-entered, the action of the procedure is re-enabled.</p>
-<div align="left"><code>(with-raw-mode <i>port min time thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(with-raw-mode <i>port min time thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>()</code>&nbsp;</div>
 
 <blockquote>
 The argument <i>port</i> must be open on a tty.
@@ -772,7 +768,7 @@ and then is restored to canonical "cooked" mode.  The effect of the
   comes first.
 </blockquote><p>
 </p>
-<div align="left"><code>(without-echo <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(without-echo <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>()</code>&nbsp;</div>
 
 <blockquote>
 The argument <i>port</i> must be open on a tty.
@@ -780,7 +776,7 @@ Echoing of input is disabled on the tty during the execution of <code>thunk</cod
 and then is re-enabled.
 </blockquote><p>
 </p>
-<div align="left"><code>(without-interrupt-chars <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(without-interrupt-chars <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>()</code>&nbsp;</div>
 
 <blockquote>
 The argument <i>port</i> must be open on a tty.
