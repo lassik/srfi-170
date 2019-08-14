@@ -169,6 +169,10 @@ because a signal was received by the process, the system call will be
 automatically retried, thus eliminating what is traditionally known as
 <a href="https://www.dreamsongs.com/RiseOfWorseIsBetter.html">
 the PC loser-ing problem<a/>.
+The canonical set of P<small>OSIX</small> calls mentioned below that
+can result in EINTR are <code>chmod</code>, <code>chown</code>,
+<code>close</code>, <code>getpwnam</code>, <code>getpwuid</code>,
+<code>getgrnam</code>, <code>getgruid</code>, and <code>truncate</code>.
 </p><p>
 This frees up the procedures to return useful values,
 and allows the programmer to assume that
