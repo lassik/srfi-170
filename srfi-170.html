@@ -756,7 +756,7 @@ The argument <i>port</i> must be open on a tty.
 Return the file name of the tty.
 </blockquote><p>
 </p>
-<p>The following procedures use <code>dynamic-wind</code> magic when executing
+<p>The following procedures use the magic of <code>dynamic-wind</code> when executing
 their <code>thunk</code> arguments; if the thunk's dynamic extent is escaped,
 the action of the procedure is undone, but if the thunk's dynamic extent
 is re-entered, the action of the procedure is re-enabled.</p>
