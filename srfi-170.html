@@ -735,57 +735,71 @@ However, now that terminal emulators have almost completely displaced
 terminals, very little of this is useful except for directly
 controlling serial-line hardware, which itself is increasingly rare.
 Therefore, this SRFI provides only the functions that are still
-in common use by command-line programs: the ability to turn echoing on and off, the
-ability to suppress the recognition of interrupt, quit, and
-suspend characters; and the ability to put a terminal into
-raw mode, in which no characters are specially recognized.
+in common use by command-line programs.
 </p>
 
 <div align="left"><code>(tty? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
-
 <blockquote>
 Return true if the argument is a tty.
 </blockquote><p>
 </p>
-<p></p>
-<p></p>
-<div align="left"><code>(tty-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>&nbsp;</div>
 
+<div align="left"><code>(tty-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>&nbsp;</div>
 <blockquote>
 The argument <i>port</i> must be open on a tty.
 Return the file name of the tty.
 </blockquote><p>
 </p>
-<p>The following procedures use the magic of <code>dynamic-wind</code> when executing
-their <code>thunk</code> arguments; if the thunk's dynamic extent is escaped,
-the action of the procedure is undone, but if the thunk's dynamic extent
-is re-entered, the action of the procedure is re-enabled.</p>
-<div align="left"><code>(with-raw-mode <i>port min time thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>()</code>&nbsp;</div>
 
+<p>
+The following procedures use <code>dynamic-wind</code> when executing
+their <code>thunk</code> argument; if the thunk's dynamic extent is escaped,
+the tty mode changes of the procedure are undone, but if the thunk's dynamic
+extent is re-entered, the tty mode changes of the procedure are re-enabled.
+They all use P<small>OSIX</small> <code>tcgetattr()</code> and
+<code>tcsetattr()</code>, see also the <code>stty</code> command.
+</p>
+
+<p>The general paradigm for using the following procedures is to set up
+your application, then run it in the thunk provided to them.
+<code>without-echo</code> is an exception in that it's generally used
+to enter a password or pass phrase.</p>
+
+<div align="left"><code>(with-raw-mode <i>port min time thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 The argument <i>port</i> must be open on a tty.
 The tty is set to raw mode during the dynamic execution of <code>thunk</code>
 and then is restored to canonical "cooked" mode.  The effect of the
   <i>min</i> and <i>time</i> arguments is that any reads done on the tty
   while raw mode is in effect will return to the caller after <i>min</i>
-  bytes have been read or <i>time</i> seconds have elapsed, whichever
-  comes first.
+  bytes have been read or <i>time</i> deciseconds (1/10ths of a second)
+  have elapsed, whichever comes first.
 </blockquote><p>
 </p>
-<div align="left"><code>(without-echo <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>()</code>&nbsp;</div>
 
+<div align="left"><code>(with-rare-mode <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 The argument <i>port</i> must be open on a tty.
-Echoing of input is disabled on the tty during the execution of <code>thunk</code>
-and then is re-enabled.
+The tty is set to "rare", also known as cbreak mode during the dynamic
+execution of <code>thunk</code> and then is restored to canonical "cooked" mode.
+Characters should be read one at a time with <code>read-char</code>.
 </blockquote><p>
 </p>
-<div align="left"><code>(without-interrupt-chars <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>()</code>&nbsp;</div>
+
+<div align="left"><code>(without-interrupt-chars <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 The argument <i>port</i> must be open on a tty.
 The detection of interrupt (^C), quit (^\), and suspend (^Z) characters
 on the tty is disabled during the execution of <code>thunk</code> and then is re-enabled.
+</blockquote><p>
+</p>
+
+<div align="left"><code>(without-echo <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>
+The argument <i>port</i> must be open on a tty.
+Echoing of input is disabled on the tty during the execution of <code>thunk</code>
+and then is re-enabled.
 </blockquote><p>
 </p>
 
