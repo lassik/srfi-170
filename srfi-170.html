@@ -334,7 +334,7 @@ and <i>old-fname</i> and <i>new-fname</i> refer to the same file, it is an error
 <blockquote>If you override an existing object, then <i>old-fname</i> 
 and <i>new-fname</i> must type-match -- either both directories, 
 or both non-directories. 
-This is required by the semantics of Unix <code>rename()</code>.<p>
+This is required by the semantics of P<small>OSIX</small> <code>rename()</code>.<p>
 </p>
 <blockquote><i>Remark: </i> 
 There is an unfortunate atomicity problem with the <code>rename-file</code> 
@@ -609,9 +609,13 @@ the user's home directory.
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpid()</code>&nbsp;</div>
+<div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getppid()</code>&nbsp;</div>
+<div align="left"><code>(parent-pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpid()</code>&nbsp;</div>
+<div align="left"><code>(process-group<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpgid()</code>&nbsp;</div>
 <blockquote>
-<code>(pid)</code> retrieves the process id for the current process.
+These procedures retrieve the process id for the current process,
+the process id for the parent of this process, and the process group
+for this process, respectively.
 </blockquote>
 
 <div align=left><code>(nice <i>[delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>nice()</code>&nbsp;</div>
@@ -662,6 +666,44 @@ and shell path stored in <i>user-info</i> respectively.</blockquote>
 <p></p>
 </p>
 <p></p>
+<div align="left"><code>(user-info:full-name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>Returns the contents of the <code>pw_gecos</code> field
+stored in <i>user-info</i>.
+Although this field is not part of P<small>OSIX</small>,
+it has been part of all Unix variants since at least
+the Sixth Edition of Research Unix.
+It normally contains the user's full name, but may contain additional
+system-specific information;
+on Windows, it contains exactly the full name.</blockquote>
+<p></p>
+</p>
+<p></p>
+<div align="left"><code>(user-info:parsed-full-name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote><p>Returns a parsed and expanded version of the raw string
+returned by <code>user-info:full-name</code>.
+The raw value is split on commas, creating a list of strings to be
+returned.  However, before doing so, the first element of the list
+is scanned for an ampersand, and if one is found, it is
+replaced by the titlecased result of <code>user-info:name</code>.</p>
+<p>However, on Windows the implementation is completely different:
+<code>user-info:parsed-full-name</code>
+returns a list with a single element, the result of
+<code>user-info:full-name</code>.  No comma splitting or
+ampersand substitution is performed.</p>
+<p>The meaning of the first element of the returned list is the
+user's full name on all known systems.  The remaining elements
+have varying meaning.  For example, on BSD systems, the second through fourth elements
+are the user's work location, the user's work phone number, and the
+user's home phone number, respectively.
+On Cygwin, the second element is the Windows SID corresponding
+to this user.</p>
+<p>Implementation note: titlecasing procedures are available in
+<a href="http://srfi.schemers.org/srfi-129/srfi-129.html">
+SRFI 129</a>, although they are not part of R7RS-large.</p></blockquote>
+<p></p>
+</p>
+<p></p>
+<p></p>
 <p></p>
 <div align="left"><code>(group-info <i>gid/name</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgrgid/getgrnam()</code>&nbsp;</div>
 
@@ -691,10 +733,11 @@ The <i>gid/name</i> argument is either an exact integer gid or a string group na
 <a name="node_sec_3.10"></a>
 <h2><a href="#node_toc_node_sec_3.10">3.10&nbsp;&nbsp;Time</a></h2>
 <p>
-A SRFI-FIXME <i>timespec</i> is a pair whose car is the number of elapsed seconds
-since a P<small>OSIX</small> epoch, and whose cdr is the number of
-elapsed nanoseconds since the beginning of the current second.  The
-system clock is not required to report time at full nanosecond
+A <a href="http://srfi.schemers.org/srfi-174/srfi-174.html">SRFI 174</a>
+timespec is an object containing two values, the number of elapsed seconds
+since a P<small>OSIX</small> epoch, and the number of
+elapsed nanoseconds since the beginning of the current second.
+The system clock is not required to report time at full nanosecond
 resolution, nor is anything guaranteed about accuracy.
 </p>
 
@@ -741,22 +784,22 @@ in common use by command-line programs.
 
 <div align="left"><code>(tty? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
 <blockquote>
-Return true if the argument is a tty.
+Return true if the argument is a terminal.
 </blockquote><p>
 </p>
 
-<div align="left"><code>(tty-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>&nbsp;</div>
+<div align="left"><code>(terminal-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>&nbsp;</div>
 <blockquote>
-The argument <i>port</i> must be open on a tty.
-Return the file name of the tty.
+The argument <i>port</i> must be open on a terminal.
+Return the file name of the terminal.
 </blockquote><p>
 </p>
 
 <p>
 The following procedures use <code>dynamic-wind</code> when executing
 their <code>thunk</code> argument; if the thunk's dynamic extent is escaped,
-the tty mode changes of the procedure are undone, but if the thunk's dynamic
-extent is re-entered, the tty mode changes of the procedure are re-enabled.
+the terminal mode changes of the procedure are undone, but if the thunk's dynamic
+extent is re-entered, the terminal mode changes of the procedure are re-enabled.
 They all use P<small>OSIX</small> <code>tcgetattr()</code> and
 <code>tcsetattr()</code>, see also the <code>stty</code> command.
 </p>
@@ -768,38 +811,42 @@ to enter a password or pass phrase.</p>
 
 <div align="left"><code>(with-raw-mode <i>port min time thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-The argument <i>port</i> must be open on a tty.
-The tty is set to raw mode during the dynamic execution of <code>thunk</code>
+The argument <i>port</i> must be open on a terminal.
+The terminal is set to raw mode during the dynamic execution of <code>thunk</code>
 and then is restored to canonical "cooked" mode.  The effect of the
-  <i>min</i> and <i>time</i> arguments is that any reads done on the tty
+  <i>min</i> and <i>time</i> arguments is that any reads done on the terminal
   while raw mode is in effect will return to the caller after <i>min</i>
   bytes have been read or <i>time</i> deciseconds (1/10ths of a second)
   have elapsed, whichever comes first.
+Therefore, it makes no sense to use any read operation on the terminal
+except <code>read-char</code>.
+No character is given special handling; all are passed to the
+application exactly as received.
+Echoing of input is disabled on the terminal during the execution of <code>thunk</code>
+and then is re-enabled.
 </blockquote><p>
 </p>
 
 <div align="left"><code>(with-rare-mode <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-The argument <i>port</i> must be open on a tty.
-The tty is set to "rare", also known as cbreak mode during the dynamic
-execution of <code>thunk</code> and then is restored to canonical "cooked" mode.
-Characters should be read one at a time with <code>read-char</code>.
+The argument <i>port</i> must be open on a terminal.
+The terminal is set to "rare", also known as cbreak, mode during the dynamic
+execution of <code>thunk</code>, and then is restored to canonical "cooked" mode.
+Just as in canonical mode, any read operation on the terminal
+will wait until characters are received, unlike raw mode.
+However, no characters are given special interpretation except
+the characters that send signals (by default, Ctrl-C and Ctrl-\).
+Echoing of input is disabled on the terminal during the execution of <code>thunk</code>
+and then is re-enabled.
 </blockquote><p>
 </p>
 
-<div align="left"><code>(without-interrupt-chars <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-The argument <i>port</i> must be open on a tty.
-The detection of interrupt (^C), quit (^\), and suspend (^Z) characters
-on the tty is disabled during the execution of <code>thunk</code> and then is re-enabled.
-</blockquote><p>
 </p>
 
 <div align="left"><code>(without-echo <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-The argument <i>port</i> must be open on a tty.
-Echoing of input is disabled on the tty during the execution of <code>thunk</code>
+The argument <i>port</i> must be open on a terminal.
+Echoing of input is disabled on the terminal during the execution of <code>thunk</code>
 and then is re-enabled.
 </blockquote><p>
 </p>
@@ -954,7 +1001,7 @@ Scsh specifies but does not implement <code>nice</code>.
 <ul>
 <li><p>
   Scsh provides a complete set of <code>termios.h</code> operations, from which the
-  <code>with-raw-mode</code>, <code>without-echo</code>, and <code>without-interrupt-chars</code>
+  <code>with-raw-mode</code>, <code>with-rare-mode</code>, and <code>without-echo</code>
   procedures can be implemented along the lines specified by the definitions.
   For <code>with-raw-mode</code>, it's important to preserve and restore the
   <code>eof</code> and <code>eol</code> control characters, as these may occupy the same
