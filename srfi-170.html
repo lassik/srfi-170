@@ -828,7 +828,7 @@ and then is re-enabled.
 </blockquote><p>
 </p>
 
-<div align="left"><code>(with-rare-mode <i>input-port output-port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(with-rare-mode <i>input-port output-port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ICANON -ECHO VMIN=1 VTIME=0</code>&nbsp;</div>
 <blockquote>
 The port argument must be opened on a terminal.
 The terminal is set to "rare", also known as cbreak, mode during the dynamic
@@ -844,7 +844,7 @@ and then is re-enabled.
 
 </p>
 
-<div align="left"><code>(without-echo <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(without-echo <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ECHO</code>&nbsp;</div>
 <blockquote>
 The argument <i>port</i> must be open on a terminal.
 Echoing of input is disabled on the terminal during the execution of <code>thunk</code>
