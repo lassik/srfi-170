@@ -809,9 +809,9 @@ your application, then run it in the thunk provided to them.
 <code>without-echo</code> is an exception in that it's generally used
 to enter a password or pass phrase.</p>
 
-<div align="left"><code>(with-raw-mode <i>port min time thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(with-raw-mode <i>input-port output-port min time thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-The argument <i>port</i> must be open on a terminal.
+The port arguments must be opened on a terminal.
 The terminal is set to raw mode during the dynamic execution of <code>thunk</code>
 and then is restored to canonical "cooked" mode.  The effect of the
   <i>min</i> and <i>time</i> arguments is that any reads done on the terminal
@@ -828,9 +828,9 @@ and then is re-enabled.
 </blockquote><p>
 </p>
 
-<div align="left"><code>(with-rare-mode <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(with-rare-mode <i>input-port output-port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-The argument <i>port</i> must be open on a terminal.
+The port argument must be opened on a terminal.
 The terminal is set to "rare", also known as cbreak, mode during the dynamic
 execution of <code>thunk</code>, and then is restored to canonical "cooked" mode.
 Just as in canonical mode, any read operation on the terminal
