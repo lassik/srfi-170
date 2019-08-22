@@ -819,7 +819,8 @@ and then is restored to canonical "cooked" mode.  The effect of the
   bytes have been read or <i>time</i> deciseconds (1/10ths of a second)
   have elapsed, whichever comes first.
 Therefore, it makes no sense to use any read operation on the terminal
-except <code>read-char</code>.
+except <code>read-char</code> or <code>read-string</code>,
+which read a fixed number of characters.
 No character is given special handling; all are passed to the
 application exactly as received.
 Echoing of input is disabled on the terminal during the execution of <code>thunk</code>
