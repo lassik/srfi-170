@@ -662,7 +662,8 @@ The <i>uid/name</i> argument is either an exact integer uid or a string user nam
 <div align="left"><code>(user-info:home-dir <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(user-info:shell <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the user name, user id, group id, home directory,
-and shell path stored in <i>user-info</i> respectively.</blockquote>
+and shell path stored in <i>user-info</i> respectively.
+Windows returns <code>#f</code> for any items it doesn't have.</blockquote>
 <p></p>
 </p>
 <p></p>
