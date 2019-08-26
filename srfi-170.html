@@ -609,8 +609,8 @@ the user's home directory.
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getppid()</code>&nbsp;</div>
-<div align="left"><code>(parent-pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpid()</code>&nbsp;</div>
+<div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpid()</code>&nbsp;</div>
+<div align="left"><code>(parent-pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getppid()</code>&nbsp;</div>
 <div align="left"><code>(process-group<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpgid()</code>&nbsp;</div>
 <blockquote>
 These procedures retrieve the process id for the current process,
@@ -662,7 +662,8 @@ The <i>uid/name</i> argument is either an exact integer uid or a string user nam
 <div align="left"><code>(user-info:home-dir <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(user-info:shell <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the user name, user id, group id, home directory,
-and shell path stored in <i>user-info</i> respectively.</blockquote>
+and shell path stored in <i>user-info</i> respectively.
+Windows returns <code>#f</code> for any items it doesn't have.</blockquote>
 <p></p>
 </p>
 <p></p>
@@ -797,22 +798,26 @@ Return the file name of the terminal.
 
 <p>
 The following procedures use <code>dynamic-wind</code> when executing
-their <code>thunk</code> argument; if the thunk's dynamic extent is escaped,
-the terminal mode changes of the procedure are undone, but if the thunk's dynamic
-extent is re-entered, the terminal mode changes of the procedure are re-enabled.
+their <code><i>proc</i></code> procedure argument; if <i><code>proc</code>'s</i> dynamic extent
+is escaped, the terminal mode changes of the containing <code>with-</code>or
+<code>without-</code> procedure are undone, but if <i><code>proc</code>'s</i> dynamic extent is
+re-entered, the terminal mode changes of the containing procedure are re-enabled.
 They all use P<small>OSIX</small> <code>tcgetattr()</code> and
 <code>tcsetattr()</code>, see also the <code>stty</code> command.
 </p>
 
 <p>The general paradigm for using the following procedures is to set up
-your application, then run it in the thunk provided to them.
+your application, then run it in the <code><i>proc</i></code> provided to
+them, a procedure that takes the same port arguments in the same order
+as the containing <code>with-</code> or <code>without-</code> procedure.
 <code>without-echo</code> is an exception in that it's generally used
-to enter a password or pass phrase.</p>
+to enter a password or pass phrase.  The procedures return the values
+that <code><i>proc</i></code> returns.</p>
 
-<div align="left"><code>(with-raw-mode <i>port min time thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(with-raw-mode <i>input-port output-port min time proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ECHO -ICANON -IEXTEN -ISIG -BRKINT -ICRNL -INPCK -ISTRIP -IXON -CSIZE -PARENB CS8 -OPOST VMIN=<i>min</i> VTIME=<i>time</i></code>&nbsp;</div>
 <blockquote>
-The argument <i>port</i> must be open on a terminal.
-The terminal is set to raw mode during the dynamic execution of <code>thunk</code>
+The port arguments must be opened on a terminal.
+The terminal is set to raw mode during the dynamic execution of <code>proc</code>
 and then is restored to canonical "cooked" mode.  The effect of the
   <i>min</i> and <i>time</i> arguments is that any reads done on the terminal
   while raw mode is in effect will return to the caller after <i>min</i>
@@ -823,31 +828,31 @@ except <code>read-char</code> or <code>read-string</code>,
 which read a fixed number of characters.
 No character is given special handling; all are passed to the
 application exactly as received.
-Echoing of input is disabled on the terminal during the execution of <code>thunk</code>
+Echoing of input is disabled on the terminal during the execution of <code>proc</code>
 and then is re-enabled.
 </blockquote><p>
 </p>
 
-<div align="left"><code>(with-rare-mode <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(with-rare-mode <i>input-port output-port proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ICANON -ECHO VMIN=1 VTIME=0</code>&nbsp;</div>
 <blockquote>
-The argument <i>port</i> must be open on a terminal.
-The terminal is set to "rare", also known as cbreak, mode during the dynamic
-execution of <code>thunk</code>, and then is restored to canonical "cooked" mode.
+The port arguments must be opened on a terminal.
+The terminal is set to "rare", also known as cbreak mode during the dynamic
+execution of <code>proc</code>, and then is restored to canonical "cooked" mode.
 Just as in canonical mode, any read operation on the terminal
 will wait until characters are received, unlike raw mode.
 However, no characters are given special interpretation except
 the characters that send signals (by default, Ctrl-C and Ctrl-\).
-Echoing of input is disabled on the terminal during the execution of <code>thunk</code>
+Echoing of input is disabled on the terminal during the execution of <code>proc</code>
 and then is re-enabled.
 </blockquote><p>
 </p>
 
 </p>
 
-<div align="left"><code>(without-echo <i>port thunk</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[thunk returns]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(without-echo <i>input-port output-port proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ECHO -ECHOE -ECHOK -ECHONL</code>&nbsp;</div>
 <blockquote>
-The argument <i>port</i> must be open on a terminal.
-Echoing of input is disabled on the terminal during the execution of <code>thunk</code>
+The port arguments must be opened on a terminal.
+Echoing of input is disabled on the terminal during the execution of <code>proc</code>
 and then is re-enabled.
 </blockquote><p>
 </p>
