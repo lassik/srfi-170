@@ -313,6 +313,7 @@ computer's file system.
 <div align="left"><code>(create-directory <i>fname [permission-bits override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>mkdir()</code>&nbsp;</div>
 <div align="left"><code>(create-fifo <i>fname [permission-bits override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>mkfifo()</code>&nbsp;</div>
 <div align="left"><code>(create-hard-link <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>link()</code>&nbsp;</div>
+<div align="left"><code>(create-symlink <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>symlink()</code>&nbsp;</div>
 
 <blockquote><p>
 These procedures create objects of various kinds in the file system.</p>
@@ -336,6 +337,9 @@ and <i>old-fname</i> and <i>new-fname</i> refer to the same file, it is an error
 </p></blockquote>
 </td></tr></tbody></table>
 <p></p>
+<div align=left><code>(read-symlink <i>fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>readlink()</code>&nbsp;</div>
+<blockquote>Return the filename referenced by the symlink <i>fname</i>.
+</blockquote>
 <div align=left><code>(rename-file <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rename()</code>&nbsp;</div>
 <blockquote>If you override an existing object, then <i>old-fname</i> 
 and <i>new-fname</i> must type-match -- either both directories, 
@@ -349,7 +353,7 @@ specify <i>override?</i>, but create file <code>new-fname</code> sometime betwee
 <code>rename-file</code>'s existence check and the actual rename operation,
 your file will be clobbered with <code>old-fname</code>. There is no way to 
 prevent this problem; at least it is highly unlikely to occur in practice.
-</blockquote>
+</blockquote><p>
 </blockquote><p>
 </p>
 <p></p>
@@ -433,11 +437,11 @@ last change of status times in SRFI 174 timespecs stored in <i>file-info</i> res
 </p><p>
 Although P<small>OSIX</small> does not standardize bit positions in the
 file mode, the following assignments are de facto standards
-(all except the socket and symbolic link bits
+(all except the socket, symlink, and fifo bits
 have been unchanged since the Sixth Edition of Research Unix):
 
 <pre>
-#o140000   socket
+#o140000   local domain socket
 #o120000   symbolic link
 #o100000   regular file
 #o40000    directory
@@ -463,12 +467,12 @@ examine several bits.</p>
 <p></p>
 <div align="left"><code>(file-info-directory? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISDIR()</code>&nbsp;</div>
 <div align="left"><code>(file-info-fifo? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISFIFO()</code>&nbsp;</div>
+<div align="left"><code>(file-info-symlink? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISLNK()</code>&nbsp;</div>
 <div align="left"><code>(file-info-regular? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISREG()</code>&nbsp;</div>
 
 <blockquote>
 These procedures are file-type predicates that test the
 file type stored in <i>file-info</i>.
-</blockquote>
 <p>
 This SRFI does not provide a special means for checking the
 permission bits in a <code>file-info</code> record,
@@ -529,7 +533,7 @@ Finally, <code>close-directory</code> closes a directory object.</p>
 <blockquote>
 Returns an absolute pathname
 derived from <i>pathname</i> that names the same file
-and whose resolution does not involve <code>.</code>, <code>..</code>, or symbolic links.
+and whose resolution does not involve <code>.</code>, <code>..</code>, or symlinks.
 </blockquote>
 
 <div align="left"><code>temp-file-prefix</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>string parameter</i>&nbsp;</div>
@@ -817,7 +821,7 @@ Therefore, this SRFI provides only the functions that are still
 in common use by command-line programs.
 </p>
 
-<div align="left"><code>(tty? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
+<div align="left"><code>(terminal? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
 <blockquote>
 Return true if the argument is a terminal.
 </blockquote><p>
