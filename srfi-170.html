@@ -112,18 +112,23 @@ In particular, this SRFI excludes:
   <a href="https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md">
     https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md</a>.
 </p></li><li><p>
+Everything to do with the creation and management of subprocesses and
+communication with them.  The low-level P<small>OSIX</small> operations
+are tricky to use, and a future SRFI will provide a higher-level interface.
+</p></li><li><p>
 Networking operations: see
 <a href="http://srfi.schemers.org/srfi-106/srfi-106.html">SRFI 106</a>.
 </p></li><li><p>
 Date and time operations, as the
 P<small>OSIX</small> date and time operations are irregular and awkward.
-This SRFI provides only the current time, timezone, and locale.
+This SRFI provides only the current time.
 </p></li><li><p>
 Access to command-line arguments and environment variables, as well
 as provisions for exiting a process, as they are already provided by R7RS.
 </p></li><li><p>
-P<small>OSIX</small> file locking, which is notoriously broken as
-designed.  Consider the use of dot files (or if necessary
+P<small>OSIX</small> file locking, which is notoriously
+<a href="http://0pointer.de/blog/projects/locking.html">broken as designed</a>.
+Consider the use of dot files (or if necessary
 non-portable facilities) instead.
 </p></li><li><p>
 All provisions for signal handling, as they are complex and require deep
@@ -131,11 +136,9 @@ integration with the particular Scheme implementation.
 </p></li><li><p>
 Memory-mapped I/O, locales, syslog, System V message
 queues, and pseudo-TTYs, as they are considered specialized and out of scope.
+Future SRFIs may provide interfaces for them.
 </p></li>
 </ul>
-<p>
-Future SRFIs may provide interfaces for them.
-</p>
 <p>
 The use of colons to join record names and fields into the name of a
 record accessor is a convention of Scheme 48, on which scsh is built.
@@ -154,6 +157,9 @@ or raise an <code>errno-error</code> exception.
 threads of control must ensure that when a thread invokes a blocking I/O
 procedure defined below, only that thread is blocked and not any other
 concurrently running ones.
+Because Scheme threads may be multiplexed on top of P<small>OSIX</small>
+threads, the per-thread P<small>OSIX</small> functions may not do the
+right thing.
 </p>
 
 <p>
@@ -362,7 +368,7 @@ It is an error if <i>fname</i> is not a non-empty directory.
 These procedures set the mode bits, owner id, and group id of a
 file, respectively, specified by supplying the file name.
 Setting file user ownership usually requires root privileges.
-This procedure chases symlinks and changes
+These procedures chases symlinks and changes
 the files to which they refer.
 </blockquote><p>
 </p>
@@ -372,10 +378,10 @@ the files to which they refer.
 
 <blockquote>
 This procedure sets the access and modified times for the file
-<i>fname</i> to the supplied SRFI-FIXME timespec values.
+<i>fname</i> to the supplied SRFI 174 timespec values.
 If neither time argument is supplied, they are both taken to be
 the current time.
-The special values <code>timespect/now</code> and <code>timespec/omit</code>
+The special values <code>timespec/now</code> and <code>timespec/omit</code>
 set their respective times to the current time, or do not change the time.
 It is an error if exactly one time is provided.
 This procedure
@@ -419,14 +425,39 @@ the files to which they refer.
 <div align="left"><code>(file-info:atime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(file-info:mtime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(file-info:ctime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns the device number, inode number, mode (permission bits),
+<blockquote>Returns the device number, inode number, mode (permission and file type bits),
 number of hard links, user id, group id, device ID if file is special,
 size in bytes, optimal blocksize for I/O, number of 512B blocks allocated,
 last access time, last modification time, and
-last change of status times in SRFI-FIXME timespecs stored in <i>file-info</i> respectively
-(see section&nbsp;<a href="#node_sec_3.10">3.10</a>
-for this SRFI's representation of time).
-</blockquote>
+last change of status times in SRFI 174 timespecs stored in <i>file-info</i> respectively.
+</p><p>
+Although P<small>OSIX</small> does not standardize bit positions in the
+file mode, the following assignments are de facto standards
+(all except the socket and symbolic link bits
+have been unchanged since the Sixth Edition of Research Unix):
+
+<pre>
+#o140000   socket
+#o120000   symbolic link
+#o100000   regular file
+#o40000    directory
+#o10000    fifo
+#o4000     setuid file
+#o2000     setgid file
+#o1000     sticky directory (restrictions on deletion)
+#o400      user read permission
+#o200      user write permission
+#o100      user execute permission
+#o40       group read permission
+#o20       group write permission
+#o10       group execute permission
+#o4        other user read permission
+#o2        other user write permission
+#o1        other user execute permission
+</pre>
+
+<p>Note that to distinguish between non-directories it is necessary to
+examine several bits.</p>
 
 </blockquote>
 <p></p>
@@ -697,7 +728,10 @@ have varying meaning.  For example, on BSD systems, the second through fourth el
 are the user's work location, the user's work phone number, and the
 user's home phone number, respectively.
 On Cygwin, the second element is the Windows SID corresponding
-to this user.</p>
+to this user; further elements depend on
+<a href="https://cygwin.com/cygwin-ug-net/ntsec.html#ntsec-mapping-nsswitch-gecos">Cygwin-specific</a>
+entries in the <code>/etc/nsswitch.conf</code> file.</p>
+
 <p>Implementation note: titlecasing procedures are available in
 <a href="http://srfi.schemers.org/srfi-129/srfi-129.html">
 SRFI 129</a>, although they are not part of R7RS-large.</p></blockquote>
@@ -810,8 +844,8 @@ They all use P<small>OSIX</small> <code>tcgetattr()</code> and
 your application, then run it in the <code><i>proc</i></code> provided to
 them, a procedure that takes the same port arguments in the same order
 as the containing <code>with-</code> or <code>without-</code> procedure.
-<code>without-echo</code> is an exception in that it's generally used
-to enter a password or pass phrase.  The procedures return the values
+The <code>without-echo</code> procedure is an exception in that it's generally used
+to enter a password or passphrase.  The procedures return the values
 that <code><i>proc</i></code> returns.</p>
 
 <div align="left"><code>(with-raw-mode <i>input-port output-port min time proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ECHO -ICANON -IEXTEN -ISIG -BRKINT -ICRNL -INPCK -ISTRIP -IXON -CSIZE -PARENB CS8 -OPOST VMIN=<i>min</i> VTIME=<i>time</i></code>&nbsp;</div>
