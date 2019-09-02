@@ -372,7 +372,7 @@ It is an error if <i>fname</i> is not a non-empty directory.
 These procedures set the mode bits, owner id, and group id of a
 file, respectively, specified by supplying the file name.
 Setting file user ownership usually requires root privileges.
-These procedures chases symlinks and changes
+These procedures follows symlinks and changes
 the files to which they refer.
 </blockquote><p>
 </p>
@@ -389,7 +389,7 @@ The special values <code>timespec/now</code> and <code>timespec/omit</code>
 set their respective times to the current time, or do not change the time.
 It is an error if exactly one time is provided.
 This procedure
-chases symlinks and sets the times of the file to which it refers.
+follows symlinks and sets the times of the file to which it refers.
 If the procedure completes successfully, the file's time of last
 status-change (<code>ctime</code>) is set to the current time.
 </blockquote><p>
@@ -404,13 +404,15 @@ status-change (<code>ctime</code>) is set to the current time.
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(file-info <i>fname/port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stat()</code>&nbsp;</div>
+<div align="left"><code>(file-info <i>fname/port follow?</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stat()</code>&nbsp;</div>
 <blockquote>
 The <code>file-info</code> procedure
 returns a file-info record containing useful
 information about a file.
-This procedure chases symlinks and reports on
-the files to which they refer.
+If the <i>follow?</i> flag is true the procedure follows symlinks and
+reports on the files to which they refer.  If <i>follow?</i> is false
+the procedure checks the actual file itself, even if it's a symlink.
+The <i>follow?</i> flag is ignored if the file argument is a port.
 </blockquote>
 <div align="left"><code>(file-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns <code>#t</code> if <i>obj</i> is a file-info object and <code>#f</code> otherwise.
@@ -967,6 +969,7 @@ which are cooerced to exact integers, and treated as the number of elapsed secon
 since the POSIX epoch of midnight January 1, 1970.
 </p></li>
 <li><p>
+The <code><i>follow?</i></code> flag for scsh's <code>file-info</code> is optional.
 The scsh <code>file-info mode</code> record field is masked to only return the last three permission bits
 bytes, omitting the top byte for <code>set-user-ID</code>, <code>set-group-ID</code>, and the save text
 or "sticky" bit.
