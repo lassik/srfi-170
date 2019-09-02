@@ -718,9 +718,9 @@ on Windows, it contains exactly the full name.</blockquote>
 <blockquote><p>Returns a parsed and expanded version of the raw string
 returned by <code>user-info:full-name</code>.
 The raw value is split on commas, creating a list of strings to be
-returned.  However, before doing so, the first element of the list
-is scanned for an ampersand, and if one is found, it is
-replaced by the titlecased result of <code>user-info:name</code>.</p>
+returned.  All ampersands in the first element of the list are
+replaced by <code>user-info:name</code>, which is capitalized if it
+starts with an ASCII lowercase letter.</p>
 <p>However, on Windows the implementation is completely different:
 <code>user-info:parsed-full-name</code>
 returns a list with a single element, the result of
