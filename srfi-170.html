@@ -668,10 +668,12 @@ If <code><i>delta</i></code> is not specified, the increment is 1.
 </p>
 <div align="left"><code>(user-uid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getuid()</code>&nbsp;</div>
 <div align="left"><code>(user-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgid()</code>&nbsp;</div>
+<div align="left"><code>(user-effective-uid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>geteuid()</code>&nbsp;</div>
+<div align="left"><code>(user-effective-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getegid()</code>&nbsp;</div>
 <div align="left"><code>(user-supplementary-gids<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i> list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgroups()</code>&nbsp;</div>
 
 <blockquote>
-For the calling process, these routines get the specified data.  The scsh proceedure <code>user-login-name</code> that uses getlogin() or getlogin_r() can be simulated with <code>(user-info:name (user-info (user-uid)))</code>, the outer procedures are described in the next section:
+For the calling process, these routines get the specified data.  The scsh proceedure <code>user-login-name</code> that uses <code>getlogin()</code> or <code>getlogin_r()</code> can be simulated with <code>(user-info:name (user-info (user-uid)))</code>, the outer procedures are described in the next section:
 </blockquote><p>
 </p>
 
