@@ -511,7 +511,7 @@ or change to the directory before using the file names.
 </p>
 </blockquote>
 
-<div align="left"><code>(make-directory-files-generator <i>dir [dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(make-directory-files-generator <i>dir [dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>generator</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 Return a SRFI 158 generator of the file names in directory <i>dir</i>.
@@ -520,7 +520,7 @@ included in the list.
 Regardless of the value of <i>dotfiles?</i>, the two files <code>.</code> and
 <code>..</code> are <i>never</i> returned.
 <p>Like <code>directory-files</code> above, the directory <i>dir</i>
-is not prepended to each file name in the result list.</p>
+is not prepended to each file name in the results the generator returns.</p>
 <p>The generator approach is particularly useful when the number of
 items in a directory might be &quot;huge&quot;, which has been a
 common paradigm when using a file system as a document database.</p>
