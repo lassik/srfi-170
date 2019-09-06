@@ -511,8 +511,23 @@ result list. That is,
 prepend the directory,
 or change to the directory before using the file names.
 </p>
-</blockquote><p>
-</p>
+</blockquote>
+
+<div align="left"><code>(make-directory-files-generator <i>dir [dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+
+<blockquote>
+Return a SRFI 158 generator of the file names in directory <i>dir</i>.
+The <i>dotfiles?</i> flag (default <code>#f</code>) causes dot files to be
+included in the list.
+Regardless of the value of <i>dotfiles?</i>, the two files <code>.</code> and
+<code>..</code> are <i>never</i> returned.
+<p>Like <code>directory-files</code> above, the directory <i>dir</i>
+is not prepended to each file name in the result list.</p>
+<p>The generator approach is particularly useful when the number of
+items in a directory might be &quot;huge&quot;, which has been a
+common paradigm when using a file system as a document database.</p>
+</blockquote>
+
 <div align="left"><code>(open-directory <i>dir [dot-files?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>directory-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>opendir()</code>&nbsp;</div>
 <div align="left"><code>(read-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string or eof-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>readdir()</code>&nbsp;</div>
 <div align="left"><code>(close-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>closedir()</code>&nbsp;</div>
@@ -741,15 +756,8 @@ On Cygwin, the second element is the Windows SID corresponding
 to this user; further elements depend on
 <a href="https://cygwin.com/cygwin-ug-net/ntsec.html#ntsec-mapping-nsswitch-gecos">Cygwin-specific</a>
 entries in the <code>/etc/nsswitch.conf</code> file.</p>
+</blockquote>
 
-<p>Implementation note: titlecasing procedures are available in
-<a href="http://srfi.schemers.org/srfi-129/srfi-129.html">
-SRFI 129</a>, although they are not part of R7RS-large.</p></blockquote>
-<p></p>
-</p>
-<p></p>
-<p></p>
-<p></p>
 <div align="left"><code>(group-info <i>gid/name</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgrgid/getgrnam()</code>&nbsp;</div>
 
 <blockquote>
@@ -981,6 +989,10 @@ The scsh <code>file-info</code> record fields <code>atime</code>, <code>mtime</c
 fields are exact integers instead of <code><i>timespecs</i></code>, and are the number of elapsed seconds
 since the POSIX epoch of midnight January 1, 1970.
 It does not implement the <code>rdev</code>, <code>blksize</code>, and <code>blocks</code> fields.
+</p></li>
+<li><p>
+Scsh does not have <code>make-directory-files-generator</code>, but is easy to implement with
+<code>open-directory</code>, <code>read-directory</code>, and <code>close-directory</code>.
 </p></li>
 <li><p>
 The scsh <code>open-directory</code>, <code>read-directory</code>, and <code>close-directory</code>
