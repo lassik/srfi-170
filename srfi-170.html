@@ -835,7 +835,7 @@ in common use by command-line programs.
 
 <div align="left"><code>(terminal? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
 <blockquote>
-Return true if the argument is a terminal.
+Return true if the argument is a terminal.  Raises an error if <code><i>port</i></code> is not a port, or if <code>isatty()</code> returns an error other than errno/notty.
 </blockquote><p>
 </p>
 
