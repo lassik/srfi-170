@@ -1,0 +1,20 @@
+MANIFEST (this file)
+README
+
+Makefile (merge with top level one)
+lib-tests.scm (merge with one in tests directory)
+
+Makefile-0.8.0 (replace with if using stock 0.8.0)
+lib-tests.scm-0.8.0 (replace with if using stock 0.8.0)
+
+170.sld
+174.sld
+
+170/170.scm
+170/170.stub
+170/COPYING
+170/aux.c
+170/common.scm
+170/test.sld
+170/TODO.txt
+
