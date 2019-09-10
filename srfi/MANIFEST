@@ -2,8 +2,10 @@ MANIFEST (this file)
 README
 
 Makefile (merge with top level one)
-
 lib-tests.scm (merge with one in tests directory)
+
+Makefile-0.8.0 (replace with if using stock 0.8.0)
+lib-tests.scm-0.8.0 (replace with if using stock 0.8.0)
 
 170.sld
 174.sld
