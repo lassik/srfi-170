@@ -1,0 +1,26 @@
+Please see copyright notice in 170/COPYING.
+
+There are several ways you might use this Chibi Scheme example
+implementation of SRFI 170.
+
+You can read 170.stub and aux.c for a guide to translate to your own
+FFI, the code above it should then work with little modification
+besides whatever changes are made in calling down to C.
+
+If starting from the SRFI 170 repository and adding to it a copy of
+Chibi Scheme, copy 170.sld, 174.sld, and the 170 directory into
+lib/srfi, merge Makefile with the top level one, lib-tests.scm with
+the one in tests, and build and test as normal.
+
+A full version can be found in https://github.com/hga/chibi-scheme,
+forked from https://github.com/ashinn/chibi-scheme, see branches
+srfi-170 and srfi-170-new.  That'll get you the complete history.
+
+The test suite 170/test.sld can be run as root, see comments at top.
+
+The test suite is pretty generic and should be adaptable to your
+implementation, note aux.c for some unexported magic like (errno) and
+(set-errno), and common.scm for Scheme code shared by both.
+
+As of initial release, it includes a very minimal implementation of
+the pre-release timespec SRFI as a disjoint type in 174.sld.
