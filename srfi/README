@@ -14,9 +14,9 @@ If starting from the SRFI 170 repository and adding to it a copy of
 Chibi Scheme, copy 170.sld, 174.sld, and the 170 directory into
 lib/srfi, merge Makefile with the top level one, lib-tests.scm with
 the one in tests, and build and test as normal.  It has been tested
-and run without errors on x86-64 systems running Ubuntu 18.04 Bionic
-Beaver compiled with GCC version 7.4.0, and OpenBSD 6.5 compiled with
-Clang version 7.0.1.
+and run without warnings or errors on x86-64 systems running Ubuntu
+18.04 Bionic Beaver compiled with GCC version 7.4.0, and OpenBSD 6.5
+compiled with Clang version 7.0.1.
 
 In the following examples, gmake is either Gnu Make on OpenBSD, or an
 alias of some sort on Linux to Gnu Make.
@@ -25,7 +25,7 @@ To build and test just this SRFI, execute the following:
 
 gmake ; LD_LIBRARY_PATH=".:" DYLD_LIBRARY_PATH=".:" CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH=lib ./chibi-scheme -m "(srfi 170 test)" -e "(run-tests)"
 
-To build and exercise without intalling (intstalling and uninstalling
+To build and exercise without installing (installing and uninstalling
 of this fork has not been tested), execute:
 
 LD_LIBRARY_PATH=".:" DYLD_LIBRARY_PATH=".:" CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH=lib ./chibi-scheme -m "(srfi 170)"
