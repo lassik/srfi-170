@@ -199,10 +199,12 @@ about each error.
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(errno-error <i>errno procedure . data</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(errno-error <i>errno procname . data</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>never returns</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 Raises a non-continuable exception for P<small>OSIX</small> error number <i>errno</i>.
-The <i>procedure</i> and <i>data</i> arguments are packaged up in the exception
+The <i>procname</i> argument is a string representing the name of the procedure
+which received the error, which is not necessarily the procedure called by the user.
+The <i>procname</i> and <i>data</i> arguments are packaged up in the exception
 packet passed to the exception handler.
 It is an error to pass an <code>errno</code> that is not provided by the OS.</p>
 </blockquote><p>
@@ -215,12 +217,12 @@ It is an error to pass an <code>errno</code> that is not provided by the OS.</p>
 </p>
 <div align="left"><code>(syscall-error:errno <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>errno</code>&nbsp;</div>
 <div align="left"><code>(syscall-error:message <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>strerror()</code>&nbsp;</div>
-<div align="left"><code>(syscall-error:procedure <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>procedure</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(syscall-error:procname <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div align="left"><code>(syscall-error:data <i>syscall-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>list</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
   Returns a value equal to the Posix error number,
   the corresponding error message,
-  the procedure passed to <code>errno-error</code>,
+  the procedure name passed to <code>errno-error</code>,
   and  a list containing the data packaged in in the <i>syscall-error</i> object respectively.
   All of these, with the possible exception of the error message, are
   packaged in the <i>syscall-error</i> object.
