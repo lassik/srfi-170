@@ -1,0 +1,494 @@
+;; please see copyright notice in ./COPYING
+
+(cond-expand
+ (plan9)
+ (windows
+  (c-system-include "sys/types.h")
+  (c-system-include "fcntl.h"))
+ (else
+
+  (c-system-include "errno.h")
+
+  (c-system-include "fcntl.h")
+
+;;  (c-system-include "sys/file.h") ; Only needed for BSD low level file operations?
+  (c-system-include "unistd.h")
+  (c-system-include "dirent.h")
+
+  (c-system-include "sys/types.h")
+  (c-system-include "sys/stat.h")
+
+  (c-system-include "sys/resource.h")
+
+  (c-system-include "pwd.h")
+  (c-system-include "grp.h")
+
+  (c-system-include "sys/utsname.h")
+
+  (c-system-include "signal.h")
+
+  (c-system-include "time.h")
+  (c-system-include "sys/time.h")
+
+  (c-system-include "termios.h")
+  ))
+
+
+;;; 3.1  Errors
+
+(define-c-const int (errno/2big "E2BIG"))
+(define-c-const int (errno/acces "EACCES"))
+(define-c-const int (errno/addrinuse "EADDRINUSE"))
+(define-c-const int (errno/addrnotavail "EADDRNOTAVAIL"))
+(define-c-const int (errno/afnosupport "EAFNOSUPPORT"))
+(define-c-const int (errno/again "EAGAIN"))
+(define-c-const int (errno/already "EALREADY"))
+(define-c-const int (errno/badf "EBADF"))
+(define-c-const int (errno/badmsg "EBADMSG"))
+(define-c-const int (errno/busy "EBUSY"))
+(define-c-const int (errno/canceled "ECANCELED"))
+(define-c-const int (errno/child "ECHILD"))
+(define-c-const int (errno/connaborted "ECONNABORTED"))
+(define-c-const int (errno/connrefused "ECONNREFUSED"))
+(define-c-const int (errno/connreset "ECONNRESET"))
+(define-c-const int (errno/deadlk "EDEADLK"))
+(define-c-const int (errno/destaddrreq "EDESTADDRREQ"))
+(define-c-const int (errno/dom "EDOM"))
+(define-c-const int (errno/dquot "EDQUOT"))
+(define-c-const int (errno/exist "EEXIST"))
+(define-c-const int (errno/fault "EFAULT"))
+(define-c-const int (errno/fbig "EFBIG"))
+(define-c-const int (errno/hostunreach "EHOSTUNREACH"))
+(define-c-const int (errno/idrm "EIDRM"))
+(define-c-const int (errno/ilseq "EILSEQ"))
+(define-c-const int (errno/inprogress "EINPROGRESS"))
+(define-c-const int (errno/intr "EINTR"))
+(define-c-const int (errno/inval "EINVAL"))
+(define-c-const int (errno/io "EIO"))
+(define-c-const int (errno/isconn "EISCONN"))
+(define-c-const int (errno/isdir "EISDIR"))
+(define-c-const int (errno/loop "ELOOP"))
+(define-c-const int (errno/mfile "EMFILE"))
+(define-c-const int (errno/mlink "EMLINK"))
+(define-c-const int (errno/msgsize "EMSGSIZE"))
+(define-c-const int (errno/nametoolong "ENAMETOOLONG"))
+(define-c-const int (errno/netdown "ENETDOWN"))
+(define-c-const int (errno/netreset "ENETRESET"))
+(define-c-const int (errno/netunreach "ENETUNREACH"))
+(define-c-const int (errno/nfile "ENFILE"))
+(define-c-const int (errno/nobufs "ENOBUFS"))
+(define-c-const int (errno/nodev "ENODEV"))
+(define-c-const int (errno/noent "ENOENT"))
+(define-c-const int (errno/noexec "ENOEXEC"))
+(define-c-const int (errno/nolck "ENOLCK"))
+(define-c-const int (errno/nomem "ENOMEM"))
+(define-c-const int (errno/nomsg "ENOMSG"))
+(define-c-const int (errno/noprotoopt "ENOPROTOOPT"))
+(define-c-const int (errno/nospc "ENOSPC"))
+(define-c-const int (errno/nosys "ENOSYS"))
+(define-c-const int (errno/notconn "ENOTCONN"))
+(define-c-const int (errno/notdir "ENOTDIR"))
+(define-c-const int (errno/notempty "ENOTEMPTY"))
+(define-c-const int (errno/notrecoverable "ENOTRECOVERABLE"))
+(define-c-const int (errno/notsock "ENOTSOCK"))
+(define-c-const int (errno/notsup "ENOTSUP"))
+(define-c-const int (errno/notty "ENOTTY"))
+(define-c-const int (errno/nxio "ENXIO"))
+(define-c-const int (errno/opnotsupp "EOPNOTSUPP"))
+(define-c-const int (errno/overflow "EOVERFLOW"))
+(define-c-const int (errno/ownerdead "EOWNERDEAD"))
+(define-c-const int (errno/perm "EPERM"))
+(define-c-const int (errno/pipe "EPIPE"))
+(define-c-const int (errno/proto "EPROTO"))
+(define-c-const int (errno/protonosupport "EPROTONOSUPPORT"))
+(define-c-const int (errno/prototype "EPROTOTYPE"))
+(define-c-const int (errno/range "ERANGE"))
+(define-c-const int (errno/rofs "EROFS"))
+(define-c-const int (errno/spipe "ESPIPE"))
+(define-c-const int (errno/srch "ESRCH"))
+(define-c-const int (errno/stale "ESTALE"))
+(define-c-const int (errno/timedout "ETIMEDOUT"))
+(define-c-const int (errno/txtbsy "ETXTBSY"))
+(define-c-const int (errno/wouldblock "EWOULDBLOCK"))
+(define-c-const int (errno/xdev "EXDEV"))
+
+(cond-expand
+ ((not bsd) ;; stand in for OpenBSD
+  (define-c-const int (errno/multihop "EMULTIHOP"))
+  (define-c-const int (errno/nolink "ENOLINK"))
+  ;; STREAMS
+  (define-c-const int (errno/nodata "ENODATA"))
+  (define-c-const int (errno/nosr "ENOSR"))
+  (define-c-const int (errno/nostr "ENOSTR"))
+  (define-c-const int (errno/time "ETIME"))))
+
+;;; 3.2  I/O
+
+;;> Copies the first file descriptor to the second, closing
+;;> it if needed.
+;;> Returns \scheme{#t} on success and \scheme{#f} on failure.
+
+(define-c int (%dup2 dup2) (int int))
+
+;;> Closes the given file descriptor.
+;;> Returns \scheme{#t} on success and \scheme{#f} on failure.
+
+(define-c errno (%close close) (int))
+
+
+;;; 3.3  File system
+
+(define-c errno (%delete-file unlink) (string))
+
+;;> Creates a new directory with the given mode.
+;;> Returns \scheme{#t} on success and \scheme{#f} on failure.
+
+(cond-expand
+  ((not windows)
+   (define-c errno (%mkdir mkdir) (string mode_t)))
+  (else
+   (define-c errno (%create-directory "mkdir_shim") (string int))))
+
+;;> Creates a fifo with the given mode.
+;;> Returns \scheme{#t} on success and \scheme{#f} on failure.
+
+(cond-expand
+  ((not windows)
+   (define-c errno (%mkfifo mkfifo) (string mode_t))))
+
+;;> Creates a hard link to the first arg from the second.
+;;> Returns \scheme{#t} on success and \scheme{#f} on failure.
+
+(cond-expand
+  ((not windows)
+   (define-c errno (%link link) (string string))))
+
+;;> Creates a symbolic link to the first arg from the second.
+;;> Returns \scheme{#t} on success and \scheme{#f} on failure.
+
+(cond-expand
+  ((not windows)
+   (define-c errno (%symlink symlink) (string string))))
+
+
+(cond-expand
+  ((not windows)
+   (define-c-const int PATH_MAX) ;; ~~~~ should be SYMLINK_MAX, but that's not defined in Linux, which is allowed if it's not larger than _POSIX_SYMLINK_MAX
+   (define-c int (%readlink readlink) (string string int))))
+
+;;> Renames the first arg to the second.
+;;> Returns \scheme{#t} on success and \scheme{#f} on failure.
+
+(define-c errno (%rename rename) (string string))
+
+;;> Deletes the directory named \var{string} from the filesystem.
+;;> Does not attempt to delete recursively.
+;;> Returns \scheme{#t} on success and \scheme{#f} on failure.
+
+(define-c errno (%rmdir rmdir) (string))
+
+;;> Sets the file permissions as in chmod.
+
+(define-c errno (%chmod chmod) (string mode_t))
+
+;;> Sets the file owner and group
+
+(define-c errno (%chown chown) (string uid_t gid_t))
+
+;;> Seting the file times
+
+(define-c-const int (utimens/at_fdcwd "AT_FDCWD"))
+(define-c-const int (utimens/utime_now "UTIME_NOW"))
+(define-c-const int (utimens/utime_omit "UTIME_OMIT"))
+
+(define-c-struct timespec
+    constructor: (make-posix-timespec seconds nanoseconds)
+    predicate: posix-timespec?
+  (time_t  tv_sec   posix-timespec:seconds)
+  (long    tv_nsec  posix-timespec:nanoseconds))
+
+;;> Truncate the file to the given size.
+
+(define-c errno (%truncate truncate) (string off_t))
+(cond-expand
+  ((not windows)
+   (define-c errno (%ftruncate ftruncate) (int off_t))))
+
+(cond-expand
+  (windows
+   (c-include-verbatim "filesystem_win32_shim.c")
+   (define-c-struct stat
+      predicate: stat?
+    (dev_t      st_dev      stat:dev)
+    (ino_t      st_ino      stat:ino)
+    (mode_t     st_mode     stat:mode)
+    (nlink_t    st_nlink    stat:nlinks)
+    (uid_t      st_uid      stat:uid)
+    (gid_t      st_gid      stat:gid)
+    (dev_t      st_rdev     stat:rdev)
+    (off_t      st_size     stat:size)
+    (time_t     st_atime    stat:atime)
+    (time_t     st_mtime    stat:mtime)
+    (time_t     st_ctime    stat:ctime)))
+  (else
+   (define-c-struct stat
+      predicate: stat?
+    (dev_t      st_dev      stat:dev)
+    (ino_t      st_ino      stat:ino)
+    (mode_t     st_mode     stat:mode)
+    (nlink_t    st_nlink    stat:nlinks)
+    (uid_t      st_uid      stat:uid)
+    (gid_t      st_gid      stat:gid)
+    (dev_t      st_rdev     stat:rdev)
+    (off_t      st_size     stat:size)
+    (blksize_t  st_blksize  stat:blksize)
+    (blkcnt_t   st_blocks   stat:blocks)
+    ((struct timespec) st_atime    stat:atime)
+    ((struct timespec) st_mtime    stat:mtime)
+    ((struct timespec) st_ctime    stat:ctime))
+   ))
+
+(define-c errno (%stat stat) (string (result stat)))
+(define-c errno (%fstat fstat) (int (result stat)))
+(cond-expand
+  ((not windows)
+   (define-c errno (%lstat lstat) (string (result stat)))))
+
+;;> Code for walking directories
+
+(define-c-struct dirent
+  (string d_name dirent-name))
+
+;; the automagic finalizer is fragile and incomplete, handing it the
+;; fixnum 1 segfaults on Bionic Beaver.  It returns SEXP_VIOD instead
+;; of 0 or -1, and errno does not get set when handed an already
+;; closed DIR, which may not be its fault
+
+(define-c-type DIR
+  finalizer: (%closedir closedir)
+  predicate: DIR?)
+
+(define-c (free DIR) (%opendir opendir) (string))
+(define-c dirent (%readdir readdir) ((link (pointer DIR))))
+
+(define-c boolean S_ISDIR (mode_t))
+(define-c boolean S_ISREG (mode_t))
+(define-c boolean S_ISFIFO (mode_t))
+(define-c boolean S_ISLNK (mode_t))
+
+(define-c-const int (posix/path-max "PATH_MAX"))
+
+(define-c non-null-string (%realpath realpath)
+  (string (result (array char 4097))))
+
+
+;;; 3.4  Processes
+
+;;; 3.4.1  Process objects
+
+;;; 3.4.2  Process waiting
+
+;;; 3.4.3  Analysing process status codes
+
+;;; 3.5  Process state
+
+;;> Sets the current umask, returning the previous one.
+
+(define-c mode_t (%umask umask) (mode_t))
+
+;;> Returns the current working directory of the process as a string.
+
+;; Also uses PATH_MAX
+(define-c non-null-string (%getcwd getcwd)
+  ((result (array char 4097)) (value 4097 int)))
+
+;;> Change the current working directory of the process.
+
+(define-c errno (%chdir chdir) (string))
+
+;;> Returns the current process id.
+
+(define-c pid_t (pid getpid) ()) ;; pid_t return value without sign problem, and cannot fail
+
+;;> Returns the parent process id.
+
+(define-c pid_t (parent-pid getppid) ()) ;; pid_t return value without sign problem, cannot fail
+
+;;> Returns a process group id for a process, -1 on failure.
+
+(define-c int (%getpgid getpgid) (pid_t))
+
+;; per the nice(3) OpenBSD man page it looks like it uses setpriority
+(define-c int (%nice nice) (int))
+
+(define-c uid_t (user-uid getuid) ())
+(define-c gid_t (user-gid getgid) ())
+(define-c uid_t (user-effective-uid geteuid) ())
+(define-c gid_t (user-effective-gid getegid) ())
+
+(define-c-const int (groups/max "NGROUPS_MAX"))
+
+;; ~~~~~~~~ Max derived from Ubuntu Bionic Beaver
+(define-c int (%getgroups getgroups) ((value 65537 int) (result (array gid_t 65537))))
+
+
+;;; 3.6  User and group database access
+
+;;> \section{\scheme{(user-information name-or-id)}}
+
+;;> Returns the password entry for the given user.  \var{name-or-id}
+;;> should be a string indicating the user name, or an integer
+;;> for the user id.
+
+(define-c-struct passwd
+    predicate: passwd?
+  (string  pw_name     passwd:name)
+  (string  pw_passwd   passwd:passwd)
+  (uid_t   pw_uid      passwd:uid)
+  (gid_t   pw_gid      passwd:gid)
+  (string  pw_gecos    passwd:gecos)
+  (string  pw_dir      passwd:dir)
+  (string  pw_shell    passwd:shell))
+
+(define-c (maybe-null passwd) (%getpwuid getpwuid) (uid_t))
+(define-c (maybe-null passwd) (%getpwnam getpwnam) (string))
+
+(define-c-struct group
+  (string  gr_name     group:name)
+  (gid_t   gr_gid      group:gid)
+  )
+
+(define-c (maybe-null group) (%getgrgid getgrgid) (gid_t))
+(define-c (maybe-null group) (%getgrnam getgrnam) (string))
+
+
+;;; 3.10  Time
+
+;;> Accessors for the \scheme{timespec} struct.
+;;/
+
+;;> Returns the current time as a timespec, clock behavior including
+;;> epoch defined by clck-id
+
+(define-c-const int (clck-id/realtime "CLOCK_REALTIME"))
+(define-c-const int (clck-id/monotonic "CLOCK_MONOTONIC"))
+
+(define-c-int-type clockid_t)
+
+(define-c errno (%clock_gettime clock_gettime) (clockid_t (result timespec)))
+
+
+;;; 3.12  Terminal device control
+
+;;> Returns \scheme{#t} if the given port of file descriptor
+;;> if backed by a TTY object, and \scheme{#f} otherwise.
+
+(define-c int (%isatty isatty) (int))
+
+(define-c-const int (tty/name-max "TTY_NAME_MAX"))
+
+(define-c errno (%ttyname_r ttyname_r)
+  (int (result (array char 65)) (value 65 int))) ;; should be big enough
+
+
+;; termios structure and set and get constants, POSIX only
+
+;; input modes for c_iflag
+
+(define-c-const unsigned-long BRKINT)
+(define-c-const unsigned-long ICRNL)
+(define-c-const unsigned-long IGNBRK)
+(define-c-const unsigned-long IGNCR)
+(define-c-const unsigned-long IGNPAR)
+(define-c-const unsigned-long INLCR)
+(define-c-const unsigned-long INPCK)
+(define-c-const unsigned-long ISTRIP)
+(define-c-const unsigned-long IXANY)
+(define-c-const unsigned-long IXON)
+(define-c-const unsigned-long IXOFF)
+(define-c-const unsigned-long PARMRK)
+
+;; output modes for c_oflag
+
+(define-c-const unsigned-long OPOST)
+(define-c-const unsigned-long ONLCR)
+(define-c-const unsigned-long OCRNL)
+(define-c-const unsigned-long ONOCR)
+(define-c-const unsigned-long ONLRET)
+;; (define-c-const unsigned-long OFDEL) ;; not in OpenBSD
+;; (define-c-const unsigned-long OFILL) ;; not in OpenBSD
+
+;; control modes for hardware control of terminal for c_cflag
+
+(define-c-const unsigned-long CSIZE)
+(define-c-const unsigned-long CS5)
+(define-c-const unsigned-long CS6)
+(define-c-const unsigned-long CS7)
+(define-c-const unsigned-long CS8)
+(define-c-const unsigned-long CSTOPB)
+(define-c-const unsigned-long CREAD)
+(define-c-const unsigned-long PARENB)
+(define-c-const unsigned-long PARODD)
+(define-c-const unsigned-long HUPCL)
+(define-c-const unsigned-long CLOCAL)
+
+;; local modes for c_lflag
+
+(define-c-const unsigned-long ECHO)
+(define-c-const unsigned-long ECHOE)
+(define-c-const unsigned-long ECHOK)
+(define-c-const unsigned-long ECHONL)
+(define-c-const unsigned-long ICANON)
+(define-c-const unsigned-long IEXTEN)
+(define-c-const unsigned-long ISIG)
+(define-c-const unsigned-long NOFLSH)
+(define-c-const unsigned-long TOSTOP)
+
+ ;; the size of the c_cc array, 32 Bionic Beaver, 20 in OpenBSD
+
+(define-c-const int NCCS)
+
+;; c_cc subscripts
+
+(define-c-const unsigned-long VEOF)   ;; canonical mode only
+(define-c-const unsigned-long VEOL)   ;; canonical mode only
+(define-c-const unsigned-long VERASE) ;; canonical mode only
+(define-c-const unsigned-long VINTR)
+(define-c-const unsigned-long VKILL)  ;; canonical mode only
+(define-c-const unsigned-long VMIN)   ;; minimum number of characters, non-canonical mode only, may have same value as VEOF
+(define-c-const unsigned-long VQUIT)
+(define-c-const unsigned-long VSTART)
+(define-c-const unsigned-long VSTOP)
+(define-c-const unsigned-long VSUSP)
+(define-c-const unsigned-long VTIME)  ;; minimum time in deciseconds, non-canonical mode only, may have same value as VEOL
+
+;; modes for second argument of tcsetattr
+
+(define-c-const int TCSANOW)   ;; Change attributes immediately
+(define-c-const int TCSADRAIN) ;; Change attributes when output has drained
+(define-c-const int TCSAFLUSH) ;; Change attributes when output has drained and flush pending input
+
+#|
+;; Can not use because FFI doesn't handle arrays like (unsigned-char (c_cc 22)....
+
+;; The following were input into the FFI, moved to aux.c, then
+;; term-attrs-cc-element and term-attrs-cc-element-set! were added.
+;; They take an array index as an additional argument following the
+;; termios struct pointer.
+
+(define-c-struct termios
+    predicate: term-attrs?
+    constructor: (make-term-attrs)
+  (unsigned-long c_iflag term-attrs-iflag term-attrs-iflag-set!)
+  (unsigned-long c_oflag term-attrs-oflag term-attrs-oflag-set!)
+  (unsigned-long c_cflag term-attrs-cflag term-attrs-cflag-set!)
+  (unsigned-long c_lflag term-attrs-lflag term-attrs-lflag-set!)
+  ;; (unsigned-char (c_cc NCCS) term-attrs-cc term-attrs-cc-set!)
+  )
+
+(define-c errno (%tcgetattr tcgetattr)
+  (port-or-fileno (result termios)))
+
+(define-c errno (%tcsetattr tcsetattr)
+  (port-or-fileno int termios))
+|#
