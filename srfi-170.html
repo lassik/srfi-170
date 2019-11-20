@@ -57,7 +57,8 @@ functions of this SRFI are available on all operating systems.
 
 <h1>Issues</h1>
 
-<p>None at present.</p>
+<p>The <code>fdes->port</code> procedures need to be able to specify
+buffering and (for textual ports) character encoding.</p>
 
 <h1>Rationale</h1>
 
@@ -107,10 +108,7 @@ In particular, this SRFI excludes:
 </p>
 <ul>
 <li><p>Most operations on ports and file descriptors
-  other than converting between them.  For such operations, see SRFI FIXME,
-  which is currently in pre-SRFI format at
-  <a href="https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md">
-    https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md</a>.
+  other than converting between them.
 </p></li><li><p>
 Everything to do with the creation and management of subprocesses and
 communication with them.  The low-level P<small>OSIX</small> operations
@@ -162,7 +160,7 @@ threads, the per-thread P<small>OSIX</small> functions may not do the
 right thing.
 </p>
 
-<h2><a href="#node_imp_node_sec_3.1">3.1&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.1&nbsp;&nbsp;[Intentionally omitted]</h2>
 <p>
 </p>
 <a name="node_sec_3.2"></a>
@@ -208,7 +206,26 @@ to provide this SRFI.</p>
 
 <p>Consequently, this SRFI assumes that file descriptors will only
 be used at the edges of the program, and that most I/O operations will be
-performed on ports.</p>
+performed on ports.
+As an exception, <code>open-file</code> is provided, because
+it allows arguments that the Scheme standard does not.  It returns
+a file descriptor that can then be converted to a port.
+</p>
+<div align=left><tt>(open-file <i>fname flags [perms]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>fd</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<blockquote>
+<i>Perms</i> defaults to <tt>#o666</tt>.
+<i>Flags</i> is an integer bitmask, composed by adding together
+one or more of the following constants:
+<code>open/read</code>,
+<code>open/write</code>,
+<code>open/read+write</code>,
+<code>open/append</code>,
+<code>open/create</code>,
+<code>open/exclusive</code>,
+<code>open/truncate</code>.
+It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
+<code>open/read+write</code> flags is provided.</p>
+</blockquote>
   
 <p>The following routines allow conversion between ports and file
 descriptors.</p>
@@ -244,7 +261,8 @@ if the implementation permits them.
 </p>
 </blockquote>
 
-<h2><a href="#node_toc_node_sec_3.3">3.3&nbsp;&nbsp;File system</a></h2>
+<a href="#node_toc_node_sec_3.3"></a>
+<h2>3.3&nbsp;&nbsp;File system</h2>
 <p>The following procedures allow access to the
 computer's file system.
 <p>
@@ -585,7 +603,7 @@ and whose resolution does not involve <code>.</code>, <code>..</code>, or symbol
 </blockquote>
 
 <a name="node_sec_3.4"></a>
-<h2><a href="#node_toc_node_sec_3.4">3.4&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.4&nbsp;&nbsp;[Intentionally omitted]</h2>
 
 <p></p>
 <a name="node_sec_3.5"></a>
@@ -724,14 +742,14 @@ The <i>gid/name</i> argument is either an exact integer gid or a string group na
 </p>
 
 <a name="node_sec_3.7"></a>
-<h2><a href="#node_toc_node_sec_3.7">3.7&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.7&nbsp;&nbsp;[Intentionally omitted]</h2>
 <h2>3.7&nbsp;&nbsp;[Intentionally omitted]</h2>
 
 <a name="node_sec_3.8"></a>
-<h2><a href="#node_toc_node_sec_3.8">3.8&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.8&nbsp;&nbsp;[Intentionally omitted]</h2>
 
 <a name="node_sec_3.9"></a>
-<h2><a href="#node_toc_node_sec_3.9">3.9&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.9&nbsp;&nbsp;[Intentionally omitted]</h2>
 
 <a name="node_sec_3.10"></a>
 <h2>3.10&nbsp;&nbsp;Time</h2>
@@ -767,7 +785,7 @@ is sometimes turned either forward or backward.
 </p>
 </blockquote>
 
-<h2><a href="#node_toc_node_sec_3.11">3.11&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.11&nbsp;&nbsp;[Intentionally omitted]</h2>
 
 <a name="node_sec_3.12"></a>
 <h2>3.12&nbsp;&nbsp;Terminal device control</h2>
@@ -873,9 +891,12 @@ They have the following exceptions and deviations, in which
 Bionic Beaver refers to x86-64 Ubuntu 18.04 Linux kernel 4.15.0, gcc v7.4.1,
 OpenBSD refers to x86-64 OpenBSD 6.5, clang v7.0.1.
 
-<h3><a href="#node_imp_node_sec_3.1">3.1&nbsp;&nbsp;[Intentionally omitted]</a></h3>
-<h3><a href="#node_imp_node_sec_3.2">3.2&nbsp;&nbsp;I/O</a></h3>
+<h3>3.2&nbsp;&nbsp;I/O</h3>
 <ul>
+<li><p>
+The scsh version of <code>open-file</code> returns a port
+rather than a file descriptor.
+</p></li>
 <li><p>
 Scsh does not distinguish between textual and binary ports,
 so there are only two procedures to convert file descriptors to ports,
@@ -966,7 +987,6 @@ neither finished or exported.
 </li></p>
 </ul>
 
-<h3><a href="#node_imp_node_sec_3.4">3.4&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 
 <h3>3.5&nbsp;&nbsp;Process state</h3>
 <ul>
@@ -978,15 +998,9 @@ Scsh specifies but does not implement <code>nice</code>.
 </p></li>
 </ul>
 
-<h3><a href="#node_imp_node_sec_3.6">3.6&nbsp;&nbsp;User and group database access</a></h3>
-<ul>
-</ul>
 
-<h3>3.7&nbsp;&nbsp;[Intentionally omitted]</h3>
 
-<h3><a href="#node_imp_node_sec_3.8">3.8&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 
-<h3><a href="#node_imp_node_sec_3.9">3.9&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 
 <h3>3.10&nbsp;&nbsp;Time</h3>
 <ul>
@@ -998,7 +1012,6 @@ Scsh specifies but does not implement <code>nice</code>.
 </p></li>
 </ul>
 
-<h3><a href="#node_imp_node_sec_3.11">3.11&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 
 <h3>3.12&nbsp;&nbsp;Terminal device control</h3>
 <ul>
