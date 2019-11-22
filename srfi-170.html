@@ -215,7 +215,7 @@ a file descriptor that can then be converted to a port.
 <div align="left"><code>(open-file <i>fname flags [permission-bits]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>fd</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>open()</code>&nbsp;</div>
 </p>
 <blockquote>
-<i>Perms</i> defaults to <tt>#o666</tt>.
+<i>Permission-bits</i> defaults to <code>#o666</code>.
 <i>Flags</i> is an integer bitmask, composed by adding together
 one or more of the following constants:
 <code>open/read</code>,
