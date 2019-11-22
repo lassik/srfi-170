@@ -211,7 +211,9 @@ As an exception, <code>open-file</code> is provided, because
 it allows arguments that the Scheme standard does not.  It returns
 a file descriptor that can then be converted to a port.
 </p>
-<div align=left><tt>(open-file <i>fname flags [perms]</i>)</tt> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i><i>fd</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<p>
+<div align="left"><code>(open-file <i>fname flags [perms]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>fd</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>open()</code>&nbsp;</div>
+</p>
 <blockquote>
 <i>Perms</i> defaults to <tt>#o666</tt>.
 <i>Flags</i> is an integer bitmask, composed by adding together
