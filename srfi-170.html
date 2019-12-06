@@ -173,7 +173,7 @@ the fundamental way I/O redirections are passed to subprocesses and executed
 programs, since file descriptors are preserved across <code>fork</code> and
 <code>exec</code> operations.</p>
 <p>
-Scheme, on the other hand, uses ports for specifying I/O sources and sinks. 
+Scheme, on the other hand, uses ports for specifying I/O sources and sinks.
 Ports are garbage-collected Scheme objects, not integers.
 When a port is garbage collected, it is effectively closed,
 but whether the underlying file descriptor is closed is left as an implementation detail.
@@ -229,7 +229,7 @@ one or more of the following constants:
 It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
 <code>open/read+write</code> flags is provided.</p>
 </blockquote>
-  
+
 <p>The following routines allow conversion between ports and file
 descriptors.</p>
 <div align="left"><code>(fdes->textual-input-port <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -300,17 +300,17 @@ and <i>old-fname</i> and <i>new-fname</i> refer to the same file, it is an error
 <blockquote>Return the filename referenced by the symlink <i>fname</i>.
 </blockquote>
 <div align=left><code>(rename-file <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rename()</code>&nbsp;</div>
-<blockquote>If you override an existing object, then <i>old-fname</i> 
-and <i>new-fname</i> must type-match -- either both directories, 
-or both non-directories. 
+<blockquote>If you override an existing object, then <i>old-fname</i>
+and <i>new-fname</i> must type-match -- either both directories,
+or both non-directories.
 This is required by the semantics of P<small>OSIX</small> <code>rename()</code>.<p>
 </p>
-<blockquote><i>Remark: </i> 
-There is an unfortunate atomicity problem with the <code>rename-file</code> 
+<blockquote><i>Remark: </i>
+There is an unfortunate atomicity problem with the <code>rename-file</code>
 procedure: if you do not
 specify <i>override?</i>, but create file <code>new-fname</code> sometime between
 <code>rename-file</code>'s existence check and the actual rename operation,
-your file will be clobbered with <code>old-fname</code>. There is no way to 
+your file will be clobbered with <code>old-fname</code>. There is no way to
 prevent this problem; at least it is highly unlikely to occur in practice.
 </blockquote><p>
 </blockquote><p>
