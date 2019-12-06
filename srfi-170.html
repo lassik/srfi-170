@@ -803,8 +803,12 @@ them.</p>
 <blockquote>
 Change the value of the environment variable <i>name</i> to
 be <i>value</i>. Both <i>name</i> and <i>value</i> are strings.
-If <i>name</i> or <i>value</i> are invalid according to the operating
-system, an exception is raised.
+If <i>name</i> is not defined at the time of call, a new variable is
+added; if <i>name</i> is defined, its old value is discarded and
+replaced by <i>value</i>. If <i>name</i> or <i>value</i> are invalid
+according to the operating system, an exception is raised.
+Mutating <i>name</i> or <i>value</i> after the call must not change
+the name or value of the environment variable.
 </blockquote>
 
 <div align="left"><code>(delete-environment-variable! <i>name</i>)</code>
