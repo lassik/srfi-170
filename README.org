@@ -1,6 +1,6 @@
 * SRFI 170: POSIX API
 
-** by Olin Shivers (original author), John Cowan (editor and shepherd)
+** by Olin Shivers (original author), John Cowan (editor and shepherd), Harold Ancell (editor)
 
 This repository hosts [[https://srfi.schemers.org/srfi-170/][SRFI 170]]: POSIX API, a [[https://srfi.schemers.org/][Scheme Request for Implementation]].
 
