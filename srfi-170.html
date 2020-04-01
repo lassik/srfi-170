@@ -79,7 +79,7 @@ or part of P<small>OSIX</small>, so the use of this SRFI is mostly
 portable, but implementations are definitely not portable.  However,
 an implementation of this SRFI can be layered over many existing
 implementation-specific interfaces, or directly over a C FFI.  It is
-even possible to implement it on top of the JVM or CLR virtual
+even possible to implement it on top of the JVM and CLR virtual
 machines.
 </p>
 
@@ -107,11 +107,8 @@ with wrappers to make them more Scheme-like.
 In particular, this SRFI excludes:
 </p>
 <ul>
-<li><p>Most operations on ports and file descriptors
-  other than converting between them.  For such operations, see SRFI FIXME,
-  which is currently in pre-SRFI format at
-  <a href="https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md">
-    https://bitbucket.org/cowan/r7rs-wg1-infra/src/default/FilesAdvancedCowan.md</a>.
+<li><p>Most operations on file descriptors
+  other than converting between them and Scheme ports.
 </p></li><li><p>
 Everything to do with the creation and management of subprocesses and
 communication with them.  The low-level P<small>OSIX</small> operations
@@ -125,7 +122,7 @@ P<small>OSIX</small> date and time operations are irregular and awkward.
 This SRFI provides only the current time.
 </p></li><li><p>
 Access to command-line arguments and environment variables, as well
-as provisions for exiting a process, as they are already provided by R7RS.
+as provisions for exiting a process, as they are already provided by R7RS-small.
 </p></li><li><p>
 P<small>OSIX</small> file locking, which is notoriously
 <a href="http://0pointer.de/blog/projects/locking.html">broken as designed</a>.
@@ -163,7 +160,7 @@ threads, the per-thread P<small>OSIX</small> functions may not do the
 right thing.
 </p>
 
-<h2><a href="#node_imp_node_sec_3.1">3.1&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.1&nbsp;&nbsp;[Intentionally omitted]</h2>
 <p>
 </p>
 <a name="node_sec_3.2"></a>
@@ -176,7 +173,7 @@ the fundamental way I/O redirections are passed to subprocesses and executed
 programs, since file descriptors are preserved across <code>fork</code> and
 <code>exec</code> operations.</p>
 <p>
-Scheme, on the other hand, uses ports for specifying I/O sources and sinks. 
+Scheme, on the other hand, uses ports for specifying I/O sources and sinks.
 Ports are garbage-collected Scheme objects, not integers.
 When a port is garbage collected, it is effectively closed,
 but whether the underlying file descriptor is closed is left as an implementation detail.
@@ -209,20 +206,55 @@ to provide this SRFI.</p>
 
 <p>Consequently, this SRFI assumes that file descriptors will only
 be used at the edges of the program, and that most I/O operations will be
-performed on ports.</p>
-  
+performed on ports.
+As an exception, <code>open-file</code> is provided, because
+it allows arguments that the Scheme standard does not.  It returns
+a file descriptor that can then be converted to a port.
+</p>
+<p>
+<div align="left"><code>(open-file <i>fname flags [permission-bits]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>fd</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>open()</code>&nbsp;</div>
+</p>
+<blockquote>
+<i>Permission-bits</i> defaults to <code>#o666</code>.
+<i>Flags</i> is an integer bitmask, composed by adding together
+one or more of the following constants:
+<code>open/read</code>,
+<code>open/write</code>,
+<code>open/read+write</code>,
+<code>open/append</code>,
+<code>open/create</code>,
+<code>open/exclusive</code>,
+<code>open/nofollow</code>,
+<code>open/truncate</code>.
+It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
+<code>open/read+write</code> flags is provided.</p>
+</blockquote>
+
 <p>The following routines allow conversion between ports and file
 descriptors.</p>
-<div align="left"><code>(fdes->textual-input-port <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(fdes->binary-input-port <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(fdes->textual-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(fdes->binary-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div align="left"><code>(fdes->textual-output-port <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div align="left"><code>(fdes->binary-output-port <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(fdes->textual-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(fdes->binary-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>These procedures wrap a newly created port around the specified file descriptor,
 effectively importing it into the Scheme world.
 In particular, the textual ports use the same character encoding applied
-by default in the underlying implemenation.</p>
+by default in the underlying implementation.</p>
+<p>The <i>buffer-mode</i> argument, if present, is one of the symbols <code>none</code>,
+  <code>block</code> (the default), or <code>line</code>.
+  When <i>buffer-mode</i> is <code>none</code>,
+  bytes are intended to appear from the source or at the destination as soon as possible;
+  otherwise, bytes may be accumulated and transmitted as a block.
+  When <i>buffer-mode</i> is <code>block</code>, bytes are intended
+  to be transmitted as a block when a buffer is filled.
+  When <i>buffer-mode</i> is <code>line</code>, bytes are intended
+  to be transmitted as a block when a <newline> byte is encountered.
+  Furthermore, bytes are intended to be transmitted as a block when a buffer is filled,
+  when input is requested on an unbuffered port,
+  or when input is requested on a line-buffered port that requires the transmission of bytes.
+</p>
 </blockquote>
 
 <div align="left"><code>(port-fdes <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -245,7 +277,8 @@ if the implementation permits them.
 </p>
 </blockquote>
 
-<h2><a href="#node_toc_node_sec_3.3">3.3&nbsp;&nbsp;File system</a></h2>
+<a href="#node_toc_node_sec_3.3"></a>
+<h2>3.3&nbsp;&nbsp;File system</h2>
 <p>The following procedures allow access to the
 computer's file system.
 <p>
@@ -280,17 +313,17 @@ and <i>old-fname</i> and <i>new-fname</i> refer to the same file, it is an error
 <blockquote>Return the filename referenced by the symlink <i>fname</i>.
 </blockquote>
 <div align=left><code>(rename-file <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rename()</code>&nbsp;</div>
-<blockquote>If you override an existing object, then <i>old-fname</i> 
-and <i>new-fname</i> must type-match -- either both directories, 
-or both non-directories. 
+<blockquote>If you override an existing object, then <i>old-fname</i>
+and <i>new-fname</i> must type-match &mdash; either both directories,
+or both non-directories.
 This is required by the semantics of P<small>OSIX</small> <code>rename()</code>.<p>
 </p>
-<blockquote><i>Remark: </i> 
-There is an unfortunate atomicity problem with the <code>rename-file</code> 
+<blockquote><i>Remark: </i>
+There is an unfortunate atomicity problem with the <code>rename-file</code>
 procedure: if you do not
 specify <i>override?</i>, but create file <code>new-fname</code> sometime between
 <code>rename-file</code>'s existence check and the actual rename operation,
-your file will be clobbered with <code>old-fname</code>. There is no way to 
+your file will be clobbered with <code>old-fname</code>. There is no way to
 prevent this problem; at least it is highly unlikely to occur in practice.
 </blockquote><p>
 </blockquote><p>
@@ -575,18 +608,10 @@ or to return values other than the new filename (<i>e.g.</i>, an open port).</p>
 </blockquote><p>
 </p>
 <p></p>
-<p></p>
-<div align="left"><code>(real-path <i>path</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<blockquote>
-Returns an absolute pathname
-derived from <i>pathname</i> that names the same file
-and whose resolution does not involve <code>.</code>, <code>..</code>, or symbolic links.
-</blockquote>
 </blockquote>
 
 <a name="node_sec_3.4"></a>
-<h2><a href="#node_toc_node_sec_3.4">3.4&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.4&nbsp;&nbsp;[Intentionally omitted]</h2>
 
 <p></p>
 <a name="node_sec_3.5"></a>
@@ -622,7 +647,7 @@ the process id for the parent of this process, and the process group
 for this process, respectively.
 </blockquote>
 
-<div align=left><code>(nice <i>[delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;---&gt; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>nice()</code>&nbsp;</div>
+<div align=left><code>(nice <i>[delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>nice()</code>&nbsp;</div>
 <blockquote><p>
 Increments the niceness of the current process by <i>delta</i>.
 The lower the <i>niceness</i> value is, the more the process is favored during scheduling.
@@ -725,14 +750,13 @@ The <i>gid/name</i> argument is either an exact integer gid or a string group na
 </p>
 
 <a name="node_sec_3.7"></a>
-<h2><a href="#node_toc_node_sec_3.7">3.7&nbsp;&nbsp;[Intentionally omitted]</a></h2>
 <h2>3.7&nbsp;&nbsp;[Intentionally omitted]</h2>
 
 <a name="node_sec_3.8"></a>
-<h2><a href="#node_toc_node_sec_3.8">3.8&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.8&nbsp;&nbsp;[Intentionally omitted]</h2>
 
 <a name="node_sec_3.9"></a>
-<h2><a href="#node_toc_node_sec_3.9">3.9&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.9&nbsp;&nbsp;[Intentionally omitted]</h2>
 
 <a name="node_sec_3.10"></a>
 <h2>3.10&nbsp;&nbsp;Time</h2>
@@ -745,7 +769,7 @@ The system clock is not required to report time at full nanosecond
 resolution, nor is anything guaranteed about accuracy.
 </p>
 
-<div align=left><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
+<div align=left><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
 
 <blockquote>
 <p>The <code>posix-time</code> procedure returns the current time as a
@@ -754,13 +778,13 @@ resolution, nor is anything guaranteed about accuracy.
 </blockquote>
 </blockquote><p>
 </p>
-<div align=left><code>(monotonic-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;---> &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
+<div align=left><code>(monotonic-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
 
 <blockquote>
 <p>The same as <code>posix-time</code>, except that the epoch is arbitrary.
 This epoch cannot change after the current
 program begins to run.
-It is guaranteed that a call to <code>monotonic-time</code>
+It is guaranteed that a call to <code>monotonic-time</code>m
 cannot return a time earlier than a previous call to <i>monotonic-time</i>.
 This is not guaranteed for <code>posix-time</code>
 because the system's P<small>OSIX</small> clock
@@ -768,7 +792,55 @@ is sometimes turned either forward or backward.
 </p>
 </blockquote>
 
-<h2><a href="#node_toc_node_sec_3.11">3.11&nbsp;&nbsp;[Intentionally omitted]</a></h2>
+<h2>3.11&nbsp;&nbsp;Environment variables</h2>
+<p>R<sup>7</sup>RS provides two procedures (via SRFI 98) to get
+environment variables:</p>
+<ul>
+<li><code>(get-environment-variables)</code></li>
+<li><code>(get-environment-variable <i>name</i>)</code></li>
+</ul>
+<p> Setters have not yet been standardized, so this SRFI provides
+them.</p>
+
+<div align="left"><code>(set-environment-variable! <i>name</i> <i>value</i>)</code>
+&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div>
+<blockquote>
+Change the value of the environment variable <i>name</i> to
+be <i>value</i>. Both <i>name</i> and <i>value</i> are strings.
+If <i>name</i> is not defined at the time of call, a new variable is
+added; if <i>name</i> is defined, its old value is discarded and
+replaced by <i>value</i>. If <i>name</i> or <i>value</i> are invalid
+according to the operating system, an exception is raised.
+Mutating <i>name</i> or <i>value</i> after the call must not change
+the name or value of the environment variable.
+</blockquote>
+
+<div align="left"><code>(delete-environment-variable! <i>name</i>)</code>
+&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div>
+<blockquote>
+Remove the environment variable <i>name</i> such that a
+subsequent <code>(get-environment-variable <i>name</i>)</code> would
+return <code>#f</code>. If the variable cannot be removed, an
+exception is raised. If <i>name</i> does not currently have a value,
+the call silently succeeds.
+</blockquote>
+
+<p><b>Concurrency note:</b> Under most operating systems, environment
+variables are per-process, not per-thread. Multi-threaded
+implementations should guard against race conditions.</p>
+
+<p><b>Naming note:</b> Many Scheme implementations (including scsh)
+use the short procedure names <code>getenv</code>
+and <code>setenv</code> (or minor variations). Since the long
+name <code>get-environment-variable</code> has been canonized by
+R<sup>n</sup>RS and SRFI 98, this SRFI matches it instead. Since
+environment variables are OS variables rather than Scheme variables,
+it's debatable whether procedures to modify them should bear
+the <code>!</code> suffix. MIT Scheme has the suffixed names and we
+are not aware of any Scheme implementation with the unsuffixed names,
+so the suffix is kept in this SRFI.</p>
 
 <a name="node_sec_3.12"></a>
 <h2>3.12&nbsp;&nbsp;Terminal device control</h2>
@@ -807,7 +879,7 @@ The following procedures use <code>dynamic-wind</code> when executing
 their <code><i>proc</i></code> procedure argument; if <i><code>proc</code>'s</i> dynamic extent
 is escaped, the terminal mode changes of the containing <code>with-</code>or
 <code>without-</code> procedure are undone, but if <i><code>proc</code>'s</i> dynamic extent is
-re-entered, the terminal mode changes of the containing procedure are re-enabled.
+re-entered, the terminal mode changes of the containing procedure are restored to their previous state.
 They all use P<small>OSIX</small> <code>tcgetattr()</code> and
 <code>tcsetattr()</code>, see also the <code>stty</code> command.
 </p>
@@ -834,8 +906,7 @@ except <code>read-char</code> or <code>read-string</code>,
 which read a fixed number of characters.
 No character is given special handling; all are passed to the
 application exactly as received.
-Echoing of input is disabled on the terminal during the execution of <code>proc</code>
-and then is re-enabled.
+Echoing of input is disabled on the terminal during the execution of <code>proc</code>.
 </blockquote><p>
 </p>
 
@@ -848,8 +919,7 @@ Just as in canonical mode, any read operation on the terminal
 will wait until characters are received, unlike raw mode.
 However, no characters are given special interpretation except
 the characters that send signals (by default, Ctrl-C and Ctrl-\).
-Echoing of input is disabled on the terminal during the execution of <code>proc</code>
-and then is re-enabled.
+Echoing of input is disabled on the terminal during the execution of <code>proc</code>.
 </blockquote><p>
 </p>
 
@@ -874,9 +944,15 @@ They have the following exceptions and deviations, in which
 Bionic Beaver refers to x86-64 Ubuntu 18.04 Linux kernel 4.15.0, gcc v7.4.1,
 OpenBSD refers to x86-64 OpenBSD 6.5, clang v7.0.1.
 
-<h3><a href="#node_imp_node_sec_3.1">3.1&nbsp;&nbsp;[Intentionally omitted]</a></h3>
-<h3><a href="#node_imp_node_sec_3.2">3.2&nbsp;&nbsp;I/O</a></h3>
+<h3>3.2&nbsp;&nbsp;I/O</h3>
 <ul>
+<li><p>
+The scsh version of <code>open-file</code> returns a port
+rather than a file descriptor.
+</p></li>
+<li><p>
+The Chibi implementation does not export <code>open-file</code>.
+</p></li>
 <li><p>
 Scsh does not distinguish between textual and binary ports,
 so there are only two procedures to convert file descriptors to ports,
@@ -884,6 +960,10 @@ so there are only two procedures to convert file descriptors to ports,
 and <code>fdes->binary-input-port</code>, and
 <code>fdes->outport</code> in place of <code>fdes->textual-output-port</code>
 and <code>fdes->binary-output-port</code>.
+</p></li>
+<li><p>
+Neither the scsh nor the Chibi versions of the <code>fdes->*port</code> procedures
+support the <i>buffer-mode</i> argument.
 </p></li>
 <li><p>The <code>port-fdes</code> procedure is called <code>port->fdes</code> in scsh.
 The name was changed because the use of the arrow suggests a conversion of the
@@ -916,21 +996,23 @@ rather than erroring it creates a copy of the file at <i>newname</i>.
 <li><p>
 <code>set-file-timespecs</code> is <code>set-file-times</code> in scsh,
 and <code>access-timespec</code> and <code>mod-timespec</code> are rational numbers,
-which are cooerced to exact integers, and treated as the number of elapsed seconds
+which are coerced to exact integers, and treated as the number of elapsed seconds
 since the POSIX epoch of midnight January 1, 1970.
 </p></li>
 <li><p>
 The <code><i>follow?</i></code> flag for scsh's <code>file-info</code> is optional.
-The scsh <code>file-info mode</code> record field is masked to only return the last three permission bits
-bytes, omitting the top byte for <code>set-user-ID</code>, <code>set-group-ID</code>, and the save text
+</p></li>
+<p><li>
+The scsh <code>file-info mode</code> record field is masked to only return the nine low-order permission bits,
+omitting the bits for <code>set-user-ID</code>, <code>set-group-ID</code>, and the save text
 or "sticky" bit.
 The scsh <code>file-info</code> record fields <code>atime</code>, <code>mtime</code>, and <code>ctime</code>
 fields are exact integers instead of <code><i>timespecs</i></code>, and are the number of elapsed seconds
-since the POSIX epoch of midnight January 1, 1970.
+(excluding leap seconds) since the POSIX epoch of midnight January 1, 1970.
 It does not implement the <code>rdev</code>, <code>blksize</code>, and <code>blocks</code> fields.
 </p></li>
 <li><p>
-Scsh does not have <code>make-directory-files-generator</code>, but is easy to implement with
+Scsh does not have <code>make-directory-files-generator</code>, but it is easy to implement with
 <code>open-directory</code>, <code>read-directory</code>, and <code>close-directory</code>.
 </p></li>
 <li><p>
@@ -950,7 +1032,7 @@ and <code>"~a"</code> appended to it, <i>e.g.</i>, <code>/var/tmp/6812~a</code>.
 </p></li>
 <li><p>
 In scsh <code>call-with-temporary-filename</code> is implemented with
-<code>temp-file-iterate</code> with the following difference:
+<code>temp-file-iterate</code>, with the following difference:
 The scsh fluid variable <code>*temp-file-template*</code> described above
 includes the substring "<code>~a</code>", which is required in the optional
 <code><i>prefix</i></code> argument to <code>temp-file-iterate</code> (the
@@ -967,7 +1049,6 @@ neither finished or exported.
 </li></p>
 </ul>
 
-<h3><a href="#node_imp_node_sec_3.4">3.4&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 
 <h3>3.5&nbsp;&nbsp;Process state</h3>
 <ul>
@@ -979,27 +1060,20 @@ Scsh specifies but does not implement <code>nice</code>.
 </p></li>
 </ul>
 
-<h3><a href="#node_imp_node_sec_3.6">3.6&nbsp;&nbsp;User and group database access</a></h3>
-<ul>
-</ul>
 
-<h3>3.7&nbsp;&nbsp;[Intentionally omitted]</h3>
 
-<h3><a href="#node_imp_node_sec_3.8">3.8&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 
-<h3><a href="#node_imp_node_sec_3.9">3.9&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 
 <h3>3.10&nbsp;&nbsp;Time</h3>
 <ul>
 <li><p>
   Scsh does not provide <code>posix-time</code>, but it is easily defined using the procedures
-  <code>time+ticks</code> and <code>ticks/sec</code>.  The first returns two values, the Posix
+  <code>time+ticks</code> and <code>ticks/sec</code>.  The first procedure returns two values, the Posix
   second and the subsecond time in ticks; the second procedure specifies how many ticks
   a second contains.  These are easily converted to seconds and nanoseconds.
 </p></li>
 </ul>
 
-<h3><a href="#node_imp_node_sec_3.11">3.11&nbsp;&nbsp;[Intentionally omitted]</a></h3>
 
 <h3>3.12&nbsp;&nbsp;Terminal device control</h3>
 <ul>
