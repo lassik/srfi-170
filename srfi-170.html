@@ -784,7 +784,7 @@ resolution, nor is anything guaranteed about accuracy.
 <p>The same as <code>posix-time</code>, except that the epoch is arbitrary.
 This epoch cannot change after the current
 program begins to run.
-It is guaranteed that a call to <code>monotonic-time</code>m
+It is guaranteed that a call to <code>monotonic-time</code>
 cannot return a time earlier than a previous call to <i>monotonic-time</i>.
 This is not guaranteed for <code>posix-time</code>
 because the system's P<small>OSIX</small> clock
@@ -949,9 +949,6 @@ OpenBSD refers to x86-64 OpenBSD 6.5, clang v7.0.1.
 <li><p>
 The scsh version of <code>open-file</code> returns a port
 rather than a file descriptor.
-</p></li>
-<li><p>
-The Chibi implementation does not export <code>open-file</code>.
 </p></li>
 <li><p>
 Scsh does not distinguish between textual and binary ports,
