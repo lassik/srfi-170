@@ -49,7 +49,7 @@ Olin Shivers (original author), John Cowan (editor and shepherd), Harold Ancell 
 <p>
 The host environment is the set of resources, such as the filesystem,
 network and processes, that are managed by the operating system on top of
-which a Scheme program is executing. This SRFI specifies how the host
+which a Scheme program is executing. This SRFI specifies some of the ways the host
 environment can be accessed from within a Scheme program.  It does so by
 leveraging widespread support for P<small>OSIX</small>, the Portable
 Operating System Interface standardized by the IEEE.  Not all of the
@@ -250,10 +250,7 @@ by default in the underlying implementation.</p>
   When <i>buffer-mode</i> is <code>block</code>, bytes are intended
   to be transmitted as a fixed size block when a buffer is filled.
   When <i>buffer-mode</i> is <code>line</code>, bytes are intended
-  to be transmitted as a block when a <newline> byte is encountered.
-  Furthermore, bytes are intended to be transmitted as a block
-  when input is requested on an unbuffered port,
-  or when input is requested on a line-buffered port that requires the transmission of bytes.
+  to be transmitted as a block when a newline byte is encountered.
 </p>
 </blockquote>
 
