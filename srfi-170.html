@@ -279,24 +279,15 @@ if the implementation permits them.
 <p>The following procedures allow access to the
 computer's file system.
 <p>
-<div align="left"><code>(create-directory <i>fname [permission-bits [override?]]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>mkdir()</code>&nbsp;</div>
-<div align="left"><code>(create-fifo <i>fname [permission-bits [override?]]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>mkfifo()</code>&nbsp;</div>
-<div align="left"><code>(create-hard-link <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>link()</code>&nbsp;</div>
-<div align="left"><code>(create-symlink <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>symlink()</code>&nbsp;</div>
+<div align="left"><code>(create-directory <i>fname [permission-bits]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>mkdir()</code>&nbsp;</div>
+<div align="left"><code>(create-fifo <i>fname [permission-bits]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>mkfifo()</code>&nbsp;</div>
+<div align="left"><code>(create-hard-link <i>old-fname new-fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>link()</code>&nbsp;</div>
+<div align="left"><code>(create-symlink <i>old-fname new-fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>symlink()</code>&nbsp;</div>
 
 <blockquote><p>
-These procedures create objects of various kinds in the file system.</p>
+These procedures create objects of various kinds in the file system.
+If an object with the same name already exists, an exception is raised.</p>
 <p>
-The <i>override?</i> argument controls the action if there is already an
-object in the file system with the new name.
-If it is <code>#f</code>, which is the default, then an
-error is signaled.  If it is <code>#t</code>,
-the old object is deleted with R7RS-small <code>delete-file</code>
-or this SRFI's <code>delete-directory</code> as appropriate before
-creating the new object.
-The effect of passing any other value is
-implementation-dependent.</p>
-</p><p>
 The <i>permission-bits</i> for <code>create-directory</code> default to <code>#o775</code>, and for <code>create-fifo</code> <code>#o664</code>, but are masked by the current umask.
 <p>
 </p><p>
@@ -309,7 +300,7 @@ and <i>old-fname</i> and <i>new-fname</i> refer to the same file, it is an error
 <div align=left><code>(read-symlink <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>readlink()</code>&nbsp;</div>
 <blockquote>Return the filename referenced by the symlink <i>fname</i>.
 </blockquote>
-<div align=left><code>(rename-file <i>old-fname new-fname [override?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rename()</code>&nbsp;</div>
+<div align=left><code>(rename-file <i>old-fname new-fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rename()</code>&nbsp;</div>
 <blockquote>If you override an existing object, then <i>old-fname</i>
 and <i>new-fname</i> must type-match &mdash; either both directories,
 or both non-directories.
@@ -317,8 +308,7 @@ This is required by the semantics of P<small>OSIX</small> <code>rename()</code>.
 </p>
 <blockquote><i>Remark: </i>
 There is an unfortunate atomicity problem with the <code>rename-file</code>
-procedure: if you do not
-specify <i>override?</i>, but create file <code>new-fname</code> sometime between
+procedure: if you create file <code>new-fname</code> sometime between
 <code>rename-file</code>'s existence check and the actual rename operation,
 your file will be clobbered with <code>old-fname</code>. There is no way to
 prevent this problem; at least it is highly unlikely to occur in practice.
@@ -328,7 +318,7 @@ prevent this problem; at least it is highly unlikely to occur in practice.
 <p></p>
 <div align="left"><code>(delete-directory <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rmdir()</code>&nbsp;</div>
 <blockquote>This procedure deletes directories from the file system.
-It is an error if <i>fname</i> is not a non-empty directory.
+It is an error if <i>fname</i> is not a directory or is not empty.
 </p>
 </blockquote><p>
 </p>
@@ -631,8 +621,10 @@ The process's current umask is retrieved with <code>umask</code>, and set with
 Get and set the current working directory.
 If <code>set-working-directory</code> is called with no arguments, it changes the current working directory to
 the user's home directory.
-</blockquote><p>
+<p>Note that in P<small>OSIX</small> the working directory is per-process rather
+than per-thread.
 </p>
+</blockquote><p>
 <p></p>
 <p></p>
 <div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpid()</code>&nbsp;</div>
@@ -977,11 +969,6 @@ a file-mode record instead of traditional permission bits.  A work-around
 is to manually set the mode of a file, and use
 <code>file-info</code> and <code>file-info:mode</code> to get a record
 with the desired permission bits.
-</p></li>
-<li><p>
-Attempting scsh's <code>create-directory</code> with <code><i>override?</i></code> as
-<code>#t</code> when the target <code><i>fname</i></code> is a directory with
-contents causes a stack consuming infinite loop.
 </p></li>
 <li><p>
 When scsh <code>create-hard-link</code> is asked to make a link across file systems,
