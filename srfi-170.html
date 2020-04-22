@@ -226,8 +226,8 @@ one or more of the following constants:
 <code>open/exclusive</code>,
 <code>open/nofollow</code>,
 <code>open/truncate</code>.
-It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
-<code>open/read+write</code> flags is provided.</p>
+Exactly one of the <code>open/read</code>, <code>open/write</code>, or
+<code>open/read+write</code> flags must be provided.</p>
 </blockquote>
 
 <p>The following routines allow conversion between ports and file
@@ -248,10 +248,10 @@ by default in the underlying implementation.</p>
   bytes are intended to appear from the source or at the destination as soon as possible;
   otherwise, bytes may be accumulated and transmitted as a block.
   When <i>buffer-mode</i> is <code>block</code>, bytes are intended
-  to be transmitted as a block when a buffer is filled.
+  to be transmitted as a fixed size block when a buffer is filled.
   When <i>buffer-mode</i> is <code>line</code>, bytes are intended
   to be transmitted as a block when a <newline> byte is encountered.
-  Furthermore, bytes are intended to be transmitted as a block when a buffer is filled,
+  Furthermore, bytes are intended to be transmitted as a block
   when input is requested on an unbuffered port,
   or when input is requested on a line-buffered port that requires the transmission of bytes.
 </p>
@@ -263,7 +263,7 @@ by default in the underlying implementation.</p>
 This procedure exposes the file descriptor of a port,
 effectively exporting it from the Scheme world.
 Alternatively, <code>#f</code> is returned if <i>port</i> does not have a
-file descriptor (a string port, e.g.).
+file descriptor (a string port, for example).
 </blockquote><p>
 </p>
 <div align="left"><code>(close-fdes <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code>&nbsp;</div>
@@ -603,7 +603,7 @@ To create a unique temporary directory:
 (call-with-temporary-filename&nbsp;(lambda&nbsp;(dir)&nbsp;(create-directory&nbsp;dir)&nbsp;dir)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/tmp/tempdir.")</code></blockquote>
 Similar operations can be used to generate unique fifos,
-or to return values other than the new filename (<i>e.g.</i>, an open port).</p>
+or to return values other than the new filename (for example, an open port).</p>
 </p>
 </blockquote><p>
 </p>
@@ -623,7 +623,7 @@ or to return values other than the new filename (<i>e.g.</i>, an open port).</p>
 <div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
 <blockquote>
 The process's current umask is retrieved with <code>umask</code>, and set with
-<code>(set-umask <i>perms</i>)</code>, <i>e.g.</i>, (set-umask #o2), which returns the previous umask.
+<code>(set-umask <i>perms</i>)</code>, for example, (set-umask #o2), which returns the previous umask.
 </blockquote><p>
 </p>
 <p></p>
@@ -670,7 +670,7 @@ For the calling process, these routines get the specified data.  The scsh procee
 <a name="node_sec_3.6"></a>
 <h2>3.6&nbsp;&nbsp;User and group database access</h2>
 <p>These procedures are used to access the user and group databases
-(<i>e.g.</i>, the ones traditionally stored in <code>/etc/passwd</code> and <code>/etc/group</code>).</p>
+(for example, the ones traditionally stored in <code>/etc/passwd</code> and <code>/etc/group</code>).</p>
 <p>
 </p>
 <p></p>
@@ -784,7 +784,7 @@ resolution, nor is anything guaranteed about accuracy.
 <p>The same as <code>posix-time</code>, except that the epoch is arbitrary.
 This epoch cannot change after the current
 program begins to run.
-It is guaranteed that a call to <code>monotonic-time</code>m
+It is guaranteed that a call to <code>monotonic-time</code>
 cannot return a time earlier than a previous call to <i>monotonic-time</i>.
 This is not guaranteed for <code>posix-time</code>
 because the system's P<small>OSIX</small> clock
@@ -951,9 +951,6 @@ The scsh version of <code>open-file</code> returns a port
 rather than a file descriptor.
 </p></li>
 <li><p>
-The Chibi implementation does not export <code>open-file</code>.
-</p></li>
-<li><p>
 Scsh does not distinguish between textual and binary ports,
 so there are only two procedures to convert file descriptors to ports,
 <code>fdes->inport</code> in place of <code>fdes->textual-inport-port</code>
@@ -1028,7 +1025,7 @@ Scsh does not support the <code>real-path</code> procedure.
 Scsh does not support parameters, so <code>temp-file-prefix</code> does not exist.
 Instead, there is a fluid variable named <code>*temp-file-template*</code> whose
 value is as defined in this SRFI with <code>/var</code> added in front of <code>/tmp</code>,
-and <code>"~a"</code> appended to it, <i>e.g.</i>, <code>/var/tmp/6812~a</code>.
+and <code>"~a"</code> appended to it, for example, <code>/var/tmp/6812~a</code>.
 </p></li>
 <li><p>
 In scsh <code>call-with-temporary-filename</code> is implemented with
