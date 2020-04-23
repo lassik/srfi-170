@@ -606,26 +606,66 @@ or to return values other than the new filename (for example, an open port).</p>
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(umask<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
-<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
+<div align="left"><code>(umask<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;may use P<small>OSIX</small> umask()&nbsp;</div>
+<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;may use P<small>OSIX</small> umask()&nbsp;</div>
 <blockquote>
-The process's current umask is retrieved with <code>umask</code>, and set with
-<code>(set-umask <i>perms</i>)</code>, for example, (set-umask #o2), which returns the previous umask.
+The current umask is retrieved with <code>umask</code>, and set with
+<code>(set-umask <i>perms</i>)</code>, for example, <code>(set-umask #o2)</code>,
+which returns the previous umask.
+</p>
+<p>Note that in P<small>OSIX</small> the umask is per-process rather
+than per-thread.
+However, a Scheme implementation which natively provides a per-thread umask
+should also provide per-thread semantics for these procedures.
+If that is done, the effective umask is the inclusive-or of the
+per-process umask and the per-thread umask.
+This is mildly incompatible with P<small>OSIX</small>, but it is better to
+be consistent with standard procedures that create files.
+</p><p>
+In addition, although <code>set-umask</code> is the only portable
+way to change the umask, implementations may treat
+<code>umask</code> as a parameter either in R7RS-small style
+(bindable with <code>parameterize</code> but not mutable) or in SRFI 39
+style (bindable and mutable by passing an argument).
+</p>
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
-<div align="left"><code>(working-directory<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getcwd()</code>&nbsp;</div>
-<div align="left"><code>(set-working-directory <i>[fname]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chdir()</code>&nbsp;</div>
+<div align="left"><code>(working-directory<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; may use P<small>OSIX</small> <code>getcwd()</code>&nbsp;</div>
+<div align="left"><code>(set-working-directory <i>[fname]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; may use P<small>OSIX</small> <code>chdir()</code>&nbsp;</div>
 <blockquote>
 Get and set the current working directory.
 If <code>set-working-directory</code> is called with no arguments, it changes the current working directory to
 the user's home directory.
 <p>Note that in P<small>OSIX</small> the working directory is per-process rather
 than per-thread.
+However, a Scheme implementation which natively provides a per-thread working
+directory should also provide per-thread semantics for these procedures.
+This is mildly incompatible with P<small>OSIX</small>, but it is better to
+be consistent with standard procedures that take pathname arguments.
+</p><p>
+In addition, although <code>set-working-directory</code> is the only portable
+way to change the working directory, implementations may treat
+<code>working-directory</code> as a parameter either in R7RS-small style
+(bindable with <code>parameterize</code> but not mutable) or in SRFI 39
+style (bindable and mutable by passing an argument).
 </p>
 </blockquote><p>
 <p></p>
+<div align="left"><code>(absolute-path <i>fname [per-process?]</i></code>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>
+<p></p>
+<blockquote>
+<p>The string <i>fname</i> may be an absolute pathname or a relative pathname.
+Returns a corresponding absolute pathname.  Path components that are <code>.</code>
+(dot) or <code>..</code> (dot-dot) may be removed where possible.
+Symbolic links are <i>not</i> expanded.</p>
+<p>If <i>per-process?</i> is false or omitted, relative pathnames are converted
+using the per-thread working directory; if it is true, relative pathnames are
+converted using the per-process working directory.  If the implementation
+does not support per-thread working directories, the per-process working directory
+is used in all cases.
+</blockquote>
 <p></p>
 <div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpid()</code>&nbsp;</div>
 <div align="left"><code>(parent-pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getppid()</code>&nbsp;</div>
