@@ -450,11 +450,10 @@ such as a CD-ROM.</p>
 </blockquote>
 <p></p>
 <p></p>
-<div align="left"><code>(directory-files <i>[dir [dotfiles?]]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div align="left"><code>(directory-files <i>dir [dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-Return a list of file names in directory <i>dir</i>,
-which defaults to the current working directory.
+Return a list of file names in directory <i>dir</i>.
 The <i>dotfiles?</i> flag (default <code>#f</code>) causes dot files to be
 included in the list.
 Regardless of the value of <i>dotfiles?</i>, the two files <code>.</code> and
