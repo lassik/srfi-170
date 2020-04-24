@@ -528,7 +528,7 @@ The procedure generates a sequence of filenames that have <i>prefix</i> as
 a common prefix, looking for a filename that doesn't already exist in the
 file system. When it finds one, it creates it with permission <code>#o600</code>
 and returns the filename. (The file permission can be changed to a more
-permissive permission with <code>set-file-mode</code> after being created).<p>
+permissive permission with <code>set-file-mode</code> after being created.)<p>
 This file is guaranteed to be brand new. No other process will have it
 open. This procedure does not simply return a filename that is very
 likely to be unused. It returns a filename that definitely did not exist
