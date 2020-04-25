@@ -215,7 +215,7 @@ a file descriptor that can then be converted to a port.
 <div align="left"><code>(open-file <i>fname flags [permission-bits]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>fd</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>open()</code>&nbsp;</div>
 </p>
 <blockquote>
-<i>Permission-bits</i> defaults to <code>#o666</code>.
+<i>Permission-bits</i> defaults to <code>#o666</code>, but are masked by the current umask.
 <i>Flags</i> is an integer bitmask, composed by adding together
 one or more of the following constants:
 <code>open/read</code>,
@@ -331,7 +331,7 @@ It is an error if <i>fname</i> is not a directory or is not empty.
 These procedures set the mode bits, owner id, and group id of a
 file, respectively, specified by supplying the file name.
 Setting file user ownership usually requires root privileges.
-These procedures follows symlinks and changes
+These procedures follow symlinks and change
 the files to which they refer.
 </blockquote><p>
 </p>
@@ -527,7 +527,7 @@ The procedure generates a sequence of filenames that have <i>prefix</i> as
 a common prefix, looking for a filename that doesn't already exist in the
 file system. When it finds one, it creates it with permission <code>#o600</code>
 and returns the filename. (The file permission can be changed to a more
-permissive permission with <code>set-file-mode</code> after being created).<p>
+permissive permission with <code>set-file-mode</code> after being created.)<p>
 This file is guaranteed to be brand new. No other process will have it
 open. This procedure does not simply return a filename that is very
 likely to be unused. It returns a filename that definitely did not exist
@@ -571,7 +571,7 @@ and signal an error.</p>
 <p>
 To rename a file to a temporary name:
 </p>
-<blockquote><code><br>
+<blockquote><code>
 (call-with-temporary-filename&nbsp;(lambda&nbsp;(backup)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(create-hard-link&nbsp;old-file&nbsp;backup)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;backup)<br>
@@ -585,7 +585,7 @@ So the following <code>delete-file</code> call can be reliably invoked,
 safe in the knowledge that the backup link has definitely been established.<p>
 To create a unique temporary directory:
 </p>
-<blockquote><code><br>
+<blockquote><code>
 (call-with-temporary-filename&nbsp;(lambda&nbsp;(dir)&nbsp;(create-directory&nbsp;dir)&nbsp;dir)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/tmp/tempdir.")</code></blockquote>
 Similar operations can be used to generate unique fifos,
