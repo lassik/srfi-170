@@ -605,28 +605,22 @@ or to return values other than the new filename (for example, an open port).</p>
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(umask<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
-<div align="left"><code>(set-umask <i>perms</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
+<div align="left"><code>(perms&nbsp; [<i>umask</i>]>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
 <blockquote>
-The current umask is retrieved with <code>umask</code>, and set with
-<code>(set-umask <i>perms</i>)</code>, for example, <code>(set-umask #o2)</code>,
-which returns the previous umask.
-</p>
+An R7RS or SRFI 39 parameter representing the current umask (file protection mask).
+If it is invoked with no arguments, it returns the current umask
+as an exact integer.
+If called with a single exact integer argument, it sets the current directory
+to the new value.
+If referenced by a <code>parameterize</code> expression,
+the umask is set to the new value,
+and restored at the end of <code>parameterize</code>.</p>
 <p>Note that in P<small>OSIX</small> the umask is per-process rather
 than per-thread.
 However, a Scheme implementation which natively provides a per-thread umask
-should also provide per-thread semantics for these procedures.
-If that is done, the effective umask is the inclusive-or of the
-per-process umask and the per-thread umask.
+should also provide per-thread semantics for this procedure.
 This is mildly incompatible with P<small>OSIX</small>, but it is better to
-be consistent with standard procedures that create files.
-</p><p>
-In addition, although <code>set-umask</code> is the only portable
-way to change the umask, implementations may treat
-<code>umask</code> as a parameter either in R7RS-small style
-(bindable with <code>parameterize</code> but not mutable) or in SRFI 39
-style (bindable and mutable by passing an argument).
-</p>
+be consistent with standard procedures that create files.</p>
 </blockquote><p>
 </p>
 <p></p>
@@ -641,8 +635,7 @@ to the new value.
 If referenced by a <code>parameterize</code> expression,
 the current directory is set to the new value,
 and (unless the operating system prevents it)
-restored at the end of <code>parameterize</code>.
-the user's home directory.</p>
+restored at the end of <code>parameterize</code>.</p>
 <p>Note that in P<small>OSIX</small> the working directory is per-process rather
 than per-thread.
 However, a Scheme implementation which natively provides a per-thread working
@@ -1072,7 +1065,11 @@ neither finished or exported.
 <h3>3.5&nbsp;&nbsp;Process state</h3>
 <ul>
 <li><p>
-Scsh <code>umask</code> and <code>set-umask</code> use the file-mode record described above, and <code>set-umask</code> does not return the previous umask.
+In scsh there are four procedures
+<code>working-directory</code>, <code>set-working-directory!</code>,
+<code>umask</code>, <code>set-umask!</code>
+instead of the <code>current-directory</code> and <code>umask</code>
+parameters.
 </p></li>
 <li><p>
 Scsh specifies but does not implement <code>nice</code>.
