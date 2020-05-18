@@ -896,12 +896,12 @@ Return the file name of the terminal.
 
 <p>
 The following procedures use <code>dynamic-wind</code> when executing
-their <code><i>proc</i></code> procedure argument; if <i><code>proc</code>'s</i> dynamic extent
-is escaped, the terminal mode changes of the containing <code>with-</code>or
+their <code><i>proc</i></code> procedure argument.  If <i><code>proc</code>'s</i> dynamic extent
+is escaped, the terminal mode changes of the containing <code>with- </code>or
 <code>without-</code> procedure are undone, but if <i><code>proc</code>'s</i> dynamic extent is
 re-entered, the terminal mode changes of the containing procedure are restored to their previous state.
 They all use P<small>OSIX</small> <code>tcgetattr()</code> and
-<code>tcsetattr()</code>, see also the <code>stty</code> command.
+<code>tcsetattr()</code>; see also the <code>stty</code> command.
 </p>
 
 <p>The general paradigm for using the following procedures is to set up
