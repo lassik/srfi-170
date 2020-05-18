@@ -1099,6 +1099,15 @@ Scsh specifies but does not implement <code>nice</code>.
 </ul>
 
 
+<h3>3.11&nbsp;&nbsp;Environment variables</h3>
+<ul>
+<li><p>
+  Scsh's <code>set-environment-variable!</code> is <code>setenv</code>, and does not signal an error in
+  any way if it fails.  It does not implement any equivalent to delete-environment-variable!
+</p></li>
+</ul>
+
+
 <h3>3.12&nbsp;&nbsp;Terminal device control</h3>
 <ul>
 <li><p>
