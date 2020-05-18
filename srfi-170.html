@@ -1066,14 +1066,18 @@ neither finished or exported.
 <ul>
 <li><p>
 In scsh there are four procedures
-<code>working-directory</code>, <code>set-working-directory!</code>,
-<code>umask</code>, <code>set-umask!</code>
-instead of the <code>current-directory</code> and <code>umask</code>
+<code>umask</code>, <code>set-umask!</code>,
+<code>working-directory</code>, and <code>set-working-directory!</code>
+instead of the <code>perms</code> and <code>current-directory</code>
 parameters.
 </p></li>
 <li><p>
 The Chibi Scheme implementation of <code>perms</code> does not
 provide per-thread semantics.
+Both <code>perms</code>, and <code>current-directory</code> are impliemented as procedures.
+</p></li>
+<li><p>
+Neither scsh nor Chibi Scheme support <code>absolute-pathname</code>.
 </p></li>
 <li><p>
 Scsh specifies but does not implement <code>nice</code>.
