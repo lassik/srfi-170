@@ -33,7 +33,7 @@ all: $(COMPILED_LIBS) # $(META_FILES)
 # Tests
 
 test:
-	$(CHIBI_LOCAL) -m "(srfi 170)" -e "(run-tests)"
+	$(CHIBI_LOCAL) -m "(srfi 170 test)" -e "(run-tests)"
 
 ########################################################################
 # Packaging
