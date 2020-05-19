@@ -482,6 +482,8 @@ is not prepended to each file name in the results the generator returns.</p>
 <p>The generator approach is particularly useful when the number of
 items in a directory might be &quot;huge&quot;, which has been a
 common paradigm when using a file system as a document database.</p>
+<p>Note that the generator must be run to exhaustion to close the underlying
+open directory object.</p>
 </blockquote>
 
 <div align="left"><code>(open-directory <i>dir [dot-files?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>directory-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>opendir()</code>&nbsp;</div>
