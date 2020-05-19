@@ -24,9 +24,9 @@ execute somethin like this:
 
 LD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." DYLD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH="/usr/local/src/chibi-scheme/lib:./lib" /usr/local/src/chibi-scheme/chibi-scheme -m "(srfi 170)"
 
-To run the tests:
+To run the tests, either do a "make test", or:
 
-LD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." DYLD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH="/usr/local/src/chibi-scheme/lib:./lib" /usr/local/src/chibi-scheme/chibi-scheme -m "(srfi 170)" -e "(run-tests)"
+LD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." DYLD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH="/usr/local/src/chibi-scheme/lib:./lib" /usr/local/src/chibi-scheme/chibi-scheme -m "(srfi 170 test)" -e "(run-tests)"
 
 Which run successfully on x86-64 Ubuntu 18.04 Linux kernel 4.15.0, gcc
 v7.4.1, and x86-64 OpenBSD 6.5, clang v7.0.1.
