@@ -3,6 +3,9 @@
 (define-library (srfi 170)
   (export
 
+#|
+   ;; No longer part of API
+
    ;; 3.1  Errors
 
    errno/2big errno/acces errno/addrinuse errno/addrnotavail
@@ -26,10 +29,13 @@
    errno-error syscall-error?
    syscall-error:errno syscall-error:message
    syscall-error:procedure syscall-error:data
-   
+|#
 
    ;; 3.2  I/O
 
+   open-file
+   open/read open/write open/read+write
+   open/append open/create open/exclusive open/nofollow open/truncate
    fdes->textual-input-port fdes->binary-input-port
    fdes->textual-output-port fdes->binary-output-port
    port-fdes
@@ -62,14 +68,15 @@
 
    temp-file-prefix
    create-temp-file
-   ;; call-with-temporary-filename left as an exercise for the reader
+   ;; call-with-temporary-filename is left as an exercise for the reader
 
 
    ;; 3.5  Process state
 
-   umask set-umask
-   working-directory set-working-directory
+   perms
+   current-directory
    pid parent-pid process-group
+   ;; absolute-path is left as an exercise for the reader
    nice
 
    user-uid user-gid
@@ -90,6 +97,12 @@
    ;; 3.10  Time
 
    posix-time monotonic-time
+
+
+   ;; 3.11  Environment variables
+
+   set-environment-variable!
+   delete-environment-variable!
 
 
    ;; 3.12  Terminal device control

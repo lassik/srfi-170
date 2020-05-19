@@ -1,3 +1,22 @@
+HTML: if real-path gets removed, remove "Scsh does not support the
+real-path procedure." in implimentation.
+
+
+Needed to match the SRFI:
+
+Add optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
+
+Finish call-with-temporary-filename
+
+Parameterize perms and current-directory
+
+Add absolute-path
+
+
+Suggested enhancements:
+
+Make appropriate procedures thread safe or thread aware
+
 Add name of the system or library call that failed to error-errno
 
 Improve temp-file-prefix specification and perhaps implementation
@@ -6,3 +25,5 @@ See (chibi io) for how to write a C function then wrap it in a stub
 
 Clean up post-set testing etc. of with- and without- tty procedures
 to match with-raw-mode
+
+Use [...]at functions to handle long file paths.

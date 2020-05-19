@@ -55,8 +55,6 @@ sexp sexp_error_string (sexp ctx, sexp self, sexp_sint_t n, sexp x) {
 
 // started from sexp.c sexp_open_input_file_descriptor
 
-// ~~~~ look up the code that creates the standard ports from stdio, stdout, and stderr
-
 sexp sexp_file_descriptor_to_port (sexp ctx, sexp self, sexp_sint_t n, sexp boxed_fd, sexp is_input, sexp is_binary) {
   sexp_gc_var3(res, str, fileno);
 

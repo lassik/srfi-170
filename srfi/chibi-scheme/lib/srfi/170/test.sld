@@ -19,8 +19,9 @@
           (only (chibi process) exit)
           (chibi optional) ;; Snow package for optional args
           (chibi test)
-          (only (chibi filesystem) file-exists?  delete-file open open/read open/write open/create open/truncate)
+          (only (chibi filesystem) file-exists? delete-file)
           (only (srfi 1) list-index)
+          (only (srfi 98) get-environment-variable)
           (only (srfi 115) regexp-replace-all regexp-split)
           (only (srfi 132) list-sort) ;; note list-sort truncates ending pair cdr not being ()
           (srfi 151) ;; bitwise operators
@@ -30,6 +31,7 @@
 
   (include "common.scm")
   (include "aux.so")
+  (include "170.so") ;; to get errno/*, no longer part of API
 
   (begin
 
@@ -65,7 +67,7 @@
     (define the-binary-bytevector-length (bytevector-length the-binary-bytevector))
     (define open-write-create-truncate (bitwise-ior open/write open/create open/truncate))
 
-    (define starting-dir (working-directory))
+    (define starting-dir (current-directory))
 
     (define no-dot (list-sort string<? '("fifo" "file-1" "hard-link" "symlink")))
     (define with-dot (list-sort string<? '(".dot-file" "fifo" "file-1" "hard-link" "symlink")))
@@ -121,49 +123,45 @@
 
           ;; From 3.5 Process state, to set up for following file system changes
 
-          (test-assert (set-umask #o2))
-          (test #o2 (umask))
+          (test-assert (perms #o2))
+          (test #o2 (perms))
 
           ;; Create containing directory so we'll have a place for 3.2  I/O
 
           (test-not-error (create-directory tmp-containing-dir))
           (test #o775 (bitwise-and (file-info:mode (file-info tmp-containing-dir #t)) #o777)) ; test umask
           (test-assert (file-exists? tmp-containing-dir))
-          (test-not-error (create-directory tmp-containing-dir #o755 #t))
+          (test-not-error (delete-directory tmp-containing-dir))
+          (test-not-error (create-directory tmp-containing-dir #o755))
           (test-assert (file-exists? tmp-containing-dir))
           (test #o755 (bitwise-and (file-info:mode (file-info tmp-containing-dir #t)) #o777))
 
           ) ;; end prologue
 
 
-        (test-group "3.1  Errors"
-
-         (test-assert errno/2big) ;; make sure the first of the set exists
-         (test-error (errno-error 1 umask))
-
-         ;; ~~~~  test record predicate and getters after this is moved to its own SRFI
-
-         ) ;; end errors
-
-
         (test-group "3.2  I/O"
 
+          (test-error (open-file 1 1 1))
+          (test-error (open-file "foo" "bar" 1))
+          (test-error (open-file "foo" 1 "baz"))
+          (test-error (open-file bogus-path open/read))
+
           (let ((the-port (fdes->binary-output-port
-                           (%fileno-to-fd (open tmp-file-1 open-write-create-truncate)))))
+                           (open-file tmp-file-1 open-write-create-truncate))))
             (test-not-error (write-bytevector the-binary-bytevector the-port))
             (test-not-error (close-port the-port)))
           (let ((the-port (fdes->binary-input-port
-                           (%fileno-to-fd (open tmp-file-1 open/read)))))
+                           (open-file tmp-file-1 open/read))))
             (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
             (test-not-error (close-port the-port)))
 
           (let ((the-port (fdes->textual-output-port
-                           (%fileno-to-fd (open tmp-file-1 open-write-create-truncate)))))
+                           (open-file tmp-file-1 open-write-create-truncate))))
             (test-not-error (write-string the-text-string the-port))
             (test-not-error (close-port the-port)))
           (let ((the-port (fdes->textual-input-port
-                           (%fileno-to-fd (open tmp-file-1 open/read)))))
+                           (open-file tmp-file-1 open/read))))
             (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
             (test-not-error (close-port the-port)))
@@ -173,8 +171,7 @@
           (test 2 (port-fdes (current-error-port)))
           (test-not (port-fdes the-string-port))
 
-          (let* ((dev-zero-fileno (open "/dev/zero" open/read)) ;; fileno type object
-                 (dev-zero-fd (%fileno-to-fd dev-zero-fileno)))
+          (let* ((dev-zero-fd (open-file "/dev/zero" open/read)))
             (test-not-error (close-fdes dev-zero-fd))
             (test-error (close-fdes dev-zero-fd)))
 
@@ -191,14 +188,16 @@
           (test-not-error (create-directory tmp-dir-1))
           (test-assert (file-exists? tmp-dir-1))
           (test-error (create-directory tmp-dir-1))
-          (test-not-error (create-directory tmp-dir-1 #o775 #t))
+          (test-not-error (delete-directory tmp-dir-1))
+          (test-not-error (create-directory tmp-dir-1 #o775))
 
           (test-error (create-fifo))
           (test-error (create-fifo tmp-fifo #t))
           (test-not-error (create-fifo tmp-fifo))
           (test-assert (file-exists? tmp-fifo))
           (test-error (create-fifo tmp-fifo))
-          (test-not-error (create-fifo tmp-fifo #o644 #t))
+          (test-not-error (delete-file tmp-fifo))
+          (test-not-error (create-fifo tmp-fifo #o644))
           (test-assert (file-exists? tmp-fifo))
           (test #o644 (bitwise-and (file-info:mode (file-info tmp-fifo #t)) #o777))
 
@@ -208,14 +207,12 @@
           (test-not-error (create-hard-link tmp-file-1 tmp-hard-link))
           (test-assert (file-exists? tmp-hard-link))
           (test-error (create-hard-link tmp-file-1 tmp-hard-link))
-          (test-not-error (create-hard-link tmp-file-1 tmp-hard-link #t))
           (test-assert (file-exists? tmp-hard-link))
 
           (test-error (create-symlink tmp-file-1))
           (test-not-error (create-symlink tmp-file-1 tmp-symlink))
           (test-assert (file-exists? tmp-symlink))
           (test-error (create-symlink tmp-file-1 tmp-symlink))
-          (test-not-error (create-symlink tmp-file-1 tmp-symlink #t))
           (test-assert (file-exists? tmp-symlink))
 
           (test-assert (equal? (file-info:inode (file-info tmp-file-1 #t))
@@ -232,7 +229,7 @@
           (test-assert (file-exists? tmp-file-2))
           (test-not (file-exists? tmp-file-1))
           (test-not-error (create-tmp-test-file tmp-file-1))
-          (test-not-error (rename-file tmp-file-2 tmp-file-1 #t))
+          (test-not-error (rename-file tmp-file-2 tmp-file-1))
           (test-assert (file-exists? tmp-file-1))
           (test-not (file-exists? tmp-file-2))
 
@@ -245,7 +242,7 @@
           (test-not (file-exists? tmp-dir-1))
           (test-not-error (create-directory tmp-dir-1))
           (test-error (rename-file tmp-dir-2 tmp-file-1))
-          (test-not-error (rename-file tmp-dir-2 tmp-dir-1 #t))
+          (test-not-error (rename-file tmp-dir-2 tmp-dir-1))
           (test-assert (file-exists? tmp-dir-1))
           (test-not (file-exists? tmp-dir-2))
 
@@ -393,10 +390,6 @@
           (test-assert (equal? no-dot (list-sort string<? (directory-files tmp-containing-dir))))
           (test-assert (equal? with-dot (list-sort string<? (directory-files tmp-containing-dir #t))))
 
-          (test-not-error (set-working-directory tmp-containing-dir))
-          (test-assert (equal? no-dot (list-sort string<? (directory-files))))
-          (test-not-error (set-working-directory starting-dir))
-
           (test-error (make-directory-files-generator tmp-no-filesystem-object))
           (let ((g (make-directory-files-generator tmp-containing-dir)))
             (test-assert (equal? no-dot (list-sort string<? (generator->list g)))))
@@ -412,13 +405,13 @@
             (test-error (close-directory dirobj))
             (test-error (read-directory dirobj)))
 
-          (test-not-error (set-working-directory tmp-containing-dir))
+          (test-not-error (current-directory tmp-containing-dir))
           (test tmp-containing-dir (real-path "."))
           (test tmp-file-1 (real-path tmp-file-1-basename))
           (test tmp-file-1 (real-path (string-append "./" tmp-file-1-basename)))
           (test tmp-file-1 (real-path tmp-symlink-basename))
           (test-error (real-path bogus-path))
-          (test-not-error (set-working-directory starting-dir))
+          (test-not-error (current-directory starting-dir))
 
           (let ((tmp-filename (temp-file-prefix)))
             (test-assert (string? tmp-filename))
@@ -446,17 +439,17 @@
           ;; umask and set-umask exercised in the prologue to set up
           ;; for following file system tests
 
-          (test-assert (string? (working-directory)))
-          (test-error (set-working-directory over-max-path))
-          (test-not-error (set-working-directory tmp-containing-dir))
-          (test tmp-containing-dir (working-directory))
+          (test-assert (string? (current-directory)))
+          (test-error (current-directory over-max-path))
+          (test-not-error (current-directory tmp-containing-dir))
+          (test tmp-containing-dir (current-directory))
           (test-not-error (file-info tmp-file-1-basename #t)) ; are we there?
 
           (cond-expand (bsd
             (test-not-error (set-file-mode tmp-containing-dir #o000))
             (if (equal? 0 (user-effective-uid))
-                (test-not-error (working-directory))
-                (test-error (working-directory)))
+                (test-not-error (current-directory))
+                (test-error (current-directory)))
             (test-not-error (set-file-mode tmp-containing-dir #o755))))
 
           (test-assert (pid))
@@ -527,6 +520,25 @@
                               (> (timespec-seconds t2) 0)
                               (> (timespec-nanoseconds t2) 0))))
           ) ;; end time
+
+
+        (test-group "3.11  Environment variables"
+
+          (test #f (get-environment-variable "xyzzy"))
+          (test-not-error (set-environment-variable! "xyzzy" "one"))
+          (test "one" (get-environment-variable "xyzzy"))
+          (test-not-error (set-environment-variable! "xyzzy" "two"))
+          (test "two" (get-environment-variable "xyzzy"))
+          (test-error (set-environment-variable! "xyzzy=plover" "three"))
+          (test-not-error (delete-environment-variable! "xyzzy"))
+          (test #f (get-environment-variable "xyzzy"))
+          (test-error (delete-environment-variable! "xyzzy=plover"))
+          (test-not-error (set-environment-variable! "xyzzy" ""))
+          (test "" (get-environment-variable "xyzzy"))
+          (test-not-error (delete-environment-variable! "xyzzy"))
+
+
+          ) ;; end environment variables
 
 
         (test-group "3.12  Terminal device control"

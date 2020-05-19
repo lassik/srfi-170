@@ -34,7 +34,7 @@
   ))
 
 
-;;; 3.1  Errors
+;;; 3.1  Errors (note, no longer part of API)
 
 (define-c-const int (errno/2big "E2BIG"))
 (define-c-const int (errno/acces "EACCES"))
@@ -124,11 +124,18 @@
 
 ;;; 3.2  I/O
 
-;;> Copies the first file descriptor to the second, closing
-;;> it if needed.
-;;> Returns \scheme{#t} on success and \scheme{#f} on failure.
+(define-c-const int (open/read "O_RDONLY"))
+(define-c-const int (open/write "O_WRONLY"))
+(define-c-const int (open/read+write "O_RDWR"))
+(define-c-const int (open/append "O_APPEND"))
+(define-c-const int (open/create "O_CREAT"))
+(define-c-const int (open/exclusive "O_EXCL"))
+(define-c-const int (open/nofollow "O_NOFOLLOW"))
+(define-c-const int (open/truncate "O_TRUNC"))
 
-(define-c int (%dup2 dup2) (int int))
+;;> Opens the given file and returns a file descriptor.
+
+(define-c int (%open open) (string int int))
 
 ;;> Closes the given file descriptor.
 ;;> Returns \scheme{#t} on success and \scheme{#f} on failure.
@@ -376,6 +383,13 @@
 (define-c-int-type clockid_t)
 
 (define-c errno (%clock_gettime clock_gettime) (clockid_t (result timespec)))
+
+
+;;; 3.11  Environment variables
+
+(define-c errno (%setenv setenv) (string string int))
+
+(define-c errno (%unsetenv unsetenv) (string))
 
 
 ;;; 3.12  Terminal device control

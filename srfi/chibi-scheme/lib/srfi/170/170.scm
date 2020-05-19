@@ -1,28 +1,20 @@
 ;; please see copyright notice in ./COPYING
 
-;;; 3.1  Errors
-
-(define-record-type syscall-error
-    (make-syscall-error errno message procedure data)
-    syscall-error?
-  (errno syscall-error:errno)
-  (message syscall-error:message)
-  (procedure syscall-error:procedure)
-  (data syscall-error:data))
-
-(define (errno-error errno procedure . data)
-    (raise (make-syscall-error errno (integer->error-string errno) procedure data)))
-
-(define (retry-if-EINTR the-lambda)
-  (let loop ((ret (the-lambda)))
-    (if ret
-        ret
-        (if (equal? errno/intr (errno))
-            (loop (the-lambda))
-            ret))))
-
 
 ;;; 3.2  I/O
+
+(define (open-file fname flags . o)
+  (let-optionals o ((permission-bits #o666))
+    (if (not (string? fname))
+        (errno-error errno/inval open-file fname))
+    (if (not (fixnum? flags))
+        (errno-error errno/inval open-file flags))
+    (if (not (fixnum? permission-bits))
+        (errno-error errno/inval open-file permission-bits))
+    (let ((fd (retry-if-EINTR (lambda () (%open fname flags permission-bits)))))
+      (if (equal? -1 fd)
+          (errno-error (errno) open-file fname flags permission-bits)
+          fd))))
 
 ;; seems Chibi handles bogus fds OK, reading input returns eof, output
 ;; raises errors
@@ -54,30 +46,22 @@
 ;;; 3.3  File system
 
 (define (create-directory fname . o)
-  (let-optionals o ((permission-bits #o775)
-                    (override? #f))
-    (if override? (delete-filesystem-object fname))
+  (let-optionals o ((permission-bits #o775))
     (if (not (%mkdir fname permission-bits))
         (errno-error (errno) create-directory fname))))
 
 (define (create-fifo fname . o)
-  (let-optionals o ((permission-bits #o664)
-                    (override? #f))
-    (if override? (delete-filesystem-object fname))
+  (let-optionals o ((permission-bits #o664))
     (if (not (%mkfifo fname permission-bits))
         (errno-error (errno) create-fifo fname))))
 
-(define (create-hard-link oldname newname . o)
-  (let-optionals o ((override? #f))
-    (if override? (delete-filesystem-object newname))
+(define (create-hard-link oldname newname)
     (if (not (%link oldname newname))
-        (errno-error (errno) create-hard-link oldname newname))))
+        (errno-error (errno) create-hard-link oldname newname)))
 
-(define (create-symlink oldname newname . o)
-  (let-optionals o ((override? #f))
-    (if override? (delete-filesystem-object newname))
+(define (create-symlink oldname newname)
     (if (not (%symlink oldname newname))
-        (errno-error (errno) create-symlink oldname newname))))
+        (errno-error (errno) create-symlink oldname newname)))
 
 (cond-expand
   (windows
@@ -90,13 +74,9 @@
             (substring buf 0 res)
             (errno-error (errno) read-symlink fname))))))
 
-(define (rename-file oldname newname . o)
-  (let-optionals o ((override? #f))
-    (if (not override?)
-        (if (%stat newname)
-            (errno-error errno/exist rename-file oldname newname)))
-    (if (not (%rename oldname newname))
-        (errno-error (errno) rename-file oldname newname))))
+(define (rename-file oldname newname)
+  (if (not (%rename oldname newname))
+      (errno-error (errno) rename-file oldname newname)))
 
 (define (delete-directory fname)
   (if (not (%rmdir fname))
@@ -229,12 +209,26 @@
   (is-open? directory-object-is-open? set-directory-object-is-open)
   (dot-files? directory-object-dot-files?))
 
+;;> The fundamental directory iterator.  Applies \var{kons} to
+;;> each filename in directory \var{dir} and the result of the
+;;> previous application, beginning with \var{knil}.  With
+;;> \var{kons} as \scheme{cons} and \var{knil} as \scheme{'()},
+;;> equivalent to \scheme{directory-files}.
+
+(define (directory-fold dir kons knil . o)
+  (let-optionals o ((dot-files? #f))
+    (let ((do (open-directory dir dot-files?)))
+      (let lp ((res knil))
+        (let ((file (read-directory do)))
+          (if (not (eof-object? file))
+              (lp (kons file res))
+              (begin (close-directory do) res)))))))
+
 ;;> Returns a list of the files in \var{dir} in an unspecified
 ;;> order.
 
-(define (directory-files . o)
-  (let-optionals o ((dir (working-directory))
-                    (dot-files? #f))
+(define (directory-files dir . o)
+  (let-optionals o ((dot-files? #f))
     (directory-fold dir cons '() dot-files?)))
 
 (define make-directory-files-generator
@@ -433,23 +427,23 @@
 
 ;;; 3.5  Process state
 
-(define (umask)
-  (let ((current-umask (%umask #o777)))
-    (%umask current-umask)
-    current-umask))
+(define (perms . o)
+  (let-optionals o ((umask #f))
+    (if umask
+        (%umask umask)
+        (let ((current-umask (%umask #o777)))
+          (%umask current-umask)
+          current-umask))))
 
-(define (set-umask perms)
-  (%umask perms))
-
-(define (working-directory)
-  (let ((dir (%getcwd)))
-    (if (not dir)
-      (errno-error (errno) working-directory)
-      dir)))
-
-(define (set-working-directory fname)
-  (if (not (%chdir fname))
-      (errno-error (errno) set-working-directory fname)))
+(define (current-directory . o)
+  (let-optionals o ((new-directory #f))
+    (if new-directory
+        (if (not (%chdir new-directory))
+            (errno-error (errno) current-directory new-directory))
+        (let ((dir (%getcwd)))
+          (if (not dir)
+              (errno-error (errno) current-directory)
+              dir)))))
 
 ;; pid and parent-pid direct from stub, they can't error
 
@@ -534,6 +528,19 @@
     (if (not t)
         (errno-error (errno) monotonic-time)
         (make-timespec (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
+
+
+;;; 3.11  Environment variables
+
+(define (set-environment-variable! name value)
+  (let ((ret (%setenv name value 1)))
+    (if (not ret)
+        (errno-error (errno) set-environment-variable! name value))))
+
+(define (delete-environment-variable! name)
+  (let ((ret (%unsetenv name)))
+    (if (not ret)
+        (errno-error (errno) delete-environment-variable! name))))
 
 
 ;;; 3.12  Terminal device control
