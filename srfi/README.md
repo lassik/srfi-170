@@ -1,10 +1,19 @@
+# Chibi Scheme example implementation of SRFI 170
+
 Please see copyright notice in 170/COPYING.
 
-There are several ways you might use this Chibi Scheme example
-implementation of SRFI 170 for Linux and OpenBSD (note that it is not
-yet production quality, and taking it to that level is not (yet) on
-the road-map, Chibi Scheme already has a robust set of POSIX libraries,
-from which this SRFI implementation freely cribbed).
+Please note this is an example implementation of SRFI 170 for Linux
+and OpenBSD and is not of production quality (Chibi Scheme already has
+a robust set of POSIX libraries, from which this SRFI implementation
+freely cribbed).
+
+The Makefile does not assume an installed Chibi Scheme is in any
+particular location to build from, so you must set the environment
+variable CHIBI_LOCATION_PATH to the desired location.  E.g., in bash:
+
+export CHIBI_LOCATION_PATH=/usr/local/src/chibi-scheme
+
+----------------
 
 You can read 170.stub and aux.c for a guide to translating to your own
 FFI, the code above it should then work with little modification
