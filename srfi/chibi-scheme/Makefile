@@ -23,6 +23,8 @@ include Makefile.libs
 
 ########################################################################
 
+XCPPFLAGS := $(CPPFLAGS) -I$(CHIBI_LOCATION_PATH)/include $(D:%=-DSEXP_USE_%)
+
 all: $(COMPILED_LIBS) # $(META_FILES)
 
 #lib/.%.meta: lib/sdbi/connector/ffi/sqlite3.sld
