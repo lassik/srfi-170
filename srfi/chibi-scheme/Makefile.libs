@@ -28,15 +28,12 @@ lib/%.c: lib/%.stub
 	$(CHIBI_FFI) $<
 
 # chibi-ffi collects libraries though the c-lib form, need to close that circle
-#
-#lib/%$(SO): lib/%.c
-#	$(CC) $(CLIBFLAGS) $(CLINKFLAGS) $(XCPPFLAGS) $(XCFLAGS) -Os $(LDFLAGS) -o $@ $< -L$(CHIBI_LOCATION_PATH) $(RLDFLAGS) $(XLIBS) -lchibi-scheme -lsqlite3
 
-lib/srfi/sdbi/connector/sqlite3-ffi/sqlite3$(SO): lib/srfi/sdbi/connector/sqlite3-ffi/sqlite3.c
-	$(CC) $(CLIBFLAGS) $(CLINKFLAGS) $(XCPPFLAGS) $(XCFLAGS) -Os $(LDFLAGS) -o $@ $< -L$(CHIBI_LOCATION_PATH) $(RLDFLAGS) $(XLIBS) -lchibi-scheme -lsqlite3
+lib/srfi/170/170$(SO): lib/srfi/170/170.c
+	$(CC) $(CLIBFLAGS) $(CLINKFLAGS) $(XCPPFLAGS) $(XCFLAGS) -Os $(LDFLAGS) -o $@ $< -L$(CHIBI_LOCATION_PATH) $(RLDFLAGS) $(XLIBS) -lchibi-scheme
 
-lib/srfi/sdbi/connector/cassandra-ffi/cassandra$(SO): lib/srfi/sdbi/connector/cassandra-ffi/cassandra.c
-	$(CC) $(CLIBFLAGS) $(CLINKFLAGS) $(XCPPFLAGS) $(XCFLAGS) -Os $(LDFLAGS) -o $@ $< -L$(CHIBI_LOCATION_PATH) $(RLDFLAGS) $(XLIBS) -lchibi-scheme -lcassandra
+lib/srfi/170/aux$(SO): lib/srfi/170/aux.c
+	$(CC) $(CLIBFLAGS) $(CLINKFLAGS) $(XCPPFLAGS) $(XCFLAGS) -Os $(LDFLAGS) -o $@ $< -L$(CHIBI_LOCATION_PATH) $(RLDFLAGS) $(XLIBS) -lchibi-scheme
 
 
 clean-libs:

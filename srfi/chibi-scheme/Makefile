@@ -11,8 +11,7 @@ CHIBI ?= LD_LIBRARY_PATH="$(CHIBI_LOCATION_PATH):$(LD_LIBRARY_PATH)" DYLD_LIBRAR
 
 CHIBI_LOCAL ?= LD_LIBRARY_PATH="$(CHIBI_LOCATION_PATH):." DYLD_LIBRARY_PATH="$(CHIBI_LOCATION_PATH):." CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH="$(CHIBI_LOCATION_PATH)/lib:./lib" $(CHIBI_LOCATION_PATH)/chibi-scheme$(EXE)
 
-SDBI_COMPILED_LIBS = lib/srfi/sdbi/connector/sqlite3-ffi/sqlite3$(SO) \
-	lib/srfi/sdbi/connector/cassandra-ffi/cassandra$(SO)
+SDBI_COMPILED_LIBS = lib/srfi/170/170$(SO) lib/srfi/170/aux$(SO)
 
 COMPILED_LIBS = $(SDBI_COMPILED_LIBS)
 
@@ -34,9 +33,7 @@ all: $(COMPILED_LIBS) # $(META_FILES)
 # Tests
 
 test:
-	$(CHIBI_LOCAL) -m "(srfi sdbi connector cassandra-ffi test)" -e "(run-tests \"3.11.4\")"
-	$(CHIBI_LOCAL) -m "(srfi sdbi connector postgresql-net test)" -e "(run-tests)"
-	$(CHIBI_LOCAL) -m "(srfi sdbi connector sqlite3-ffi test)" -e "(run-tests)"
+	$(CHIBI_LOCAL) -m "(srfi 170)" -e "(run-tests)"
 
 ########################################################################
 # Packaging
