@@ -13,51 +13,23 @@ variable CHIBI_LOCATION_PATH to the desired location.  E.g., in bash:
 
 export CHIBI_LOCATION_PATH=/usr/local/src/chibi-scheme
 
-----------------
+Or without modifying your environment, with gmake being Gnu Make or
+some sort of alias to it, you could execute something like this using
+bash to make the example SRFI implementation:
 
-You can read 170.stub and aux.c for a guide to translating to your own
-FFI, the code above it should then work with little modification
-besides whatever changes are made in calling down to C.
+CHIBI_LOCATION_PATH=/home/src/chibi-scheme gmake
 
-If starting from this SRFI 170 repository and adding to an existing
-copy of Chibi Scheme, copy 170.sld, 174.sld, and the 170 directory
-into lib/srfi.
+To run with all paths set correctly, from the top repo directory,
+execute somethin like this:
 
-If using stock Chibi Scheme 0.8.0, copy Makefile-0.8.0 to Makefile,
-and lib-tests.scm-0.8.0 to tests/lib-tests.scm, and make and test as
-normal.
+LD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." DYLD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH="/usr/local/src/chibi-scheme/lib:./lib" /usr/local/src/chibi-scheme/chibi-scheme -m "(srfi 170)"
 
-If using a newer version of Chibi Scheme, merge Makefile with the top
-level one, lib-tests.scm with the one in tests, and build and test as
-normal.
+To run the tests:
 
-In all cases above and below, note that installation and
-uninstallation have not been tested.
+LD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." DYLD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH="/usr/local/src/chibi-scheme/lib:./lib" /usr/local/src/chibi-scheme/chibi-scheme -m "(srfi 170)" -e "(run-tests)"
 
-It has been tested and run without warnings or errors on x86-64
-systems running Ubuntu 18.04 Bionic Beaver compiled with GCC version
-7.4.0, and OpenBSD 6.5 compiled with Clang version 7.0.1.
-
-In the following examples, gmake is either Gnu Make on OpenBSD, or an
-alias of some sort on Linux to Gnu Make.
-
-To build Chibi Scheme and test just this SRFI in place, execute the following:
-
-gmake ; LD_LIBRARY_PATH=".:" DYLD_LIBRARY_PATH=".:" CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH=lib ./chibi-scheme -m "(srfi 170 test)" -e "(run-tests)"
-
-To exercise in place, execute:
-
-LD_LIBRARY_PATH=".:" DYLD_LIBRARY_PATH=".:" CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH=lib ./chibi-scheme -m "(srfi 170)"
-
-A full version can be found in https://github.com/hga/chibi-scheme,
-forked from https://github.com/ashinn/chibi-scheme, see branches
-srfi-170 and srfi-170-new.  That'll get you the complete history,
-you can check out and build it like this:
-
-git clone https://github.com/hga/chibi-scheme
-cd chibi-scheme/
-git checkout srfi-170
-gmake ; LD_LIBRARY_PATH=".:" DYLD_LIBRARY_PATH=".:" CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH=lib ./chibi-scheme -m "(srfi 170 test)" -e "(run-tests)"
+Which run successfully on x86-64 Ubuntu 18.04 Linux kernel 4.15.0, gcc
+v7.4.1, and x86-64 OpenBSD 6.5, clang v7.0.1.
 
 The test suite 170/test.sld can be run as root, and needs to be to
 fully test some features, see the comments at its top.
@@ -66,5 +38,5 @@ The test suite is pretty generic and should be adaptable to your
 implementation, note aux.c for some unexported magic like (errno) and
 (set-errno), and common.scm for Scheme code shared by both.
 
-As of initial release, it includes a very minimal implementation of
-the pre-release timespec SRFI as a disjoint type in 174.sld.
+This includes a very minimal implementation of the pre-release
+timespec SRFI as a disjoint type in 174.sld.
