@@ -330,7 +330,7 @@ It is an error if <i>fname</i> is not a directory or is not empty.
 <blockquote>
 These procedures set the mode bits, owner id, and group id of a
 file, respectively, specified by supplying the file name.
-Setting file user ownership usually requires root privileges.
+Setting file ownership usually requires root privileges.
 These procedures follow symlinks and change
 the files to which they refer.
 </blockquote><p>
@@ -344,11 +344,12 @@ This procedure sets the access and modified times for the file
 <i>fname</i> to the supplied SRFI 174 timespec values.
 If neither time argument is supplied, they are both taken to be
 the current time.
-The special values <code>timespec/now</code> and <code>timespec/omit</code>
-set their respective times to the current time, or do not change the time.
+The constants <code>timespec/now</code> and <code>timespec/omit</code>
+are bound to values used to specify the current time and an unchanged
+time respectively.
 It is an error if exactly one time is provided.
 This procedure
-follows symlinks and sets the times of the file to which it refers.
+will follow symlinks and set the times of the file to which it refers.
 If the procedure completes successfully, the file's time of last
 status-change (<code>ctime</code>) is set to the current time.
 </blockquote><p>
@@ -363,13 +364,13 @@ status-change (<code>ctime</code>) is set to the current time.
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(file-info <i>fname/port follow?</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stat()</code>&nbsp;</div>
+<div align="left"><code>(file-info <i>fname/port follow?</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stat(), lstat()</code>&nbsp;</div>
 <blockquote>
 The <code>file-info</code> procedure
 returns a file-info record containing useful
 information about a file.
-If the <i>follow?</i> flag is true the procedure follows symlinks and
-reports on the files to which they refer.  If <i>follow?</i> is false
+If the <i>follow?</i> flag is true the procedure will follow symlinks and
+report on the file to which they refer.  If <i>follow?</i> is false
 the procedure checks the actual file itself, even if it's a symlink.
 The <i>follow?</i> flag is ignored if the file argument is a port.
 </blockquote>
@@ -394,7 +395,7 @@ The <i>follow?</i> flag is ignored if the file argument is a port.
 number of hard links, user id, group id, device ID if file is special,
 size in bytes, optimal blocksize for I/O, number of 512B blocks allocated,
 last access time, last modification time, and
-last change of status times in SRFI 174 timespecs stored in <i>file-info</i> respectively.
+last change of status times (using SRFI 174 timespecs) stored in <i>file-info</i> respectively.
 </p><p>
 Although P<small>OSIX</small> does not standardize bit positions in the
 file mode, the following assignments are de facto standards
@@ -605,58 +606,49 @@ or to return values other than the new filename (for example, an open port).</p>
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(perms&nbsp; [<i>umask</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
+<div align="left"><code>(umask)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
 <blockquote>
-An R7RS or SRFI 39 parameter representing the current umask (file protection mask).
-If it is invoked with no arguments, it returns the current umask
-as an exact integer.
-If called with a single exact integer argument, it sets the umask
-to the new value.
-If referenced by a <code>parameterize</code> expression,
-the umask is set to the new value,
-and restored at the end of <code>parameterize</code>.</p>
-<p>Note that in P<small>OSIX</small> the umask is per-process rather
-than per-thread.
-However, a Scheme implementation which natively provides a per-thread umask
-should also provide per-thread semantics for this procedure.
-This is mildly incompatible with P<small>OSIX</small>, but it is better to
-be consistent with standard procedures that create files.</p>
-</blockquote><p>
-</p>
-<p></p>
-<p></p>
-<div align="left"><code>(current-directory&nbsp;[<i>new-directory</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getcwd(), chdir()</code>&nbsp;</div>
-<blockquote>
-An R7RS or SRFI 39 parameter representing the current (working) directory.
-If it is invoked with no arguments, it returns the current directory
-as a string.
-If called with a single string argument, it sets the current directory
-to the new value.
-If referenced by a <code>parameterize</code> expression,
-the current directory is set to the new value,
-and (unless the operating system prevents it)
-restored at the end of <code>parameterize</code>.</p>
-<p>Note that in P<small>OSIX</small> the working directory is per-process rather
-than per-thread.
-However, a Scheme implementation which natively provides a per-thread working
-directory should also provide per-thread semantics for this procedure.
-This is mildly incompatible with P<small>OSIX</small>, but it is better to
-be consistent with standard procedures that take pathname arguments.</p>
-</blockquote><p>
-<p></p>
-<div align="left"><code>(absolute-path <i>fname [per-process?]</i></code>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>
-<p></p>
-<blockquote>
-<p>The string <i>fname</i> may be an absolute pathname or a relative pathname.
-Returns a corresponding absolute pathname.  Path components that are <code>.</code>
-(dot) or <code>..</code> (dot-dot) may be removed where possible.
-Symbolic links are <i>not</i> expanded.</p>
-<p>If <i>per-process?</i> is false or omitted, relative pathnames are converted
-using the per-thread working directory; if it is true, relative pathnames are
-converted using the per-process working directory.  If the implementation
-does not support per-thread working directories, the per-process working directory
-is used in all cases.
+Returns the current file protection mask, or umask, as an exact integer.
+Whenever a file is created, the specified or default permissions are
+bitwise-anded with the complement of the umask before they are used.
 </blockquote>
+<div align="left"><code>(set-umask!&nbsp;<i>umask</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>unspecified</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
+<blockquote>
+<p>Sets the file protection mask to the exact integer <i>umask</i>
+and returns an unspecified value.</p>
+<p><b>Warning:</b>
+Although P<small>OSIX</small> specifies that changing the umask
+affects all threads in the current process, some Scheme implementations
+maintain a separate simulated umask for each thread.
+As a result, the effects of this procedure in a multi-threaded
+program are only partly predictable.
+This SRFI recommends that in multi-threaded programs the mask
+be set in the primordial thread before any other threads are created
+and never changed again.</p>
+</blockquote>
+<p></p>
+<p></p>
+<div align="left"><code>(current-directory)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getcwd()</code>&nbsp;</div>
+<blockquote>
+Returns the current directory as a string containing an absolute pathname.
+Whenever a file is referenced with a relative path, it is interpreted as
+relative to this directory.
+</blockquote>
+<div align="left"><code>(set-current-directory!&nbsp;<i>new-directory</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>unspecified</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chdir()</code>&nbsp;</div>
+<blockquote>
+<p>Sets the current directory to <i>new-directory</i>
+and returns an unspecified value.</p>
+<p><b>Warning:</b>
+Although P<small>OSIX</small> specifies that changing the current directory
+affects all threads in the current process, some Scheme implementations
+maintain a separate simulated current directory for each thread.
+As a result, the effects of this procedure in a multi-threaded
+program are only partly predictable.
+This SRFI recommends that in multi-threaded programs the current directory
+be set in the primordial thread before any other threads are created
+and never changed again.</p>
+</blockquote>
+<p></p>
 <p></p>
 <div align="left"><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpid()</code>&nbsp;</div>
 <div align="left"><code>(parent-pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getppid()</code>&nbsp;</div>
@@ -683,7 +675,7 @@ If <code><i>delta</i></code> is not specified, the increment is 1.
 <div align="left"><code>(user-supplementary-gids<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i> list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgroups()</code>&nbsp;</div>
 
 <blockquote>
-For the calling process, these routines get the specified data.  The scsh proceedure <code>user-login-name</code> that uses <code>getlogin()</code> or <code>getlogin_r()</code> can be simulated with <code>(user-info:name (user-info (user-uid)))</code>, the outer procedures are described in the next section:
+For the calling process, these routines get the specified data.  The scsh proceedure <code>user-login-name</code> that uses <code>getlogin()</code> or <code>getlogin_r()</code> can be simulated with <code>(user-info.name (user-info (user-uid)))</code>, using procedures that are described in the next section.
 </blockquote><p>
 </p>
 
@@ -884,6 +876,8 @@ Return true if the argument is a terminal.
 Raises an error if <code><i>port</i></code> is not a port,
 or if the underlying call to <code>isatty()</code> returns an error
 other than <code>ENOTTY</code>.
+This procedure is useful when writing programs that change their behavior
+when their standard input or output is a terminal.
 </blockquote><p>
 </p>
 
@@ -916,7 +910,7 @@ that <code><i>proc</i></code> returns.</p>
 <blockquote>
 The port arguments must be opened on a terminal.
 The terminal is set to raw mode during the dynamic execution of <code>proc</code>
-and then is restored to canonical "cooked" mode.  The effect of the
+and then is restored to its previous state.  The effect of the
   <i>min</i> and <i>time</i> arguments is that any reads done on the terminal
   while raw mode is in effect will return to the caller after <i>min</i>
   bytes have been read or <i>time</i> deciseconds (1/10ths of a second)
@@ -933,13 +927,22 @@ Echoing of input is disabled on the terminal during the execution of <code>proc<
 <div align="left"><code>(with-rare-mode <i>input-port output-port proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ICANON -ECHO VMIN=1 VTIME=0</code>&nbsp;</div>
 <blockquote>
 The port arguments must be opened on a terminal.
-The terminal is set to "rare", also known as cbreak mode during the dynamic
+The terminal is set to rare mode, also known as cbreak mode, during the dynamic
 execution of <code>proc</code>, and then is restored to canonical "cooked" mode.
 Just as in canonical mode, any read operation on the terminal
 will wait until characters are received, unlike raw mode.
 However, no characters are given special interpretation except
 the characters that send signals (by default, Ctrl-C and Ctrl-\).
-Echoing of input is disabled on the terminal during the execution of <code>proc</code>.
+Echoing of input is enabled on the terminal during the execution of <code>proc</code>.
+</blockquote><p>
+</p>
+
+<div align="left"><code>(with-cooked-mode <i>input-port output-port proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ICANON -ECHO VMIN=1 VTIME=0</code>&nbsp;</div>
+<blockquote>
+The port arguments must be opened on a terminal.
+The terminal is set to cooked mode, also known as canonical mode, during the dynamic
+execution of <code>proc</code>, and then is restored to its previous state.
+Echoing of input is enabled on the terminal during the execution of <code>proc</code>.
 </blockquote><p>
 </p>
 
@@ -1065,15 +1068,9 @@ neither finished or exported.
 <h3>3.5&nbsp;&nbsp;Process state</h3>
 <ul>
 <li><p>
-In scsh there are four procedures
-<code>working-directory</code>, <code>set-working-directory!</code>,
-<code>umask</code>, <code>set-umask!</code>
-instead of the <code>current-directory</code> and <code>umask</code>
-parameters.
-</p></li>
-<li><p>
-The Chibi Scheme implementation of <code>perms</code> does not
-provide per-thread semantics.
+In scsh the procedures <code>current-directory</code> and
+<code>set-current-directory!</code> are called
+<code>cwd</code> and <code>chdir</code> respectively.
 </p></li>
 <li><p>
 Scsh specifies but does not implement <code>nice</code>.
