@@ -116,9 +116,11 @@
 
      ;; 3.1  Errors
 
+#|
      errno/multihop errno/nolink
      ;; STREAMS:
      errno/nodata errno/nostr errno/nosr errno/time
+|#
 
     )))
 
