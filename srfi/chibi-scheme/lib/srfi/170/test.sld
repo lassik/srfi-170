@@ -114,8 +114,8 @@
 
           ;; From 3.5 Process state, to set up for following file system changes
 
-          (test-assert (perms #o2))
-          (test #o2 (perms))
+          (test-assert (set-umask! #o2))
+          (test #o2 (umask))
 
           ;; Create containing directory so we'll have a place for 3.2  I/O
 
@@ -410,13 +410,13 @@
             (test-error (close-directory dirobj))
             (test-error (read-directory dirobj)))
 
-          (test-not-error (current-directory tmp-containing-dir))
+          (test-not-error (set-current-directory! tmp-containing-dir))
           (test tmp-containing-dir (real-path "."))
           (test tmp-file-1 (real-path tmp-file-1-basename))
           (test tmp-file-1 (real-path (string-append "./" tmp-file-1-basename)))
           (test tmp-file-1 (real-path tmp-symlink-basename))
           (test-error (real-path bogus-path))
-          (test-not-error (current-directory starting-dir))
+          (test-not-error (set-current-directory! starting-dir))
 
           (let ((tmp-filename (temp-file-prefix)))
             (test-assert (string? tmp-filename))
@@ -445,8 +445,8 @@
           ;; for following file system tests
 
           (test-assert (string? (current-directory)))
-          (test-error (current-directory over-max-path))
-          (test-not-error (current-directory tmp-containing-dir))
+          (test-error (set-current-directory! over-max-path))
+          (test-not-error (set-current-directory! tmp-containing-dir))
           (test tmp-containing-dir (current-directory))
           (test-not-error (file-info tmp-file-1-basename #t)) ; are we there?
 

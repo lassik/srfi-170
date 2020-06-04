@@ -442,23 +442,23 @@
 
 ;;; 3.5  Process state
 
-(define (perms . o)
-  (let-optionals o ((umask #f))
-    (if umask
-        (%umask umask)
-        (let ((current-umask (%umask #o777)))
-          (%umask current-umask)
-          current-umask))))
+(define (umask)
+  (let ((current-umask (%umask #o777)))
+    (%umask current-umask)
+    current-umask))
 
-(define (current-directory . o)
-  (let-optionals o ((new-directory #f))
-    (if new-directory
-        (if (not (%chdir new-directory))
-            (errno-error (errno) "current-directory" new-directory))
-        (let ((dir (%getcwd)))
-          (if (not dir)
-              (errno-error (errno) "current-directory")
-              dir)))))
+(define (set-umask! perms)
+  (%umask perms))
+
+(define (current-directory)
+  (let ((dir (%getcwd)))
+    (if (not dir)
+      (errno-error (errno) "current-directory")
+      dir)))
+
+(define (set-current-directory! fname)
+  (if (not (%chdir fname))
+      (errno-error (errno) "set-current-directory" fname)))
 
 ;; pid and parent-pid direct from stub, they can't error
 
