@@ -1,15 +1,19 @@
 Fixup error handling per reversion + enhancements:
 
 - Add name of the system or library call that failed to error-errno
-- Add errno define name to message string
+
 - Create disjoint exception type "srfi-error" for errors we catch
+
 - Maybe incorporate procedure string name in message as opposed to a seperate record field
+
+- Search for which stubs raise exceptions vs. doing the errno #f FFI trick
+
+- Document, or catch exceptions raised by 170.stub wrappers and turn
+  into SRFI errors and/or catch them all before calling the stub
+  wrappers
 
 
 Needed to match the SRFI:
-
-Catch exceptions raised by 170.stub wrappers and turn into SRFI errors
-and/or catch them all before calling the stub wrappers
 
 Add optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
 
@@ -23,6 +27,9 @@ Make appropriate procedures thread safe or thread aware
 Improve temp-file-prefix specification and perhaps implementation
 
 See (chibi io) for how to write a C function then wrap it in a stub
+(in general, a great deal of cleanup can be done, this project was my
+reintrodution to using Scheme in anger after decades, and my
+introduction to Chibi Scheme and its nifty autogenerating FFI.
 
 Clean up post-set testing etc. of without-echo tty procedure to match
 (commented out but previously working) with-raw-mode
