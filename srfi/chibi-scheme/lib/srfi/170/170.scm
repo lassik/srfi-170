@@ -1,6 +1,21 @@
 ;; please see copyright notice in ./COPYING
 
 
+;;; 3.1  Errors
+
+(define-record-type syscall-error
+    (make-syscall-error errno message procedure data)
+    syscall-error?
+  (errno syscall-error:errno)
+  (message syscall-error:message)
+  (procedure syscall-error:procedure)
+  (data syscall-error:data))
+
+(define (errno-error errno procedure . data)
+    (raise (make-syscall-error errno (integer->error-string errno) procedure data)))
+
+
+
 ;;; 3.2  I/O
 
 (define (open-file fname flags . o)

@@ -2,19 +2,6 @@
 
 ;; Common code that's included by both 170.sld and test.sld
 
-;;; Formerly 3.1  Errors before that section was removed from the API
-
-(define-record-type syscall-error
-    (make-syscall-error errno message procedure data)
-    syscall-error?
-  (errno syscall-error:errno)
-  (message syscall-error:message)
-  (procedure syscall-error:procedure)
-  (data syscall-error:data))
-
-(define (errno-error errno procedure . data)
-    (raise (make-syscall-error errno (integer->error-string errno) procedure data)))
-
 (define (retry-if-EINTR the-lambda)
   (let loop ((ret (the-lambda)))
     (if ret
