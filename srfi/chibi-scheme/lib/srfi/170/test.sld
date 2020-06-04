@@ -110,15 +110,6 @@
           ;; ~~~~~~~~ need to test that PATH_MAX is no larger than 4096
           ;; ~~~~~~~~ need to test that term/l-ctermid is no larger than 1024
 
-          (test 0 (errno))
-          (test-not-error (set-errno errno/2big))
-          (set-errno errno/2big)
-          (test errno/2big (errno))
-          (test-assert (string? (integer->error-string)))
-          (test-assert (string? (integer->error-string errno/2big)))
-          (set-errno errno/2big)
-          (test-assert (equal? (integer->error-string) (integer->error-string errno/2big)))
-
           (delete-tmp-test-files)
 
           ;; From 3.5 Process state, to set up for following file system changes
@@ -137,6 +128,20 @@
           (test #o755 (bitwise-and (file-info:mode (file-info tmp-containing-dir #t)) #o777))
 
           ) ;; end prologue
+
+
+        (test-group "3.1  Errors"
+
+          (test 0 (errno))
+          (test-not-error (set-errno errno/2big))
+          (set-errno errno/2big)
+          (test errno/2big (errno))
+          (test-assert (string? (integer->error-string)))
+          (test-assert (string? (integer->error-string errno/2big)))
+          (set-errno errno/2big)
+          (test-assert (equal? (integer->error-string) (integer->error-string errno/2big)))
+
+          ) ;; end errors
 
 
         (test-group "3.2  I/O"
