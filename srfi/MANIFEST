@@ -1,20 +1,16 @@
 MANIFEST (this file)
-README
 
-Makefile (merge with top level one)
-lib-tests.scm (merge with one in tests directory)
+chibi-scheme/README.md
+chibi-scheme/Makefile
+chibi-scheme/Makefile.libs
 
-Makefile-0.8.0 (replace with if using stock 0.8.0)
-lib-tests.scm-0.8.0 (replace with if using stock 0.8.0)
+chibi-scheme/lib/srfi/170.sld
+chibi-scheme/lib/srfi/174.sld
 
-170.sld
-174.sld
-
-170/170.scm
-170/170.stub
-170/COPYING
-170/aux.c
-170/common.scm
-170/test.sld
-170/TODO.txt
-
+chibi-scheme/lib/srfi/170/170.scm
+chibi-scheme/lib/srfi/170/170.stub
+chibi-scheme/lib/srfi/170/COPYING
+chibi-scheme/lib/srfi/170/aux.c
+chibi-scheme/lib/srfi/170/common.scm
+chibi-scheme/lib/srfi/170/test.sld
+chibi-scheme/lib/srfi/170/TODO.txt
