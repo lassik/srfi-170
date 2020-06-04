@@ -133,13 +133,13 @@
         (test-group "3.1  Errors"
 
           (test 0 (errno))
-          (test-not-error (set-errno errno/2big))
-          (set-errno errno/2big)
-          (test errno/2big (errno))
+          (test-not-error (set-errno errno/E2BIG))
+          (set-errno errno/E2BIG)
+          (test errno/E2BIG (errno))
           (test-assert (string? (integer->error-string)))
-          (test-assert (string? (integer->error-string errno/2big)))
-          (set-errno errno/2big)
-          (test-assert (equal? (integer->error-string) (integer->error-string errno/2big)))
+          (test-assert (string? (integer->error-string errno/E2BIG)))
+          (set-errno errno/E2BIG)
+          (test-assert (equal? (integer->error-string) (integer->error-string errno/E2BIG)))
 
           ) ;; end errors
 

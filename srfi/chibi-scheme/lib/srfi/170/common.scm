@@ -6,7 +6,7 @@
   (let loop ((ret (the-lambda)))
     (if ret
         ret
-        (if (equal? errno/intr (errno))
+        (if (equal? errno/EINTR (errno))
             (loop (the-lambda))
             ret))))
 

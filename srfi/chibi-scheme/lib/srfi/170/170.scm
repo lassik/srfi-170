@@ -21,11 +21,11 @@
 (define (open-file fname flags . o)
   (let-optionals o ((permission-bits #o666))
     (if (not (string? fname))
-        (errno-error errno/inval "open-file" fname))
+        (errno-error errno/EINVAL "open-file" fname))
     (if (not (fixnum? flags))
-        (errno-error errno/inval "open-file" flags))
+        (errno-error errno/EINVAL "open-file" flags))
     (if (not (fixnum? permission-bits))
-        (errno-error errno/inval "open-file" permission-bits))
+        (errno-error errno/EINVAL "open-file" permission-bits))
     (let ((fd (retry-if-EINTR (lambda () (%open fname flags permission-bits)))))
       (if (equal? -1 fd)
           (errno-error (errno) "open-file" fname flags permission-bits)
@@ -48,12 +48,12 @@
 
 (define (port-fdes the-port)
   (if (not (port? the-port))
-      (errno-error errno/inval "port-fdes" the-port))
+      (errno-error errno/EINVAL "port-fdes" the-port))
   (port-fileno the-port))
 
 (define (close-fdes the-fd)
   (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (errno-error errno/inval "close-fdes" the-fd))
+      (errno-error errno/EINVAL "close-fdes" the-fd))
   (if (not (retry-if-EINTR (lambda () (%close the-fd))))
       (errno-error (errno) "close-fdes" the-fd)))
 
@@ -121,7 +121,7 @@
 
 (define (set-file-timespecs* fname atime mtime)
   (if (or (not (timespec? atime)) (not (timespec? mtime)))
-      (errno-error errno/inval "set-file-timespecs*" fname atime mtime)) ;; exit the procedure
+      (errno-error errno/EINVAL "set-file-timespecs*" fname atime mtime)) ;; exit the procedure
   (if (not (%utimensat utimens/at_fdcwd
                        fname
                        ;; don't change underlying representation until timespec SRFI finalized
@@ -138,7 +138,7 @@
         ((port? fname/port)
          (if (not (retry-if-EINTR (lambda () (%ftruncate (port-fdes fname/port) len))))
              (errno-error (errno) "truncate-file" fname/port len))) ;; exit the procedure
-        (else (errno-error errno/inval "truncate-file" fname/port len))))
+        (else (errno-error errno/EINVAL "truncate-file" fname/port len))))
 
 (cond-expand
   (windows
@@ -295,9 +295,9 @@
 
 (define (read-directory dirobj)
   (if (not (directory-object? dirobj))
-      (errno-error errno/inval "read-directory" dirobj)) ;; exit the procedure
+      (errno-error errno/EINVAL "read-directory" dirobj)) ;; exit the procedure
   (if (not (directory-object-is-open? dirobj))
-      (errno-error errno/badf "read-directory" dirobj)) ;; exit the procedure
+      (errno-error errno/EBADF "read-directory" dirobj)) ;; exit the procedure
   (let ((dot-files? (directory-object-dot-files? dirobj)))
     (let loop ()
       (let ((de (read-directory-raise-error dirobj)))
@@ -313,16 +313,16 @@
 
 (define (close-directory directory-object)
   (if (not (directory-object? directory-object))
-      (errno-error errno/inval "close-directory" directory-object)) ;; exit the procedure
+      (errno-error errno/EINVAL "close-directory" directory-object)) ;; exit the procedure
   (if (not (directory-object-is-open? directory-object))
-      (errno-error errno/badf "read-directory" directory-object)) ;; exit the procedure
+      (errno-error errno/EBADF "read-directory" directory-object)) ;; exit the procedure
       (set-directory-object-is-open directory-object #f)
       ;; does not dirobj any error stuff, see 170.stub
       (%closedir (directory-object-get-DIR directory-object)))
 
 (define (real-path the-starting-path)
   (if (not (string? the-starting-path))
-      (errno-error errno/inval "real-path" the-starting-path)) ;; exit the procedure
+      (errno-error errno/EINVAL "real-path" the-starting-path)) ;; exit the procedure
   (let ((the-real-path (%realpath the-starting-path)))
     (if the-real-path
         the-real-path
@@ -429,11 +429,11 @@
   (if (equal? '() o) (temp-file-prefix #t)) ;; force new prefix if none supplied
   (let-optionals o ((the-prefix (temp-file-prefix)))
     (let loop ((i 0))
-      (if (> i 1000) (errno-error errno/inval "call-with-temporary-filename" maker the-prefix) ;; exit the procedure ~~~~ maybe a better errno (for now)?
+      (if (> i 1000) (errno-error errno/EINVAL "call-with-temporary-filename" maker the-prefix) ;; exit the procedure ~~~~ maybe a better errno (for now)?
           (let ((fname (string-append the-prefix "." (number->string i))))
             (receive retvals (with-errno-handler ;; ~~~~ "THEN A MIRACLE OCCURS..."
                                ((errno data)
-                                ((errno/exist errno/acces) #f))
+                                ((errno/EEXIST errno/EACCES) #f))
                                (maker fname))
               (if (car retvals) (apply values retvals) ;; ~~~~ don't understand the use of values at all
                   (loop (+ i 1)))))))))
@@ -562,7 +562,7 @@
 
 (define (terminal? the-port)
   (if (not (port? the-port))
-      (errno-error errno/inval "terminal?" the-port)) ;; exit the procedure
+      (errno-error errno/EINVAL "terminal?" the-port)) ;; exit the procedure
   (let ((the-fd (port-fdes the-port)))
     (if (not the-fd)
         #f)
@@ -572,16 +572,16 @@
         (if (equal? 1 ret)
             #t
             (if (or (not (equal? 0 ret))
-                    (not (equal? errno/notty (errno))))
+                    (not (equal? errno/ENOTTY (errno))))
                 (errno-error (errno) "terminal?" the-port) ;; exit the procedure
                 #f))))))
 
 (define (terminal-file-name the-port)
   (if (not (port? the-port))
-      (errno-error errno/inval "terminal-file-name" the-port)) ;; exit the procedure
+      (errno-error errno/EINVAL "terminal-file-name" the-port)) ;; exit the procedure
   (let ((the-fd (port-fdes the-port)))
     (if (not the-fd)
-        (errno-error errno/inval "terminal-file-name" the-port)) ;; exit the procedure
+        (errno-error errno/EINVAL "terminal-file-name" the-port)) ;; exit the procedure
     (let ((the-file-name (%ttyname_r the-fd)))
       (if (not the-file-name)
           (errno-error (errno) "terminal-file-name" the-port)) ;; exit the procedure
@@ -596,15 +596,15 @@
 
 (define (with-raw-mode input-port output-port min time proc)
   (if (not (and (port? input-port) (port? output-port)))
-      (errno-error errno/inval "with-raw-mode" input-port output-port min time proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "with-raw-mode" input-port output-port min time proc)) ;; exit the procedure
   (if (not (and (terminal? input-port) (terminal? output-port)))
-      (errno-error errno/inval "with-raw-mode" input-port output-port min time proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "with-raw-mode" input-port output-port min time proc)) ;; exit the procedure
   (if (not (and (input-port? input-port) (output-port? output-port)))
-      (errno-error errno/inval "with-raw-mode" input-port output-port min time proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "with-raw-mode" input-port output-port min time proc)) ;; exit the procedure
   (if (not (exact-integer? min))
-      (errno-error errno/inval "with-raw-mode" input-port output-port min time proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "with-raw-mode" input-port output-port min time proc)) ;; exit the procedure
   (if (not (exact-integer? time))
-      (errno-error errno/inval "with-raw-mode" input-port output-port min time proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "with-raw-mode" input-port output-port min time proc)) ;; exit the procedure
 
   (let* ((initial-input-termios (%tcgetattr input-port))
          (initial-output-termios (%tcgetattr output-port))
@@ -673,18 +673,18 @@
                                   (equal? (term-attrs-cflag new-output-termios) (term-attrs-cflag real-new-output-termios))
                                   (equal? (term-attrs-oflag new-output-termios) (term-attrs-oflag real-new-output-termios))))
                         (begin (reset-terminal)
-                               (errno-error errno/inval "with-raw-mode" input-port output-port min time proc))))))) ;; exit the procedure
+                               (errno-error errno/EINVAL "with-raw-mode" input-port output-port min time proc))))))) ;; exit the procedure
         (lambda () (proc input-port output-port))
         (lambda ()
           (reset-terminal)))))
 
 (define (with-rare-mode input-port output-port proc)
   (if (not (and (port? input-port) (port? output-port)))
-      (errno-error errno/inval "with-rare-mode" input-port output-port proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "with-rare-mode" input-port output-port proc)) ;; exit the procedure
   (if (not (and (terminal? input-port) (terminal? output-port)))
-      (errno-error errno/inval "with-rare-mode" input-port output-port proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "with-rare-mode" input-port output-port proc)) ;; exit the procedure
   (if (not (and (input-port? input-port) (output-port? output-port)))
-      (errno-error errno/inval "with-rare-mode" input-port output-port proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "with-rare-mode" input-port output-port proc)) ;; exit the procedure
 
   (let* ((initial-input-termios (%tcgetattr input-port))
          (initial-output-termios (%tcgetattr output-port))
@@ -724,7 +724,7 @@
                                   (equal? 0 (term-attrs-cc-element real-new-input-termios VTIME))
                                   (equal? 0 (bitwise-and (term-attrs-lflag real-new-output-termios) the-lflags))))
                         (begin (reset-terminal)
-                               (errno-error errno/inval "with-rare-mode" input-port output-port proc))))))) ;; exit the procedure
+                               (errno-error errno/EINVAL "with-rare-mode" input-port output-port proc))))))) ;; exit the procedure
         (lambda () (proc input-port output-port))
         (lambda ()
           (reset-terminal)))))
@@ -732,11 +732,11 @@
 
 (define (without-echo input-port output-port proc)
   (if (not (and (port? input-port) (port? output-port)))
-      (errno-error errno/inval "without-echo" input-port output-port proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "without-echo" input-port output-port proc)) ;; exit the procedure
   (if (not (and (terminal? input-port) (terminal? output-port)))
-      (errno-error errno/inval "without-echo" input-port output-port proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "without-echo" input-port output-port proc)) ;; exit the procedure
   (if (not (and (input-port? input-port) (output-port? output-port)))
-      (errno-error errno/inval "without-echo" input-port output-port proc)) ;; exit the procedure
+      (errno-error errno/EINVAL "without-echo" input-port output-port proc)) ;; exit the procedure
 
   (let* ((initial-output-termios (%tcgetattr output-port))
          (new-output-termios (%tcgetattr output-port)) ;; ~~~~ because of tagging, how to copy is not obvious
@@ -763,7 +763,7 @@
                            (errno-error (errno) "without-echo" output-port proc)) ;; exit the procedure
                     (if (not (equal? 0 (bitwise-and (term-attrs-lflag real-new-output-termios) the-lflags)))
                         (begin (reset-terminal)
-                               (errno-error errno/inval "without-echo" output-port proc))))))) ;; exit the procedure
+                               (errno-error errno/EINVAL "without-echo" output-port proc))))))) ;; exit the procedure
         (lambda () (proc input-port output-port))
         (lambda ()
           (reset-terminal)))))
