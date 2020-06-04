@@ -19,9 +19,9 @@
   (if (file-exists? fname)
       (if (file-info-directory? (file-info fname #f))
           (if (not (delete-directory fname))
-              (errno-error (errno) "delete-filesystem-object" fname))
+              (errno-error (errno) "delete-filesystem-object" "rmdir" fname))
           (if (not (delete-file fname))
-              (errno-error (errno) "delete-filesystem-object" fname)))))
+              (srfi-170-error "delete-file failed" "delete-filesystem-object" fname)))))
 
 ;; Needs to be in common for testing since we can't create or modify actual accounts
 
