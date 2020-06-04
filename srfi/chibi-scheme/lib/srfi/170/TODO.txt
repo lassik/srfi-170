@@ -1,17 +1,15 @@
-HTML: if real-path gets removed, remove "Scsh does not support the
-real-path procedure." in implimentation.
-
-Revert perms and current-directory changes towards being parameters
-
 Fixup error handling per reversion + enhancements:
 
-- Create disjoint exception type "srfi-error" for errors we catch
-- Maybe incorporate procedure string name in message as opposed to a seperate record field
 - Add name of the system or library call that failed to error-errno
 - Add errno define name to message string
+- Create disjoint exception type "srfi-error" for errors we catch
+- Maybe incorporate procedure string name in message as opposed to a seperate record field
 
 
 Needed to match the SRFI:
+
+Catch exceptions raised by 170.stub wrappers and turn into SRFI errors
+and/or catch them all before calling the stub wrappers
 
 Add optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
 
@@ -26,7 +24,7 @@ Improve temp-file-prefix specification and perhaps implementation
 
 See (chibi io) for how to write a C function then wrap it in a stub
 
-Clean up post-set testing etc. of with- and without- tty procedures
-to match with-raw-mode
+Clean up post-set testing etc. of without-echo tty procedure to match
+(commented out but previously working) with-raw-mode
 
 Use [...]at functions to handle long file paths.
