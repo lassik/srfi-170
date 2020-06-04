@@ -163,6 +163,9 @@ sexp sexp_25_tcgetattr_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0) {
   return res;
 }
 
+/* with-* removed, only need lflags, but left in to avoid modifying sexp_init_library,
+   which I no longer understand ^_^ */
+
 sexp sexp_termios_get_c_iflag (sexp ctx, sexp self, sexp_sint_t n, sexp x) {
   if (! (sexp_pointerp(x) && (sexp_pointer_tag(x) == sexp_unbox_fixnum(sexp_opcode_arg1_type(self)))))
     return sexp_type_exception(ctx, self, sexp_unbox_fixnum(sexp_opcode_arg1_type(self)), x);
@@ -222,6 +225,9 @@ sexp sexp_termios_set_c_lflag (sexp ctx, sexp self, sexp_sint_t n, sexp x, sexp 
   ((struct termios*)sexp_cpointer_value(x))->c_lflag = sexp_uint_value(v);
   return SEXP_VOID;
 }
+
+/* with-* removed, cc_element no longer needed, but left in to avoid modifying sexp_init_library,
+   which I no longer understand ^_^ */
 
 // x is the termios struct pointer, i is the array index for the value for the c_cc array element to return
 

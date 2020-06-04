@@ -561,6 +561,7 @@
           ;; getting to and out of the supplied proc, not the actual
           ;; detailed terminal mode which has to be done by hand
 
+          #| with-* removed, left as examples for minimum testing of them
           (test-error (with-raw-mode 1 (current-output-port) 2 4 (lambda (x y) 'something-for-body)))
           (test-error (with-raw-mode (current-input-port) 1 2 4 (lambda (x y) 'something-for-body)))
           (test-error (with-raw-mode the-string-port (current-output-port) 2 4 (lambda (x y) 'something-for-body)))
@@ -576,6 +577,7 @@
           (test-error (with-rare-mode (current-output-port) (current-input-port) (lambda (x y) 'something-for-body)))
           ;; ~~~~ test for a file descriptor in port???
           (test 'something-for-body (with-rare-mode (current-input-port) (current-output-port) (lambda (x y) 'something-for-body)))
+          |#
 
           (test-error (without-echo 1 (current-output-port) (lambda (x y) 'something-for-body)))
           (test-error (without-echo (current-input-port) 1 (lambda (x y) 'something-for-body)))

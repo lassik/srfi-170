@@ -3,11 +3,9 @@
 (define-library (srfi 170)
   (export
 
-#|
-   ;; No longer part of API
-
    ;; 3.1  Errors
 
+#|
    errno/2big errno/acces errno/addrinuse errno/addrnotavail
    errno/afnosupport errno/again errno/already errno/badf errno/badmsg
    errno/busy errno/canceled errno/child errno/connaborted
@@ -25,11 +23,12 @@
    errno/protonosupport errno/prototype errno/range errno/rofs
    errno/spipe errno/srch errno/stale errno/timedout errno/txtbsy
    errno/wouldblock errno/xdev
+|#
 
    errno-error syscall-error?
    syscall-error:errno syscall-error:message
    syscall-error:procedure syscall-error:data
-|#
+   ;; ~~~ additional/adjustments
 
    ;; 3.2  I/O
 
@@ -76,7 +75,6 @@
    perms
    current-directory
    pid parent-pid process-group
-   ;; absolute-path is left as an exercise for the reader
    nice
 
    user-uid user-gid
@@ -109,7 +107,7 @@
 
    terminal?
    terminal-file-name
-   with-raw-mode with-rare-mode without-echo
+   without-echo
 
    )
   

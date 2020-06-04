@@ -573,8 +573,11 @@
       the-file-name)))
 
 
+
 ;; ~~~~ all prefactory with- and without- errno-errors need a more
 ;;      specific error indicator, that's why they're not combined
+
+#| without-* removed from SRFI, left here as once working example code
 
 (define (with-raw-mode input-port output-port min time proc)
   (if (not (and (port? input-port) (port? output-port)))
@@ -710,6 +713,7 @@
         (lambda () (proc input-port output-port))
         (lambda ()
           (reset-terminal)))))
+|#
 
 (define (without-echo input-port output-port proc)
   (if (not (and (port? input-port) (port? output-port)))
