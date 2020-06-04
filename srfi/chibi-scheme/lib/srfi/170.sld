@@ -115,14 +115,13 @@
   (cond-expand ((not bsd)
     (export
 
+#|
      ;; 3.1  Errors
 
-#|
      errno/EMULTIHOP errno/ENOLINK
      ;; STREAMS:
      errno/ENODATA errno/ENOSTR errno/ENOSR errno/ETIME
 |#
-
     )))
 
   (cond-expand ((not windows)
@@ -143,6 +142,7 @@
             (only (srfi 1) take)
             (only (srfi 8) receive) ;; the only export, but let us maintain form
             (only (srfi 27) random-integer)
+            (only (srfi 69) make-hash-table hash-table-set! hash-table-ref)
             (only (srfi 98) get-environment-variables)
             (only (srfi 115) regexp-replace-all regexp-split)
             (srfi 151) ;; bitwise operators
