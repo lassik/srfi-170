@@ -1,0 +1,43 @@
+# -*- makefile-gmake -*-
+
+# Include-able makefile for building Chibi libraries - see README.libs
+# for usage.
+
+.PHONY: clean test snowballs
+.PRECIOUS: %.c lib/%.c
+
+AR        ?= ar
+CC        ?= cc
+FIND      ?= find
+LN        ?= ln -sf
+RM        ?= rm -f
+
+PREFIX    ?= /usr/local
+
+########################################################################
+# System configuration - if not using GNU make, set PLATFORM and the
+# flags from Makefile.detect (at least SO, EXE, CLIBFLAGS) as necessary.
+
+include $(CHIBI_LOCATION_PATH)/Makefile.detect
+
+########################################################################
+
+all-libs: $(COMPILED_LIBS)
+
+lib/%.c: lib/%.stub
+	$(CHIBI_FFI) $<
+
+# chibi-ffi collects libraries though the c-lib form, need to close that circle
+
+lib/srfi/170/170$(SO): lib/srfi/170/170.c
+	$(CC) $(CLIBFLAGS) $(CLINKFLAGS) $(XCPPFLAGS) $(XCFLAGS) -Os $(LDFLAGS) -o $@ $< -L$(CHIBI_LOCATION_PATH) $(RLDFLAGS) $(XLIBS) -lchibi-scheme
+
+lib/srfi/170/aux$(SO): lib/srfi/170/aux.c
+	$(CC) $(CLIBFLAGS) $(CLINKFLAGS) $(XCPPFLAGS) $(XCFLAGS) -Os $(LDFLAGS) -o $@ $< -L$(CHIBI_LOCATION_PATH) $(RLDFLAGS) $(XLIBS) -lchibi-scheme
+
+
+clean-libs:
+	$(RM) $(COMPILED_LIBS)
+	$(RM) -r $(patsubst %,%.dSYM,$(COMPILED_LIBS))
+	$(RM) $(patsubst %.stub, %.c, $(shell $(FIND) lib -name \*.stub))
+	$(RM) $(HTML_LIBS)

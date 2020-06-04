@@ -1,1 +1,3 @@
 *~
+*.so
+srfi/chibi-scheme/lib/srfi/170/170.c
