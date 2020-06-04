@@ -65,12 +65,25 @@
   (procedure syscall-error:procedure)
   (data syscall-error:data))
 
-(define (errno-error errno procedure . data)
+(define (errno-error errno procedure system-call-name . data)
   (raise (make-syscall-error
-          errno
-          (string-append "called " "The System Call" ": " (hash-table-ref errno-map errno) ": " (integer->error-string errno))
-          procedure
-          data)))
+           errno
+           (string-append "called " system-call-name ": " (hash-table-ref errno-map errno) ": " (integer->error-string errno))
+           procedure
+           data)))
+
+(define-record-type SRFI-170-Error
+    (make-srfi-170-error message procedure data)
+    srfi-170-error?
+  (message srfi-170-error:message)
+  (procedure srfi-170-error:procedure)
+  (data srfi-170-error:data))
+
+(define (srfi-170-error message procedure . data)
+  (raise (make-srfi-170-error
+           message
+           procedure
+           data)))
 
 
 ;;; 3.2  I/O
@@ -78,7 +91,7 @@
 (define (open-file fname flags . o)
   (let-optionals o ((permission-bits #o666))
     (if (not (string? fname))
-        (errno-error errno/EINVAL "open-file" fname))
+        (srfi-170-error "fname must be a string" "open-file" fname))
     (if (not (fixnum? flags))
         (errno-error errno/EINVAL "open-file" flags))
     (if (not (fixnum? permission-bits))

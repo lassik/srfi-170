@@ -29,7 +29,10 @@
    errno-error syscall-error?
    syscall-error:errno syscall-error:message
    syscall-error:procedure syscall-error:data
-   ;; ~~~ additional/adjustments
+
+   srfi-170-error srfi-170-error?
+   srfi-170-error:message
+   srfi-170-error:procedure srfi-170-error:data
 
    ;; 3.2  I/O
 
