@@ -6,11 +6,6 @@ Fixup error handling per reversion + enhancements:
 
 Needed to match the SRFI:
 
-Search for which stubs raise exceptions vs. doing the errno #f FFI trick
-
-Document, or catch exceptions raised by 170.stub wrappers and turn
-into SRFI errors and/or catch them all before calling the stub wrappers
-
 Add optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
 
 Finish call-with-temporary-filename

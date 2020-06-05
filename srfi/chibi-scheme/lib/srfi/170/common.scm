@@ -15,13 +15,17 @@
 ;; the fname doesn't exist.  Unlike the scsh version, will raise an
 ;; exception if an object can't be deleted.
 
+;; ~~~ all these errors are obscure because this is not an SRFI defined procedure
+
 (define (delete-filesystem-object fname)
+  (if (not (string? fname))
+        (srfi-170-error "fname must be a string" "delete-filesystem-object" fname))
   (if (file-exists? fname)
       (if (file-info-directory? (file-info fname #f))
           (if (not (delete-directory fname))
               (errno-error (errno) "delete-filesystem-object" "rmdir" fname))
           (if (not (delete-file fname))
-              (srfi-170-error "delete-file failed" "delete-filesystem-object" fname)))))
+              (errno-error (errno) "delete-filesystem-object" "unlink" fname)))))
 
 ;; Needs to be in common for testing since we can't create or modify actual accounts
 
