@@ -6,29 +6,33 @@
    ;; 3.1  Errors
 
 #|
-   errno/2big errno/acces errno/addrinuse errno/addrnotavail
-   errno/afnosupport errno/again errno/already errno/badf errno/badmsg
-   errno/busy errno/canceled errno/child errno/connaborted
-   errno/connrefused errno/connreset errno/deadlk errno/destaddrreq
-   errno/dom errno/dquot errno/exist errno/fault errno/fbig
-   errno/hostunreach errno/idrm errno/ilseq errno/inprogress
-   errno/intr errno/inval errno/io errno/isconn errno/isdir errno/loop
-   errno/mfile errno/mlink errno/msgsize errno/nametoolong
-   errno/netdown errno/netreset errno/netunreach errno/nfile
-   errno/nobufs errno/nodev errno/noent errno/noexec errno/nolck
-   errno/nomem errno/nomsg errno/noprotoopt errno/nospc errno/nosys
-   errno/notconn errno/notdir errno/notempty errno/notrecoverable
-   errno/notsock errno/notsup errno/notty errno/nxio errno/opnotsupp
-   errno/overflow errno/ownerdead errno/perm errno/pipe errno/proto
-   errno/protonosupport errno/prototype errno/range errno/rofs
-   errno/spipe errno/srch errno/stale errno/timedout errno/txtbsy
-   errno/wouldblock errno/xdev
+   errno/E2BIG errno/EACCES errno/EADDRINUSE errno/EADDRNOTAVAIL
+   errno/EAFNOSUPPORT errno/EAGAIN errno/EALREADY errno/EBADF
+   errno/EBADMSG errno/EBUSY errno/ECANCELED errno/ECHILD
+   errno/ECONNABORTED errno/ECONNREFUSED errno/ECONNRESET
+   errno/EDEADLK errno/EDESTADDRREQ errno/EDOM errno/EDQUOT
+   errno/EEXIST errno/EFAULT errno/EFBIG errno/EHOSTUNREACH
+   errno/EIDRM errno/EILSEQ errno/EINPROGRESS errno/EINTR errno/EINVAL
+   errno/EIO errno/EISCONN errno/EISDIR errno/ELOOP errno/EMFILE
+   errno/EMLINK errno/EMSGSIZE errno/ENAMETOOLONG errno/ENETDOWN
+   errno/ENETRESET errno/ENETUNREACH errno/ENFILE errno/ENOBUFS
+   errno/ENODEV errno/ENOENT errno/ENOEXEC errno/ENOLCK errno/ENOMEM
+   errno/ENOMSG errno/ENOPROTOOPT errno/ENOSPC errno/ENOSYS
+   errno/ENOTCONN errno/ENOTDIR errno/ENOTEMPTY errno/ENOTRECOVERABLE
+   errno/ENOTSOCK errno/ENOTSUP errno/ENOTTY errno/ENXIO
+   errno/EOPNOTSUPP errno/EOVERFLOW errno/EOWNERDEAD errno/EPERM
+   errno/EPIPE errno/EPROTO errno/EPROTONOSUPPORT errno/EPROTOTYPE
+   errno/ERANGE errno/EROFS errno/ESPIPE errno/ESRCH errno/ESTALE
+   errno/ETIMEDOUT errno/ETXTBSY errno/EWOULDBLOCK errno/EXDEV
 |#
 
    errno-error syscall-error?
    syscall-error:errno syscall-error:message
    syscall-error:procedure syscall-error:data
-   ;; ~~~ additional/adjustments
+
+   srfi-170-error srfi-170-error?
+   srfi-170-error:message
+   srfi-170-error:procedure srfi-170-error:data
 
    ;; 3.2  I/O
 
@@ -72,8 +76,8 @@
 
    ;; 3.5  Process state
 
-   perms
-   current-directory
+   umask set-umask!
+   current-directory set-current-directory!
    pid parent-pid process-group
    nice
 
@@ -114,12 +118,13 @@
   (cond-expand ((not bsd)
     (export
 
+#|
      ;; 3.1  Errors
 
-     errno/multihop errno/nolink
+     errno/EMULTIHOP errno/ENOLINK
      ;; STREAMS:
-     errno/nodata errno/nostr errno/nosr errno/time
-
+     errno/ENODATA errno/ENOSTR errno/ENOSR errno/ETIME
+|#
     )))
 
   (cond-expand ((not windows)
@@ -140,6 +145,7 @@
             (only (srfi 1) take)
             (only (srfi 8) receive) ;; the only export, but let us maintain form
             (only (srfi 27) random-integer)
+            (only (srfi 69) make-hash-table hash-table-set! hash-table-ref)
             (only (srfi 98) get-environment-variables)
             (only (srfi 115) regexp-replace-all regexp-split)
             (srfi 151) ;; bitwise operators

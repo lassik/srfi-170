@@ -110,21 +110,12 @@
           ;; ~~~~~~~~ need to test that PATH_MAX is no larger than 4096
           ;; ~~~~~~~~ need to test that term/l-ctermid is no larger than 1024
 
-          (test 0 (errno))
-          (test-not-error (set-errno errno/2big))
-          (set-errno errno/2big)
-          (test errno/2big (errno))
-          (test-assert (string? (integer->error-string)))
-          (test-assert (string? (integer->error-string errno/2big)))
-          (set-errno errno/2big)
-          (test-assert (equal? (integer->error-string) (integer->error-string errno/2big)))
-
           (delete-tmp-test-files)
 
           ;; From 3.5 Process state, to set up for following file system changes
 
-          (test-assert (perms #o2))
-          (test #o2 (perms))
+          (test-assert (set-umask! #o2))
+          (test #o2 (umask))
 
           ;; Create containing directory so we'll have a place for 3.2  I/O
 
@@ -137,6 +128,20 @@
           (test #o755 (bitwise-and (file-info:mode (file-info tmp-containing-dir #t)) #o777))
 
           ) ;; end prologue
+
+
+        (test-group "3.1  Errors"
+
+          (test 0 (errno))
+          (test-not-error (set-errno errno/E2BIG))
+          (set-errno errno/E2BIG)
+          (test errno/E2BIG (errno))
+          (test-assert (string? (integer->error-string)))
+          (test-assert (string? (integer->error-string errno/E2BIG)))
+          (set-errno errno/E2BIG)
+          (test-assert (equal? (integer->error-string) (integer->error-string errno/E2BIG)))
+
+          ) ;; end errors
 
 
         (test-group "3.2  I/O"
@@ -405,13 +410,13 @@
             (test-error (close-directory dirobj))
             (test-error (read-directory dirobj)))
 
-          (test-not-error (current-directory tmp-containing-dir))
+          (test-not-error (set-current-directory! tmp-containing-dir))
           (test tmp-containing-dir (real-path "."))
           (test tmp-file-1 (real-path tmp-file-1-basename))
           (test tmp-file-1 (real-path (string-append "./" tmp-file-1-basename)))
           (test tmp-file-1 (real-path tmp-symlink-basename))
           (test-error (real-path bogus-path))
-          (test-not-error (current-directory starting-dir))
+          (test-not-error (set-current-directory! starting-dir))
 
           (let ((tmp-filename (temp-file-prefix)))
             (test-assert (string? tmp-filename))
@@ -440,8 +445,8 @@
           ;; for following file system tests
 
           (test-assert (string? (current-directory)))
-          (test-error (current-directory over-max-path))
-          (test-not-error (current-directory tmp-containing-dir))
+          (test-error (set-current-directory! over-max-path))
+          (test-not-error (set-current-directory! tmp-containing-dir))
           (test tmp-containing-dir (current-directory))
           (test-not-error (file-info tmp-file-1-basename #t)) ; are we there?
 
