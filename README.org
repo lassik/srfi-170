@@ -1,6 +1,6 @@
 * SRFI 170: POSIX API
 
-** by Olin Shivers (original author), John Cowan (editor and shepherd), and Harold Ancell (editor)
+** by Olin Shivers (original author), John Cowan (editor and shepherd), and Harold Ancell (implementer and editor)
 
 Based on scsh by Olin Shivers.
 
