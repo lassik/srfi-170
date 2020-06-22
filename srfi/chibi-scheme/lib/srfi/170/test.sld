@@ -27,7 +27,8 @@
           (srfi 151) ;; bitwise operators
           ;; (only (srfi 158) generator->list) ;; not in Chibi Scheme, SRFI supplied implemention is very complicated....
           (srfi 170)
-          (only (srfi 174) make-timespec timespec? timespec-seconds timespec-nanoseconds))
+          (rename (only (srfi 174) timespec timespec? timespec-seconds timespec-nanoseconds)
+                  (timespec make-timespec)))
 
   (include "common.scm")
   (include "aux.so")

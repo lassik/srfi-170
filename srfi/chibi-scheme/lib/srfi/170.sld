@@ -149,7 +149,8 @@
             (only (srfi 98) get-environment-variables)
             (only (srfi 115) regexp-replace-all regexp-split)
             (srfi 151) ;; bitwise operators
-            (only (srfi 174) make-timespec timespec? timespec-seconds timespec-nanoseconds)
+            (rename (only (srfi 174) timespec timespec? timespec-seconds timespec-nanoseconds)
+                    (timespec make-timespec))
             )
     (include-shared "170/170")
     (include-shared "170/aux")))
