@@ -169,26 +169,29 @@ right thing.
 <h2>3.1&nbsp;&nbsp;Error handling</h2>
 <p>
 As noted above, the procedures of this SRFI signal an exception
-when the underlying system calls fail.  These procedures allow such
-condition objects to be injected, inspected, and detected
-(but not infected, neglected or selected).</p>
-<p><div><code>(syscall-error? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns <code>#t</code> if <em>obj</em> is a condition object
-representing a syscall error, and <code>#f</code> otherwise.</p>
-<p><div><code>(syscall-error:errno <i>syscall-obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns the P<small>OSIX</small> error number of the condition object
-<em>syscall-obj</em>.</p>
-<p><div><code>(syscall-error:message <i>syscall-obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns an error message associated with the P<small>OSIX</small>
-error number of the condition object <em>syscall-obj</em>.</p>
-<p><div><code>(syscall-error:procedure <i>syscall-obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>symbol</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns the name of the procedure reporting this error.</p>
-<p><div><code>(syscall-error:data <i>syscall-obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns a list of arbitrary objects associated with the signaling of
-the condition object <em>syscall-obj</em>.</p>
-<p><div><code>(errno-error <i>errno procedure obj</i> ...)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>does not return</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns a list of arbitrary objects associated with the P<small>OSIX</small>
-error number of the condition object <em>syscall-obj</em>.</p>
+when the underlying system calls fail.  They are fully documented in
+<a href="http://srfi.schemers.org/srfi-198/srfi-198.html">SRFI 198</a>,
+which may not yet be finalized when you are reading this,
+so they are summarized here.</p>
+<p>The condition object signaled in case of an <code>errno</code>-based error
+has the predicate <code>syscall-error?</code> and the accessors
+<code>syscall-error:errno</code>,
+<code>syscall-error:message</code>,
+<code>syscall-error:procedure-name</code>,
+and <code>syscall-error:data</code>.
+The accessors return, respectively, the value of <code>errno</code>
+as an exact integer, a string describing the error situation, the
+name of the procedure (as a symbol) reporting the error, and
+a list of relevant objects, possibly the arguments of the system call.</p>
+
+<p>Errors unrelated to <code>errno</code> are signaled with condition
+objects that are detected by <code>srfi-170-error?</code>.
+The available accessors are <code>srfi-170-error:message</code>,
+<code>srfi-170-error:procedure-name</code>, and
+<code>srfi-170-error:data</code>,
+with the same semantics as the corrsponding <code>syscall-error</code>
+accessors.
+These procedures are not part of SRFI 198.</p>
 <a name="node_sec_3.2"></a>
 <h2>3.2&nbsp;&nbsp;I/O</h2>
 <p></p>
@@ -941,6 +944,8 @@ They have the following exceptions and deviations:
 <li><p>
 Scsh only exposes <code>errno-error</code>,
 because it uses specialized syntax to catch system errors.</p>
+<li><p>The Chibi version of error handling does not use the
+SRFI 198 implementation, which is inherently less portable.</p></li>
 </p></li>
 </ul>
 <h3>3.2&nbsp;&nbsp;I/O</h3>
