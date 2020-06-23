@@ -133,8 +133,8 @@ non-portable facilities) instead.
 All provisions for signal handling, as they are complex and require deep
 integration with the particular Scheme implementation.
 </p></li><li><p>
-Memory-mapped I/O, locales, syslog, System V message queues,
-terminal device control, and pseudo-TTYs, as they are considered specialized and out of scope.
+Memory-mapped I/O, locales, syslog, System V message
+queues, and pseudo-TTYs, as they are considered specialized and out of scope.
 Future SRFIs may provide interfaces for them.
 </p></li>
 </ul>
@@ -880,8 +880,49 @@ are not aware of any Scheme implementation with the unsuffixed names,
 so the suffix is kept in this SRFI.</p>
 
 <a name="node_sec_3.12"></a>
-<h2>3.12&nbsp;&nbsp;[Intentionally omitted]</h2>
+<h2>3.12&nbsp;&nbsp;Terminal device control</h2>
 <p></p>
+<p>
+</p>
+<p>
+P<small>OSIX</small> provides a complete set of routines for manipulating terminal
+devices &mdash; putting them in "raw" mode, changing and querying their
+special characters, modifying their I/O speeds, and so forth.
+However, now that terminal emulators have almost completely displaced
+terminals, very little of this is useful except for directly
+controlling serial-line hardware, which itself is increasingly rare.</p>
+<p>Therefore, this SRFI provides only the functions that are still
+in common use by command-line programs.
+A future SRFI may provide a package suitable for writing textual user interfaces
+along the lines of ncurses, but hopefully much simpler.</p>
+</p>
+
+<div><code>(terminal? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
+<blockquote>
+Return true if the argument is a terminal.
+Raises an error if <code><i>port</i></code> is not a port,
+or if the underlying call to <code>isatty()</code> returns an error
+other than <code>ENOTTY</code>.
+This procedure is useful when writing programs that change their behavior
+when their standard input or output is a terminal.
+</blockquote><p>
+</p>
+
+<div><code>(terminal-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>&nbsp;</div>
+<blockquote>
+The argument <i>port</i> must be open on a terminal.
+Return the filename of the terminal.
+</blockquote><p>
+</p>
+
+
+<div><code>(without-echo <i>input-port output-port proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ECHO -ECHOE -ECHOK -ECHONL</code>&nbsp;</div>
+<blockquote>
+The port arguments must be opened on a terminal.
+Echoing of input is disabled on the terminal during the execution of <code>proc</code>
+and then is restored to its previous state.
+</blockquote><p>
+</p>
 
 <h1>Implementation</h1>
 
