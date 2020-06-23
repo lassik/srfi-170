@@ -5,11 +5,10 @@
 
    ;; 3.1  Errors
 
-#|
+   ;; syscall-* imported from SRFI 198
    syscall-error?
    syscall-error:errno syscall-error:message
    syscall-error:procedure-name syscall-error:data
-|#
 
    srfi-170-error?
    srfi-170-error:message
@@ -92,23 +91,9 @@
    ;; 3.12  Terminal device control
 
    terminal?
-   terminal-file-name
-   without-echo
 
    )
   
-  (cond-expand ((not bsd)
-    (export
-
-#|
-     ;; 3.1  Errors
-
-     errno/EMULTIHOP errno/ENOLINK
-     ;; STREAMS:
-     errno/ENODATA errno/ENOSTR errno/ENOSR errno/ETIME
-|#
-    )))
-
   (cond-expand ((not windows)
     (export
 
@@ -133,7 +118,7 @@
      (srfi 151) ;; bitwise operators
      (rename (only (srfi 174) timespec timespec? timespec-seconds timespec-nanoseconds)
              (timespec make-timespec))
-     (only (srfi 198) errno-error)
+     (only (srfi 198) syscall-error? syscall-error:errno syscall-error:message syscall-error:procedure-name syscall-error:data errno-error)
      )
 
     (include-shared "170/170")

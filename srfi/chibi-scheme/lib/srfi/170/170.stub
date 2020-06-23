@@ -399,6 +399,10 @@
 
 (define-c int (%isatty isatty) (int))
 
+#|
+;; All terminal procedures except for terminal? will be moved to a new
+;; SRFI; this working code is left here for it.
+
 (define-c-const int (tty/name-max "TTY_NAME_MAX"))
 
 (define-c errno (%ttyname_r ttyname_r)
@@ -506,3 +510,5 @@
 (define-c errno (%tcsetattr tcsetattr)
   (port-or-fileno int termios))
 |#
+
+end removal of all but terminal? supporting stubs |#

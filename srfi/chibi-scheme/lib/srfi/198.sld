@@ -35,6 +35,18 @@
    errno-error
    )
 
+  (cond-expand ((not bsd)
+    (export
+
+#|
+     ;; 3.1  Errors
+
+     errno/EMULTIHOP errno/ENOLINK
+     ;; STREAMS:
+     errno/ENODATA errno/ENOSTR errno/ENOSR errno/ETIME
+|#
+    )))
+
   (cond-expand
    (chibi
     (import
