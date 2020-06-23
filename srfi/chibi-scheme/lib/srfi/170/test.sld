@@ -558,7 +558,7 @@
 
 #|
 ;; All terminal procedures except for terminal? will be moved to a new
-;; SRFI; this working code is left here, commented out, for it.
+;; SRFI; this working code is left here for it.
 
           (test-error (terminal-file-name 1))
           (test-error (terminal-file-name the-string-port))
