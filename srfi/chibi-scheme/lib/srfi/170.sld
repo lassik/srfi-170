@@ -6,33 +6,15 @@
    ;; 3.1  Errors
 
 #|
-   errno/E2BIG errno/EACCES errno/EADDRINUSE errno/EADDRNOTAVAIL
-   errno/EAFNOSUPPORT errno/EAGAIN errno/EALREADY errno/EBADF
-   errno/EBADMSG errno/EBUSY errno/ECANCELED errno/ECHILD
-   errno/ECONNABORTED errno/ECONNREFUSED errno/ECONNRESET
-   errno/EDEADLK errno/EDESTADDRREQ errno/EDOM errno/EDQUOT
-   errno/EEXIST errno/EFAULT errno/EFBIG errno/EHOSTUNREACH
-   errno/EIDRM errno/EILSEQ errno/EINPROGRESS errno/EINTR errno/EINVAL
-   errno/EIO errno/EISCONN errno/EISDIR errno/ELOOP errno/EMFILE
-   errno/EMLINK errno/EMSGSIZE errno/ENAMETOOLONG errno/ENETDOWN
-   errno/ENETRESET errno/ENETUNREACH errno/ENFILE errno/ENOBUFS
-   errno/ENODEV errno/ENOENT errno/ENOEXEC errno/ENOLCK errno/ENOMEM
-   errno/ENOMSG errno/ENOPROTOOPT errno/ENOSPC errno/ENOSYS
-   errno/ENOTCONN errno/ENOTDIR errno/ENOTEMPTY errno/ENOTRECOVERABLE
-   errno/ENOTSOCK errno/ENOTSUP errno/ENOTTY errno/ENXIO
-   errno/EOPNOTSUPP errno/EOVERFLOW errno/EOWNERDEAD errno/EPERM
-   errno/EPIPE errno/EPROTO errno/EPROTONOSUPPORT errno/EPROTOTYPE
-   errno/ERANGE errno/EROFS errno/ESPIPE errno/ESRCH errno/ESTALE
-   errno/ETIMEDOUT errno/ETXTBSY errno/EWOULDBLOCK errno/EXDEV
+   syscall-error?
+   syscall-error:errno syscall-error:message
+   syscall-error:procedure-name syscall-error:data
 |#
 
-   errno-error syscall-error?
-   syscall-error:errno syscall-error:message
-   syscall-error:procedure syscall-error:data
-
-   srfi-170-error srfi-170-error?
+   srfi-170-error?
    srfi-170-error:message
-   srfi-170-error:procedure srfi-170-error:data
+   srfi-170-error:procedure-name srfi-170-error:data
+
 
    ;; 3.2  I/O
 
@@ -136,24 +118,27 @@
 
   (cond-expand
    (chibi
-    (import (scheme base)
-            (scheme case-lambda)
-            (only (scheme process-context) get-environment-variable)
-            (chibi)
-            (chibi optional) ;; Snow package for optional args
-            (only (chibi filesystem) file-exists? delete-file open open/write open/create)
-            (only (srfi 1) take)
-            (only (srfi 8) receive) ;; the only export, but let us maintain form
-            (only (srfi 27) random-integer)
-            (only (srfi 69) make-hash-table hash-table-set! hash-table-ref)
-            (only (srfi 98) get-environment-variables)
-            (only (srfi 115) regexp-replace-all regexp-split)
-            (srfi 151) ;; bitwise operators
-            (rename (only (srfi 174) timespec timespec? timespec-seconds timespec-nanoseconds)
-                    (timespec make-timespec))
-            )
+    (import
+     (scheme base)
+     (scheme case-lambda)
+     (only (scheme process-context) get-environment-variable)
+     (chibi)
+     (chibi optional) ;; Snow package for optional args
+     (only (chibi filesystem) file-exists? delete-file open open/write open/create)
+     (only (srfi 1) take)
+     (only (srfi 8) receive) ;; the only export, but let us maintain form
+     (only (srfi 27) random-integer)
+     (only (srfi 98) get-environment-variables)
+     (only (srfi 115) regexp-replace-all regexp-split)
+     (srfi 151) ;; bitwise operators
+     (rename (only (srfi 174) timespec timespec? timespec-seconds timespec-nanoseconds)
+             (timespec make-timespec))
+     (only (srfi 198) errno-error)
+     )
+
     (include-shared "170/170")
     (include-shared "170/aux")))
+
   (include "170/common.scm")
   (include "170/170.scm")
   )
