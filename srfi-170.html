@@ -1043,17 +1043,6 @@ Scsh specifies but does not implement <code>nice</code>.
 </ul>
 
 
-<h3>3.12&nbsp;&nbsp;Terminal device control</h3>
-<ul>
-<li><p>
-  Scsh provides a complete set of <code>termios.h</code> operations, from which the
-  <code>with-raw-mode</code>, <code>with-rare-mode</code>, and <code>without-echo</code>
-  procedures can be implemented along the lines specified by the definitions.
-  For <code>with-raw-mode</code>, it's important to preserve and restore the
-  <code>eof</code> and <code>eol</code> control characters, as these may occupy the same
-  memory locations in cooked mode as the <code>min</code> and <code>time</code> settings in raw mode.
-</p></li>
-</ul>
 
 
 <h1>Acknowledgements</h1>
