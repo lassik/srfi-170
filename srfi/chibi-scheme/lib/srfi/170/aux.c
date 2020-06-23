@@ -125,6 +125,10 @@ sexp sexp_wrap_utimensat (sexp ctx, sexp self, sexp_sint_t n, sexp the_fd, sexp 
 
 // 3.12  Terminal device control
 
+/*
+// with-* and without-* have been removed from SRFI, this working code
+// left here for a future SRFI which uses these functions
+
 sexp sexp_25_tcsetattr_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
   int err = 0;
   sexp res;
@@ -162,9 +166,6 @@ sexp sexp_25_tcgetattr_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0) {
   sexp_gc_release1(ctx);
   return res;
 }
-
-/* with-* removed, only need lflags, but left in to avoid modifying sexp_init_library,
-   which I no longer understand ^_^ */
 
 sexp sexp_termios_get_c_iflag (sexp ctx, sexp self, sexp_sint_t n, sexp x) {
   if (! (sexp_pointerp(x) && (sexp_pointer_tag(x) == sexp_unbox_fixnum(sexp_opcode_arg1_type(self)))))
@@ -226,9 +227,6 @@ sexp sexp_termios_set_c_lflag (sexp ctx, sexp self, sexp_sint_t n, sexp x, sexp 
   return SEXP_VOID;
 }
 
-/* with-* removed, cc_element no longer needed, but left in to avoid modifying sexp_init_library,
-   which I no longer understand ^_^ */
-
 // x is the termios struct pointer, i is the array index for the value for the c_cc array element to return
 
 sexp sexp_termios_get_cc_element (sexp ctx, sexp self, sexp_sint_t n, sexp x, sexp i) {
@@ -250,11 +248,13 @@ sexp sexp_termios_set_cc_element (sexp ctx, sexp self, sexp_sint_t n, sexp x, se
   ((struct termios*)sexp_cpointer_value(x))->c_cc[sexp_unbox_fixnum(i)] = sexp_uint_value(v);
   return SEXP_VOID;
 }
-
+*/
 
 sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char* version, const sexp_abi_identifier_t abi) {
+/*
   sexp sexp_termios_type_obj;
   sexp_gc_var3(name, tmp, op);
+*/
 
   if (!(sexp_version_compatible(ctx, version, sexp_version)
         && sexp_abi_compatible(ctx, abi, SEXP_ABI_IDENTIFIER)))
@@ -269,6 +269,7 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
 
   sexp_define_foreign(ctx, env, "%utimensat", 5, sexp_wrap_utimensat);
 
+/*
   // ~~~~ examine sexp_register_simple_type to create double timespect struct???
 
   sexp_gc_preserve3(ctx, name, tmp, op);
@@ -385,6 +386,7 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
   }
 
   sexp_gc_release3(ctx);
+*/
 
   return SEXP_VOID;
 }
