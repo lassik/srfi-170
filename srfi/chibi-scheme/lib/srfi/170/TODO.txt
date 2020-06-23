@@ -1,9 +1,3 @@
-Fixup error handling per reversion + enhancements:
-
-- Maybe incorporate procedure string name in message as opposed to a
-  seperate record field
-
-
 Needed to match the SRFI:
 
 Add optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
@@ -17,9 +11,6 @@ Make appropriate procedures thread safe or thread aware
 
 Improve temp-file-prefix specification and perhaps implementation
 
-Clean up post-set testing etc. of without-echo tty procedure to match
-(commented out but previously working) with-raw-mode
-
 Use [...]at functions to handle long file paths.
 
 See (chibi io) for how to write a C function then wrap it in a stub
@@ -27,4 +18,4 @@ See (chibi io) for how to write a C function then wrap it in a stub
 WRT to above, in general, a great deal of cleanup can be done, this
 project was my (hga's) reintrodution to using Scheme in anger after
 many decades, and my introduction to Chibi Scheme and its extremely
-nifty autogenerating FFI (170.stub).
+nifty autogenerating FFI (170.stub) and raw FFI (aux.c).
