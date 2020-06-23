@@ -5,30 +5,15 @@
 
    ;; 3.1  Errors
 
-#|
-   errno/2big errno/acces errno/addrinuse errno/addrnotavail
-   errno/afnosupport errno/again errno/already errno/badf errno/badmsg
-   errno/busy errno/canceled errno/child errno/connaborted
-   errno/connrefused errno/connreset errno/deadlk errno/destaddrreq
-   errno/dom errno/dquot errno/exist errno/fault errno/fbig
-   errno/hostunreach errno/idrm errno/ilseq errno/inprogress
-   errno/intr errno/inval errno/io errno/isconn errno/isdir errno/loop
-   errno/mfile errno/mlink errno/msgsize errno/nametoolong
-   errno/netdown errno/netreset errno/netunreach errno/nfile
-   errno/nobufs errno/nodev errno/noent errno/noexec errno/nolck
-   errno/nomem errno/nomsg errno/noprotoopt errno/nospc errno/nosys
-   errno/notconn errno/notdir errno/notempty errno/notrecoverable
-   errno/notsock errno/notsup errno/notty errno/nxio errno/opnotsupp
-   errno/overflow errno/ownerdead errno/perm errno/pipe errno/proto
-   errno/protonosupport errno/prototype errno/range errno/rofs
-   errno/spipe errno/srch errno/stale errno/timedout errno/txtbsy
-   errno/wouldblock errno/xdev
-|#
-
-   errno-error syscall-error?
+   ;; syscall-* imported from SRFI 198
+   syscall-error?
    syscall-error:errno syscall-error:message
-   syscall-error:procedure syscall-error:data
-   ;; ~~~ additional/adjustments
+   syscall-error:procedure-name syscall-error:data
+
+   srfi-170-error?
+   srfi-170-error:message
+   srfi-170-error:procedure-name srfi-170-error:data
+
 
    ;; 3.2  I/O
 
@@ -72,8 +57,8 @@
 
    ;; 3.5  Process state
 
-   perms
-   current-directory
+   umask set-umask!
+   current-directory set-current-directory!
    pid parent-pid process-group
    nice
 
@@ -106,22 +91,9 @@
    ;; 3.12  Terminal device control
 
    terminal?
-   terminal-file-name
-   without-echo
 
    )
   
-  (cond-expand ((not bsd)
-    (export
-
-     ;; 3.1  Errors
-
-     errno/multihop errno/nolink
-     ;; STREAMS:
-     errno/nodata errno/nostr errno/nosr errno/time
-
-    )))
-
   (cond-expand ((not windows)
     (export
 
@@ -131,22 +103,27 @@
 
   (cond-expand
    (chibi
-    (import (scheme base)
-            (scheme case-lambda)
-            (only (scheme process-context) get-environment-variable)
-            (chibi)
-            (chibi optional) ;; Snow package for optional args
-            (only (chibi filesystem) file-exists? delete-file open open/write open/create)
-            (only (srfi 1) take)
-            (only (srfi 8) receive) ;; the only export, but let us maintain form
-            (only (srfi 27) random-integer)
-            (only (srfi 98) get-environment-variables)
-            (only (srfi 115) regexp-replace-all regexp-split)
-            (srfi 151) ;; bitwise operators
-            (only (srfi 174) make-timespec timespec? timespec-seconds timespec-nanoseconds)
-            )
+    (import
+     (scheme base)
+     (scheme case-lambda)
+     (only (scheme process-context) get-environment-variable)
+     (chibi)
+     (chibi optional) ;; Snow package for optional args
+     (only (chibi filesystem) file-exists? delete-file open open/write open/create)
+     (only (srfi 1) take)
+     (only (srfi 8) receive) ;; the only export, but let us maintain form
+     (only (srfi 27) random-integer)
+     (only (srfi 98) get-environment-variables)
+     (only (srfi 115) regexp-replace-all regexp-split)
+     (srfi 151) ;; bitwise operators
+     (rename (only (srfi 174) timespec timespec? timespec-seconds timespec-nanoseconds)
+             (timespec make-timespec))
+     (only (srfi 198) syscall-error? syscall-error:errno syscall-error:message syscall-error:procedure-name syscall-error:data errno-error)
+     )
+
     (include-shared "170/170")
     (include-shared "170/aux")))
+
   (include "170/common.scm")
   (include "170/170.scm")
   )
