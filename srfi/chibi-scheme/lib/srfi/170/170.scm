@@ -224,7 +224,7 @@
     (if (not file-stat)
         (errno-error (errno)
                      'file-info
-                     (if (string fname/port)
+                     (if (string? fname/port)
                             (if follow?
                                 'stat
                                 'lstat)
@@ -558,7 +558,7 @@
     (if (not ui)
         (errno-error (errno)
                      'user-info
-                     (if (string user)
+                     (if (string? user)
                          'getpwnam
                          'getpwuid)
                      user)
