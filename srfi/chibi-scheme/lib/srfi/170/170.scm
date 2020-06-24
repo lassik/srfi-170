@@ -556,12 +556,14 @@
                   (else (srfi-170-error "user must be a string or exact integer" 'user-info user)))))
 
     (if (not ui)
-        (errno-error (errno)
-                     'user-info
-                     (if (string? user)
-                         'getpwnam
-                         'getpwuid)
-                     user)
+        (if (equal? 0 (errno))
+            (srfi-170-error "user not found" 'user-info user)
+            (errno-error (errno)
+                         'user-info
+                         (if (string? user)
+                             'getpwnam
+                             'getpwuid)
+                         user))
         (make-user-info (passwd:name ui)
                         (passwd:uid ui)
                         (passwd:gecos ui)
@@ -583,13 +585,15 @@
                   (else (srfi-170-error "group must be a string or exact integer" 'group-info group)))))
 
     (if (not gi)
-        (errno-error
-         (errno)
-         'group-info
-         (if (string? group)
-             'getgrnam
-             'getgrdid)
-         group)
+        (if (equal? 0 (errno))
+            (srfi-170-error "group not found" 'group-info group)
+            (errno-error
+             (errno)
+             'group-info
+             (if (string? group)
+                 'getgrnam
+                 'getgrdid)
+             group))
         (make-group-info (group:name gi)
                          (group:gid gi)))))
 
