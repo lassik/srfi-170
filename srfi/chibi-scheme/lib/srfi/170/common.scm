@@ -37,9 +37,9 @@
   (if (file-exists? fname)
       (if (file-info-directory? (file-info fname #f))
           (if (not (delete-directory fname))
-              (errno-error (errno) 'delete-filesystem-object "rmdir" fname))
+              (errno-error (errno) 'delete-filesystem-object 'rmdir fname))
           (if (not (delete-file fname))
-              (errno-error (errno) 'delete-filesystem-object "unlink" fname)))))
+              (errno-error (errno) 'delete-filesystem-object 'unlink fname)))))
 
 ;; Needs to be in common for testing since we can't create or modify actual accounts
 
