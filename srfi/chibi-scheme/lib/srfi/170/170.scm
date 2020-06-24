@@ -599,13 +599,13 @@
 (define (posix-time)
   (let ((t (%clock_gettime clck-id/realtime)))
     (if (not t)
-        (errno-error (errno) 'posix-time 'clockgettime)
+        (errno-error (errno) 'posix-time 'clock_gettime)
         (make-timespec (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
 
 (define (monotonic-time)
   (let ((t (%clock_gettime clck-id/monotonic)))
     (if (not t)
-        (errno-error (errno) 'monotonic-time 'clockgettime)
+        (errno-error (errno) 'monotonic-time 'clock_gettime)
         (make-timespec (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
 
 
@@ -656,7 +656,7 @@
         (srfi-170-error "port must have a file descriptor associated with it" 'terminal-file-name the-port))
     (let ((the-file-name (%ttyname_r the-fd)))
       (if (not the-file-name)
-          (errno-error (errno) 'terminal-file-name 'ttynamer" the-port))
+          (errno-error (errno) 'terminal-file-name 'ttyname_r the-port))
       the-file-name)))
 
 ;; ~~~~ all prefactory with- and without- errno-errors need a more
