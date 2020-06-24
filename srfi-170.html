@@ -173,10 +173,12 @@ has the predicate <code>syscall-error?</code> and the accessors
 <code>syscall-error:errno</code>,
 <code>syscall-error:message</code>,
 <code>syscall-error:procedure-name</code>,
+<code>syscall-error:syscall-name</code>,
 and <code>syscall-error:data</code>.
 The accessors return, respectively, the value of <code>errno</code>
 as an exact integer, a string describing the error situation, the
-name of the procedure (as a symbol) reporting the error, and
+name of the procedure (as a symbol) reporting the error,
+the C name of the syscall (as a symbol) reporting the error,
 a list of relevant objects, possibly the arguments of the system call.</p>
 
 <p>Errors unrelated to <code>errno</code> are signaled with condition
