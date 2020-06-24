@@ -32,7 +32,7 @@ sexp sexp_set_errno (sexp ctx, sexp self, sexp_sint_t n, sexp x) {
 #endif
 }
 
-// integer->error-string takes an optional errno, and returns the
+// errno-string takes an optional errno, and returns the
 // strerror string for it or the current errno
 
 sexp sexp_error_string (sexp ctx, sexp self, sexp_sint_t n, sexp x) {
@@ -262,7 +262,7 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
 
   sexp_define_foreign(ctx, env, "errno", 0, sexp_errno);
   sexp_define_foreign(ctx, env, "set-errno", 1, sexp_set_errno);
-  sexp_define_foreign_opt(ctx, env, "integer->error-string", 1, sexp_error_string, SEXP_FALSE); // ~~~~ what the bleep is the false, and why _opt?
+  sexp_define_foreign_opt(ctx, env, "errno-string", 1, sexp_error_string, SEXP_FALSE); // ~~~~ what the bleep is the false, and why _opt?
 
   sexp_define_foreign(ctx, env, "%file_descriptor_to_port", 3, sexp_file_descriptor_to_port);
   sexp_define_foreign(ctx, env, "%fileno-to-fd", 1, sexp_fileno_to_fd);
