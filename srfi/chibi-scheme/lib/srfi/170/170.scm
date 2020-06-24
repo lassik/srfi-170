@@ -224,7 +224,7 @@
     (if (not file-stat)
         (errno-error (errno)
                      'file-info
-                     (if (string fname/port)
+                     (if (string? fname/port)
                             (if follow?
                                 'stat
                                 'lstat)
@@ -556,12 +556,14 @@
                   (else (srfi-170-error "user must be a string or exact integer" 'user-info user)))))
 
     (if (not ui)
-        (errno-error (errno)
-                     'user-info
-                     (if (string user)
-                         'getpwnam
-                         'getpwuid)
-                     user)
+        (if (equal? 0 (errno))
+            (srfi-170-error "user not found" 'user-info user)
+            (errno-error (errno)
+                         'user-info
+                         (if (string? user)
+                             'getpwnam
+                             'getpwuid)
+                         user))
         (make-user-info (passwd:name ui)
                         (passwd:uid ui)
                         (passwd:gecos ui)
@@ -583,13 +585,15 @@
                   (else (srfi-170-error "group must be a string or exact integer" 'group-info group)))))
 
     (if (not gi)
-        (errno-error
-         (errno)
-         'group-info
-         (if (string? group)
-             'getgrnam
-             'getgrdid)
-         group)
+        (if (equal? 0 (errno))
+            (srfi-170-error "group not found" 'group-info group)
+            (errno-error
+             (errno)
+             'group-info
+             (if (string? group)
+                 'getgrnam
+                 'getgrdid)
+             group))
         (make-group-info (group:name gi)
                          (group:gid gi)))))
 
@@ -599,13 +603,13 @@
 (define (posix-time)
   (let ((t (%clock_gettime clck-id/realtime)))
     (if (not t)
-        (errno-error (errno) 'posix-time 'clockgettime)
+        (errno-error (errno) 'posix-time 'clock_gettime)
         (make-timespec (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
 
 (define (monotonic-time)
   (let ((t (%clock_gettime clck-id/monotonic)))
     (if (not t)
-        (errno-error (errno) 'monotonic-time 'clockgettime)
+        (errno-error (errno) 'monotonic-time 'clock_gettime)
         (make-timespec (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
 
 
@@ -656,7 +660,7 @@
         (srfi-170-error "port must have a file descriptor associated with it" 'terminal-file-name the-port))
     (let ((the-file-name (%ttyname_r the-fd)))
       (if (not the-file-name)
-          (errno-error (errno) 'terminal-file-name 'ttynamer" the-port))
+          (errno-error (errno) 'terminal-file-name 'ttyname_r the-port))
       the-file-name)))
 
 ;; ~~~~ all prefactory with- and without- errno-errors need a more

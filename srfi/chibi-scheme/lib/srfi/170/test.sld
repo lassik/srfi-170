@@ -29,7 +29,7 @@
           (srfi 170)
           (rename (only (srfi 174) timespec timespec? timespec-seconds timespec-nanoseconds)
                   (timespec make-timespec))
-          (only (srfi 198) errno-error)
+          (only (srfi 198) errno-error errno-string)
           )
 
   (include "common.scm")
@@ -139,10 +139,10 @@
           (test-not-error (set-errno errno/E2BIG))
           (set-errno errno/E2BIG)
           (test errno/E2BIG (errno))
-          (test-assert (string? (integer->error-string)))
-          (test-assert (string? (integer->error-string errno/E2BIG)))
+          (test-assert (string? (errno-string)))
+          (test-assert (string? (errno-string errno/E2BIG)))
           (set-errno errno/E2BIG)
-          (test-assert (equal? (integer->error-string) (integer->error-string errno/E2BIG)))
+          (test-assert (equal? (errno-string) (errno-string errno/E2BIG)))
 
           ) ;; end errors
 

@@ -7,6 +7,9 @@ Finish call-with-temporary-filename
 
 Suggested enhancements:
 
+Have tests check for correct objects when error raised; now an error
+raised in the error handling code is not detected
+
 Make appropriate procedures thread safe or thread aware
 
 Improve temp-file-prefix specification and perhaps implementation
