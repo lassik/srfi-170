@@ -31,8 +31,10 @@
 
    make-syscall-error syscall-error?
    syscall-error:errno syscall-error:message
-   syscall-error:procedure-name syscall-error:data
+   syscall-error:procedure-name syscall-error:syscall-name
+   syscall-error:data
    errno-error
+   errno-string errno-name
    )
 
   (cond-expand ((not bsd)
@@ -115,17 +117,31 @@
           ))
 
     (define-record-type syscall-error
-      (make-syscall-error errno message procedure-name data)
+      (make-syscall-error errno message procedure-name syscall-name data)
       syscall-error?
       (errno syscall-error:errno)
       (message syscall-error:message)
       (procedure-name syscall-error:procedure-name)
+      (syscall-name syscall-error:syscall-name)
       (data syscall-error:data))
 
-    (define (errno-error errno procedure-name system-call-name . data)
+    (define (errno-error errno procedure-name syscall-name . data)
       (raise (make-syscall-error
               errno
-              (string-append (symbol->string procedure-name) ": called " (symbol->string system-call-name) ": " (symbol->string (hash-table-ref errno-map errno)) ": " (integer->error-string errno))
+              (string-append (symbol->string procedure-name)
+                             " called "
+                             (symbol->string syscall-name)
+                             ": "
+                             (symbol->string (errno-name errno))
+                             ": "
+                             (errno-string errno))
               procedure-name
-              data))))
+              syscall-name
+              data)))
+
+    ;; errno-string defined in aux.c, and without arguments will use the current errno
+
+    (define (errno-name errno)
+      (hash-table-ref errno-map errno))
+    )
   )
