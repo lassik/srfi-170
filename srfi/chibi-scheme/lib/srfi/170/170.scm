@@ -219,15 +219,18 @@
                 (let ((the-file-info (%fstat (port-fdes fname/port))))
                   (if the-file-info
                       the-file-info
-                      (errno-error (errno) 'file-info 'fstat fname/port))))
+                      (errno-error (errno) 'file-info 'fstat fname/port follow?))))
                (else (srfi-170-error "first argument must be a string or port" 'file-info fname/port)))))
     (if (not file-stat)
         (errno-error (errno)
                      'file-info
-                     (if follow?
-                         'stat
-                         'lstat)
-                     fname/port))
+                     (if (string fname/port)
+                            (if follow?
+                                'stat
+                                'lstat)
+                            'fname/port)
+                     fname/port
+                     follow?))
     (make-file-info
      (stat:dev file-stat)
      (stat:ino file-stat)
