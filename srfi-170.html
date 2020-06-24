@@ -164,26 +164,31 @@ right thing.
 <h2>3.1&nbsp;&nbsp;Error handling</h2>
 <p>
 As noted above, the procedures of this SRFI signal an exception
-when the underlying system calls fail.  These procedures allow such
-condition objects to be injected, inspected, and detected
-(but not infected, neglected or selected).</p>
-<p><div><code>(syscall-error? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns <code>#t</code> if <em>obj</em> is a condition object
-representing a syscall error, and <code>#f</code> otherwise.</p>
-<p><div><code>(syscall-error:errno <i>syscall-obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns the P<small>OSIX</small> error number of the condition object
-<em>syscall-obj</em>.</p>
-<p><div><code>(syscall-error:message <i>syscall-obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns an error message associated with the P<small>OSIX</small>
-error number of the condition object <em>syscall-obj</em>.</p>
-<p><div><code>(syscall-error:procedure <i>syscall-obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>symbol</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns the name of the procedure reporting this error.</p>
-<p><div><code>(syscall-error:data <i>syscall-obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns a list of arbitrary objects associated with the signaling of
-the condition object <em>syscall-obj</em>.</p>
-<p><div><code>(errno-error <i>errno procedure obj</i> ...)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>does not return</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div></p>
-<p>Returns a list of arbitrary objects associated with the P<small>OSIX</small>
-error number of the condition object <em>syscall-obj</em>.</p>
+when the underlying system calls fail.  They are fully documented in
+<a href="http://srfi.schemers.org/srfi-198/srfi-198.html">SRFI 198</a>,
+which may not yet be finalized when you are reading this,
+so they are summarized here.</p>
+<p>The condition object signaled in case of an <code>errno</code>-based error
+has the predicate <code>syscall-error?</code> and the accessors
+<code>syscall-error:errno</code>,
+<code>syscall-error:message</code>,
+<code>syscall-error:procedure-name</code>,
+<code>syscall-error:syscall-name</code>,
+and <code>syscall-error:data</code>.
+The accessors return, respectively, the value of <code>errno</code>
+as an exact integer, a string describing the error situation, the
+name of the procedure (as a symbol) reporting the error,
+the C name of the syscall (as a symbol) reporting the error,
+a list of relevant objects, possibly the arguments of the system call.</p>
+
+<p>Errors unrelated to <code>errno</code> are signaled with condition
+objects that are detected by <code>srfi-170-error?</code>.
+The available accessors are <code>srfi-170-error:message</code>,
+<code>srfi-170-error:procedure-name</code>, and
+<code>srfi-170-error:data</code>,
+with the same semantics as the corrsponding <code>syscall-error</code>
+accessors.
+These procedures are not part of SRFI 198.</p>
 <a name="node_sec_3.2"></a>
 <h2>3.2&nbsp;&nbsp;I/O</h2>
 <p></p>
@@ -384,7 +389,7 @@ status-change (<code>ctime</code>) is set to the current time.
 <p></p>
 <p></p>
 <p></p>
-<div><code>(file-info <i>fname/port follow?</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stat(), lstat()</code>&nbsp;</div>
+<div align="left"><code>(file-info <i>fname/port follow?</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stat()</code>&nbsp;</div>
 <blockquote>
 The <code>file-info</code> procedure
 returns a file-info record containing useful
@@ -881,19 +886,6 @@ so the suffix is kept in this SRFI.</p>
 <p></p>
 <p>
 </p>
-<p>
-P<small>OSIX</small> provides a complete set of routines for manipulating terminal
-devices &mdash; putting them in "raw" mode, changing and querying their
-special characters, modifying their I/O speeds, and so forth.
-However, now that terminal emulators have almost completely displaced
-terminals, very little of this is useful except for directly
-controlling serial-line hardware, which itself is increasingly rare.</p>
-<p>Therefore, this SRFI provides only the functions that are still
-in common use by command-line programs.
-A future SRFI may provide a package suitable for writing textual user interfaces
-along the lines of ncurses, but hopefully much simpler.</p>
-</p>
-
 <div><code>(terminal? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
 <blockquote>
 Return true if the argument is a terminal.
@@ -902,25 +894,7 @@ or if the underlying call to <code>isatty()</code> returns an error
 other than <code>ENOTTY</code>.
 This procedure is useful when writing programs that change their behavior
 when their standard input or output is a terminal.
-</blockquote><p>
-</p>
-
-<div><code>(terminal-file-name <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>ttyname()</code>&nbsp;</div>
-<blockquote>
-The argument <i>port</i> must be open on a terminal.
-Return the filename of the terminal.
-</blockquote><p>
-</p>
-
-
-<div><code>(without-echo <i>input-port output-port proc</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>[values]</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stty -ECHO -ECHOE -ECHOK -ECHONL</code>&nbsp;</div>
-<blockquote>
-The port arguments must be opened on a terminal.
-Echoing of input is disabled on the terminal during the execution of <code>proc</code>
-and then is restored to its previous state.
-</blockquote><p>
-</p>
-
+</blockquote>
 <h1>Implementation</h1>
 
 There are two implementations of this SRFI, <a href="https://scsh.net/">Scsh</a> version 0.7,
@@ -936,6 +910,8 @@ They have the following exceptions and deviations:
 <li><p>
 Scsh only exposes <code>errno-error</code>,
 because it uses specialized syntax to catch system errors.</p>
+<li><p>The Chibi version of error handling does not use the
+SRFI 198 implementation, which is inherently less portable.</p></li>
 </p></li>
 </ul>
 <h3>3.2&nbsp;&nbsp;I/O</h3>
@@ -1074,24 +1050,17 @@ Scsh specifies but does not implement <code>nice</code>.
 </ul>
 
 
-<h3>3.12&nbsp;&nbsp;Terminal device control</h3>
-<ul>
-<li><p>
-  Scsh provides a complete set of <code>termios.h</code> operations, from which the
-  <code>with-raw-mode</code>, <code>with-rare-mode</code>, and <code>without-echo</code>
-  procedures can be implemented along the lines specified by the definitions.
-  For <code>with-raw-mode</code>, it's important to preserve and restore the
-  <code>eof</code> and <code>eol</code> control characters, as these may occupy the same
-  memory locations in cooked mode as the <code>min</code> and <code>time</code> settings in raw mode.
-</p></li>
-</ul>
 
 
 <h1>Acknowledgements</h1>
 
-Thanks to Olin Shivers, <i>sine quo non</i>, and all the Scheme implementors
+<p>Thanks to Olin Shivers, <i>sine quo non</i>, and all the Scheme implementors
 who have followed his work.  Thanks also to all the participants in the
-SRFI mailing list.
+SRFI mailing list.</p>
+
+<p>(Why <i>quo</i>?  Because in <i>sine qua non</i>
+the pronoun is feminine, agreeing with <i>re</i> 'thing' understood,
+whereas Olin is masculine.)</p>
 
 <h1>Copyright</h1>
 Copyright &copy; 2019 by John Cowan.
