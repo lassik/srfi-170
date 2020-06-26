@@ -1,6 +1,6 @@
 # Chibi Scheme example implementation of SRFI 170
 
-Please see copyright notice in 170/COPYING.
+Please see copyright notice in lib/srfi/170/COPYING.
 
 Please note this is an example implementation of SRFI 170 for Linux
 and OpenBSD and is not of production quality (Chibi Scheme already has
@@ -19,12 +19,13 @@ bash to make the example SRFI implementation:
 
 CHIBI_LOCATION_PATH=/home/src/chibi-scheme gmake
 
-To run with all paths set correctly, from the top repo directory,
-execute somethin like this:
+To run with all paths set correctly, from srfi/chibi-scheme off the
+top repo directory, execute somethin like this:
 
 LD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." DYLD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH="/usr/local/src/chibi-scheme/lib:./lib" /usr/local/src/chibi-scheme/chibi-scheme -m "(srfi 170)"
 
-To run the tests, either do a "make test", or:
+To run the tests, either do a "gmake test" with the above mentioned
+CHIBI_LOCATION_PATH environment variable set, or something like:
 
 LD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." DYLD_LIBRARY_PATH="/usr/local/src/chibi-scheme:." CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH="/usr/local/src/chibi-scheme/lib:./lib" /usr/local/src/chibi-scheme/chibi-scheme -m "(srfi 170 test)" -e "(run-tests)"
 
@@ -41,4 +42,3 @@ implementation, note aux.c for some unexported magic like (errno) and
 This includes a very minimal implementation of the pre-release at the
 time timespec SRFI 174 as a disjoint type in 174.sld, plus the same
 for SRFI 198 for syscall-errors.
-
