@@ -174,26 +174,18 @@ when the underlying system calls fail.  They are fully documented in
 which may not yet be finalized when you are reading this,
 so they are summarized here.</p>
 <p>The condition object signaled in case of an <code>errno</code>-based error
-has the predicate <code>syscall-error?</code> and the accessors
-<code>syscall-error:errno</code>,
-<code>syscall-error:message</code>,
-<code>syscall-error:procedure-name</code>,
-<code>syscall-error:syscall-name</code>,
-and <code>syscall-error:data</code>.
+has the predicate <code>external-error?</code> and the accessors
+<code>external-error:errno</code>,
+<code>external-error:message</code>,
+<code>external-error:scheme-procedure-name</code>,
+<code>external-error:external-name</code>,
+and <code>syscall-error:irritants</code>.
 The accessors return, respectively, the value of <code>errno</code>
 as an exact integer, a string describing the error situation, the
-name of the procedure (as a symbol) reporting the error,
-the C name of the syscall (as a symbol) reporting the error,
-a list of relevant objects, possibly the arguments of the system call.</p>
+name of the Scheme procedure (as a symbol) reporting the error,
+the name of the C procedure (as a symbol) reporting the error,
+and a list of relevant objects, possibly the arguments of the system call.</p>
 
-<p>Errors unrelated to <code>errno</code> are signaled with condition
-objects that are detected by <code>srfi-170-error?</code>.
-The available accessors are <code>srfi-170-error:message</code>,
-<code>srfi-170-error:procedure-name</code>, and
-<code>srfi-170-error:data</code>,
-with the same semantics as the corrsponding <code>syscall-error</code>
-accessors.
-These procedures are not part of SRFI 198.</p>
 <a name="node_sec_3.2"></a>
 <h2>3.2&nbsp;&nbsp;I/O</h2>
 <p></p>
