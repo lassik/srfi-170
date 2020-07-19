@@ -1,20 +1,15 @@
 ;; please see copyright notice in ./COPYING
 
-;;; 3.1  Errors
-
-;; See SRFI 198, and common.scm, srfi-170-error is also needed by test.sld
-
-
 ;;; 3.2  I/O
 
 (define (open-file fname flags . o)
   (let-optionals o ((permission-bits #o666))
     (if (not (string? fname))
-        (srfi-170-error "fname must be a string" 'open-file fname))
+        (sanity-check-error "fname must be a string" 'open-file fname))
     (if (not (fixnum? flags))
-        (srfi-170-error "flags must be a fixnum" 'open-file flags))
+        (sanity-check-error "flags must be a fixnum" 'open-file flags))
     (if (not (fixnum? permission-bits))
-        (srfi-170-error "permission-bits must be a fixnum" 'open-file permission-bits))
+        (sanity-check-error "permission-bits must be a fixnum" 'open-file permission-bits))
     (let ((fd (retry-if-EINTR (lambda () (%open fname flags permission-bits)))))
       (if (equal? -1 fd)
           (errno-error (errno) 'open-file 'open fname flags permission-bits)
@@ -37,12 +32,12 @@
 
 (define (port-fdes the-port)
   (if (not (port? the-port))
-      (srfi-170-error "argument must be a port" 'port-fdes the-port))
+      (sanity-check-error "argument must be a port" 'port-fdes the-port))
   (port-fileno the-port))
 
 (define (close-fdes the-fd)
   (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (srfi-170-error "argument must be a fixnum" 'close-fdes the-fd))
+      (sanity-check-error "argument must be a fixnum" 'close-fdes the-fd))
   (if (not (retry-if-EINTR (lambda () (%close the-fd))))
       (errno-error (errno) 'close-fdes 'close the-fd)))
 
@@ -51,35 +46,35 @@
 
 (define (create-directory fname . o)
   (if (not (string? fname))
-        (srfi-170-error "fname must be a string" 'create-directory fname))
+        (sanity-check-error "fname must be a string" 'create-directory fname))
   (let-optionals o ((permission-bits #o775))
     (if (not (exact-integer? permission-bits))
-        (srfi-170-error "permission-bits must be an exact integer" 'create-directory permission-bits))
+        (sanity-check-error "permission-bits must be an exact integer" 'create-directory permission-bits))
     (if (not (%mkdir fname permission-bits))
         (errno-error (errno) 'create-directory 'mkdir fname))))
 
 (define (create-fifo fname . o)
   (if (not (string? fname))
-        (srfi-170-error "fname must be a string" 'create-fifo fname))
+        (sanity-check-error "fname must be a string" 'create-fifo fname))
   (let-optionals o ((permission-bits #o664))
     (if (not (exact-integer? permission-bits))
-        (srfi-170-error "permission-bits must be an exact integer" 'create-fifo permission-bits))
+        (sanity-check-error "permission-bits must be an exact integer" 'create-fifo permission-bits))
     (if (not (%mkfifo fname permission-bits))
         (errno-error (errno) 'create-fifo 'mkfifo fname))))
 
 (define (create-hard-link oldname newname)
   (if (not (string? oldname))
-        (srfi-170-error "first argument must be a string" 'create-hard-link oldname))
+        (sanity-check-error "first argument must be a string" 'create-hard-link oldname))
   (if (not (string? newname))
-        (srfi-170-error "second argument must be a string" 'create-hard-link newname))
+        (sanity-check-error "second argument must be a string" 'create-hard-link newname))
     (if (not (%link oldname newname))
         (errno-error (errno) 'create-hard-link 'link oldname newname)))
 
 (define (create-symlink oldname newname)
   (if (not (string? oldname))
-        (srfi-170-error "first argument must be a string" 'create-symlink oldname))
+        (sanity-check-error "first argument must be a string" 'create-symlink oldname))
   (if (not (string? newname))
-        (srfi-170-error "second argument must be a string" 'create-symlink newname))
+        (sanity-check-error "second argument must be a string" 'create-symlink newname))
     (if (not (%symlink oldname newname))
         (errno-error (errno) 'create-symlink 'symlink oldname newname)))
 
@@ -89,7 +84,7 @@
   (else
     (define (read-symlink fname)
       (if (not (string? fname))
-          (srfi-170-error "fname must be a string" 'read-symlink fname))
+          (sanity-check-error "fname must be a string" 'read-symlink fname))
       (let* ((buf (make-string (+ 1 PATH_MAX)))
              (res (%readlink fname buf PATH_MAX)))
         (if (positive? res)
@@ -98,40 +93,40 @@
 
 (define (rename-file oldname newname)
   (if (not (string? oldname))
-        (srfi-170-error "first argument must be a string" 'rename-file oldname))
+        (sanity-check-error "first argument must be a string" 'rename-file oldname))
   (if (not (string? newname))
-        (srfi-170-error "second argument must be a string" 'rename-file newname))
+        (sanity-check-error "second argument must be a string" 'rename-file newname))
   (if (not (%rename oldname newname))
       (errno-error (errno) 'rename-file 'rename oldname newname)))
 
 (define (delete-directory fname)
   (if (not (string? fname))
-        (srfi-170-error "fname must be a string" 'delete-directory fname))
+        (sanity-check-error "fname must be a string" 'delete-directory fname))
   (if (not (%rmdir fname))
       (errno-error (errno) 'delete-directory 'rmdir fname)))
 
 (define (set-file-mode fname permission-bits)
   (if (not (string? fname))
-        (srfi-170-error "fname must be a string" 'set-file-mode fname))
+        (sanity-check-error "fname must be a string" 'set-file-mode fname))
   (if (not (exact-integer? permission-bits))
-        (srfi-170-error "permission-bits must be an exact integer" 'set-file-mode permission-bits))
+        (sanity-check-error "permission-bits must be an exact integer" 'set-file-mode permission-bits))
   (if (not (retry-if-EINTR (lambda () (%chmod fname permission-bits))))
       (errno-error (errno) 'set-file-mode 'chmod fname permission-bits)))
 
 (define (set-file-owner fname uid)
   (if (not (string? fname))
-        (srfi-170-error "fname must be a string" 'set-file-owner fname))
+        (sanity-check-error "fname must be a string" 'set-file-owner fname))
   (if (not (exact-integer? uid))
-        (srfi-170-error "uid must be an exact integer" 'set-file-owner uid))
+        (sanity-check-error "uid must be an exact integer" 'set-file-owner uid))
   (let ((gid (file-info:gid (file-info fname #t))))
     (if (not (retry-if-EINTR (lambda () (%chown fname uid gid))))
         (errno-error (errno) 'set-file-owner 'chown fname uid gid))))
 
 (define (set-file-group fname gid)
   (if (not (string? fname))
-        (srfi-170-error "fname must be a string" 'set-file-group fname))
+        (sanity-check-error "fname must be a string" 'set-file-group fname))
   (if (not (exact-integer? gid))
-        (srfi-170-error "gid must be an exact integer" 'set-file-group gid))
+        (sanity-check-error "gid must be an exact integer" 'set-file-group gid))
   (let ((uid (file-info:uid (file-info fname #t))))
     (if (not (retry-if-EINTR (lambda () (%chown fname uid gid))))
         (errno-error (errno) 'set-file-group 'chown fname uid gid))))
@@ -146,7 +141,7 @@
 
 (define (set-file-timespecs* fname atime mtime)
   (if (or (not (timespec? atime)) (not (timespec? mtime)))
-      (srfi-170-error "atime and mtime must be timespecs" 'set-file-timespecs* fname atime mtime))
+      (sanity-check-error "atime and mtime must be timespecs" 'set-file-timespecs* fname atime mtime))
   (if (not (%utimensat utimens/at_fdcwd
                        fname
                        ;; don't change underlying representation until timespec SRFI finalized
@@ -158,14 +153,14 @@
 
 (define (truncate-file fname/port len)
   (if (not (exact-integer? len))
-        (srfi-170-error "second argument must be an exact integer" 'truncate-file len))
+        (sanity-check-error "second argument must be an exact integer" 'truncate-file len))
   (cond ((string? fname/port)
          (if (not (retry-if-EINTR (lambda () (%truncate fname/port len))))
              (errno-error (errno) 'truncate-file 'truncate fname/port len)))
         ((port? fname/port)
          (if (not (retry-if-EINTR (lambda () (%ftruncate (port-fdes fname/port) len))))
              (errno-error (errno) 'truncate-file 'ftruncate fname/port len)))
-        (else (srfi-170-error "first argument must be a file name or a port" 'truncate-file fname/port len))))
+        (else (sanity-check-error "first argument must be a file name or a port" 'truncate-file fname/port len))))
 
 (cond-expand
   (windows
@@ -220,7 +215,7 @@
                   (if the-file-info
                       the-file-info
                       (errno-error (errno) 'file-info 'fstat fname/port follow?))))
-               (else (srfi-170-error "first argument must be a string or port" 'file-info fname/port)))))
+               (else (sanity-check-error "first argument must be a string or port" 'file-info fname/port)))))
     (if (not file-stat)
         (errno-error (errno)
                      'file-info
@@ -321,7 +316,7 @@
 
 (define (open-directory dir . o)
   (if (not (string? dir))
-        (srfi-170-error "dir must be a string" 'open-directory dir))
+        (sanity-check-error "dir must be a string" 'open-directory dir))
   (let-optionals o ((dot-files? #f))
     (let ((ret (%opendir dir)))
       (if ret
@@ -338,9 +333,9 @@
 
 (define (read-directory dirobj)
   (if (not (directory-object? dirobj))
-      (srfi-170-error "argument must be a director object created by open-directory" 'read-directory dirobj))
+      (sanity-check-error "argument must be a director object created by open-directory" 'read-directory dirobj))
   (if (not (directory-object-is-open? dirobj))
-      (srfi-170-error "argument must be a directory object not already closed" 'read-directory dirobj))
+      (sanity-check-error "argument must be a directory object not already closed" 'read-directory dirobj))
   (let ((dot-files? (directory-object-dot-files? dirobj)))
     (let loop ()
       (let ((de (read-directory-raise-error dirobj)))
@@ -356,16 +351,16 @@
 
 (define (close-directory directory-object)
   (if (not (directory-object? directory-object))
-      (srfi-170-error "argument must be a director object created by open-directory" 'close-directory directory-object))
+      (sanity-check-error "argument must be a director object created by open-directory" 'close-directory directory-object))
   (if (not (directory-object-is-open? directory-object))
-      (srfi-170-error "argument must be a directory object not already closed" 'close-directory directory-object))
+      (sanity-check-error "argument must be a directory object not already closed" 'close-directory directory-object))
       (set-directory-object-is-open directory-object #f)
       ;; does not dirobj any error stuff, see 170.stub
       (%closedir (directory-object-get-DIR directory-object)))
 
 (define (real-path the-starting-path)
   (if (not (string? the-starting-path))
-      (srfi-170-error "argument must be a string" 'real-path the-starting-path))
+      (sanity-check-error "argument must be a string" 'real-path the-starting-path))
   (let ((the-real-path (%realpath the-starting-path)))
     (if the-real-path
         the-real-path
@@ -401,7 +396,7 @@
             (let ((the-fileno (open the-filename (bitwise-ior open/write open/create) #o600)))
               (if (not the-fileno)
                   ;; ~~~~ adding the filename is not in the specs, but necessary for sane debugging
-                  (srfi-170-error "failed to open a file name" 'create-temp-file prefix the-filename))
+                  (sanity-check-error "failed to open a file name" 'create-temp-file prefix the-filename))
               (retry-if-EINTR (lambda () (%close (%fileno-to-fd the-fileno))))
               the-filename))))))
 
@@ -472,7 +467,7 @@
   (if (equal? '() o) (temp-file-prefix #t)) ;; force new prefix if none supplied
   (let-optionals o ((the-prefix (temp-file-prefix)))
     (let loop ((i 0))
-      (if (> i 1000) (srfi-170-error "exceeded maximum number of tries" 'call-with-temporary-filename maker the-prefix) ~~~~ maybe a better errno (for now)?
+      (if (> i 1000) (sanity-check-error "exceeded maximum number of tries" 'call-with-temporary-filename maker the-prefix) ~~~~ maybe a better errno (for now)?
           (let ((fname (string-append the-prefix "." (number->string i))))
             (receive retvals (with-errno-handler ;; ~~~~ "THEN A MIRACLE OCCURS..."
                                ((errno data)
@@ -492,7 +487,7 @@
 
 (define (set-umask! perms)
   (if (not (exact-integer? perms))
-        (srfi-170-error "perms must be an exact integer" 'set-umask! perms))
+        (sanity-check-error "perms must be an exact integer" 'set-umask! perms))
   (%umask perms))
 
 (define (current-directory)
@@ -503,7 +498,7 @@
 
 (define (set-current-directory! fname)
   (if (not (string? fname))
-      (srfi-170-error "fname must be a string" 'set-current-directory! fname))
+      (sanity-check-error "fname must be a string" 'set-current-directory! fname))
   (if (not (%chdir fname))
       (errno-error (errno) 'set-current-directory 'chdir fname)))
 
@@ -512,7 +507,7 @@
 (define (process-group . o)
   (let-optionals o ((process-object/pid 0))
     (if (not (exact-integer? process-object/pid))
-        (srfi-170-error "process-object/pid must be an exact integer" 'process-group process-object/pid))
+        (sanity-check-error "process-object/pid must be an exact integer" 'process-group process-object/pid))
     (let ((pgid (%getpgid process-object/pid)))
       (if (equal? -1 pgid)
           (errno-error (errno) 'process-group 'getpgid process-object/pid)
@@ -521,7 +516,7 @@
 (define (nice . o)
   (let-optionals o ((delta 1))
     (if (not (exact-integer? delta))
-        (srfi-170-error "delta must be an exact integer" 'nice delta))
+        (sanity-check-error "delta must be an exact integer" 'nice delta))
     (set-errno 0)
     (let ((ret (%nice delta)))
       (if (and (equal? -1 ret) (not (equal? 0 (errno))))
@@ -553,11 +548,11 @@
   (set-errno 0)
   (let ((ui (cond ((string? user) (retry-if-EINTR (lambda () (%getpwnam user))))
                   ((exact-integer? user) (retry-if-EINTR (lambda () (%getpwuid user))))
-                  (else (srfi-170-error "user must be a string or exact integer" 'user-info user)))))
+                  (else (sanity-check-error "user must be a string or exact integer" 'user-info user)))))
 
     (if (not ui)
         (if (equal? 0 (errno))
-            (srfi-170-error "user not found" 'user-info user)
+            (sanity-check-error "user not found" 'user-info user)
             (errno-error (errno)
                          'user-info
                          (if (string? user)
@@ -582,11 +577,11 @@
   (set-errno 0)
   (let ((gi (cond ((string? group) (retry-if-EINTR (lambda () (%getgrnam group))))
                   ((exact-integer? group) (retry-if-EINTR (lambda () (%getgrgid group))))
-                  (else (srfi-170-error "group must be a string or exact integer" 'group-info group)))))
+                  (else (sanity-check-error "group must be a string or exact integer" 'group-info group)))))
 
     (if (not gi)
         (if (equal? 0 (errno))
-            (srfi-170-error "group not found" 'group-info group)
+            (sanity-check-error "group not found" 'group-info group)
             (errno-error
              (errno)
              'group-info
@@ -617,15 +612,15 @@
 
 (define (set-environment-variable! name value)
   (if (not (string? name))
-        (srfi-170-error "name must be a string" 'set-environment-variable! name))
+        (sanity-check-error "name must be a string" 'set-environment-variable! name))
   (if (not (string? value))
-        (srfi-170-error "value must be a string" 'set-environment-variable! value))
+        (sanity-check-error "value must be a string" 'set-environment-variable! value))
   (if (not (%setenv name value 1))
       (errno-error (errno) 'set-environment-variable! 'setenv name value)))
 
 (define (delete-environment-variable! name)
   (if (not (string? name))
-        (srfi-170-error "name must be a string" 'delete-environment-variable! name))
+        (sanity-check-error "name must be a string" 'delete-environment-variable! name))
   (if (not (%unsetenv name))
       (errno-error (errno) 'delete-environment-variable! 'unsetenv name)))
 
@@ -634,7 +629,7 @@
 
 (define (terminal? the-port)
   (if (not (port? the-port))
-      (srfi-170-error "argument must be a port" 'terminal? the-port))
+      (sanity-check-error "argument must be a port" 'terminal? the-port))
   (let ((the-fd (port-fdes the-port)))
     (if (not the-fd)
         #f)
@@ -654,10 +649,10 @@
 
 (define (terminal-file-name the-port)
   (if (not (port? the-port))
-      (srfi-170-error "argument must be a port" 'terminal-file-name the-port))
+      (sanity-check-error "argument must be a port" 'terminal-file-name the-port))
   (let ((the-fd (port-fdes the-port)))
     (if (not the-fd)
-        (srfi-170-error "port must have a file descriptor associated with it" 'terminal-file-name the-port))
+        (sanity-check-error "port must have a file descriptor associated with it" 'terminal-file-name the-port))
     (let ((the-file-name (%ttyname_r the-fd)))
       (if (not the-file-name)
           (errno-error (errno) 'terminal-file-name 'ttyname_r the-port))
@@ -668,15 +663,15 @@
 
 (define (with-raw-mode input-port output-port min time proc)
   (if (not (and (port? input-port) (port? output-port)))
-      (srfi-170-error "first two arguments must ports" 'with-raw-mode input-port output-port min time proc))
+      (sanity-check-error "first two arguments must ports" 'with-raw-mode input-port output-port min time proc))
   (if (not (and (terminal? input-port) (terminal? output-port)))
-      (srfi-170-error "first two argument must be a terminal port" 'with-raw-mode input-port output-port min time proc))
+      (sanity-check-error "first two argument must be a terminal port" 'with-raw-mode input-port output-port min time proc))
   (if (not (and (input-port? input-port) (output-port? output-port)))
-      (srfi-170-error "first two arguments must be an input and output ports, respectively" 'with-raw-mode input-port output-port min time proc))
+      (sanity-check-error "first two arguments must be an input and output ports, respectively" 'with-raw-mode input-port output-port min time proc))
   (if (not (exact-integer? min))
-      (srfi-170-error "third argument must be an exact integer" 'with-raw-mode input-port output-port min time proc))
+      (sanity-check-error "third argument must be an exact integer" 'with-raw-mode input-port output-port min time proc))
   (if (not (exact-integer? time))
-      (srfi-170-error "fourth argument must be an exact integer" 'with-raw-mode input-port output-port min time proc))
+      (sanity-check-error "fourth argument must be an exact integer" 'with-raw-mode input-port output-port min time proc))
 
   (let* ((initial-input-termios (%tcgetattr input-port))
          (initial-output-termios (%tcgetattr output-port))
@@ -694,7 +689,7 @@
          (the-oflags OPOST))
 
     (if (or (not initial-input-termios) (not new-input-termios) (not initial-output-termios) (not new-output-termios))
-        (srfi-170-error "failure to get or set termios data" 'with-raw-mode input-port output-port min time proc))
+        (sanity-check-error "failure to get or set termios data" 'with-raw-mode input-port output-port min time proc))
 
     (term-attrs-lflag-set! new-input-termios
                            (bitwise-and (term-attrs-lflag new-input-termios) (bitwise-not the-lflags)))
@@ -745,18 +740,18 @@
                                   (equal? (term-attrs-cflag new-output-termios) (term-attrs-cflag real-new-output-termios))
                                   (equal? (term-attrs-oflag new-output-termios) (term-attrs-oflag real-new-output-termios))))
                         (begin (reset-terminal)
-                               (srfi-170-error "a termios update failed" 'with-raw-mode input-port output-port min time proc)))))))
+                               (sanity-check-error "a termios update failed" 'with-raw-mode input-port output-port min time proc)))))))
         (lambda () (proc input-port output-port))
         (lambda ()
           (reset-terminal)))))
 
 (define (with-rare-mode input-port output-port proc)
   (if (not (and (port? input-port) (port? output-port)))
-      (srfi-170-error "first two arguments must be ports" 'with-rare-mode input-port output-port proc))
+      (sanity-check-error "first two arguments must be ports" 'with-rare-mode input-port output-port proc))
   (if (not (and (terminal? input-port) (terminal? output-port)))
-      (srfi-170-error "first two arguments must be a terminal ports" 'with-rare-mode input-port output-port proc))
+      (sanity-check-error "first two arguments must be a terminal ports" 'with-rare-mode input-port output-port proc))
   (if (not (and (input-port? input-port) (output-port? output-port)))
-      (srfi-170-error "first two arguments must be an input and output ports, respectively" 'with-rare-mode input-port output-port proc))
+      (sanity-check-error "first two arguments must be an input and output ports, respectively" 'with-rare-mode input-port output-port proc))
 
   (let* ((initial-input-termios (%tcgetattr input-port))
          (initial-output-termios (%tcgetattr output-port))
@@ -769,7 +764,7 @@
          (the-lflags (bitwise-ior ICANON ECHO))) ;; ~~~~~~~ set for *both* ports???
 
     (if (or (not initial-input-termios) (not new-input-termios) (not initial-output-termios) (not new-output-termios))
-        (srfi-170-error "failure to get or set termios data" 'with-rare-mode input-port output-port proc))
+        (sanity-check-error "failure to get or set termios data" 'with-rare-mode input-port output-port proc))
 
     (term-attrs-lflag-set! new-input-termios
                            (bitwise-and (term-attrs-lflag new-input-termios) (bitwise-not the-lflags)))
@@ -796,18 +791,18 @@
                                   (equal? 0 (term-attrs-cc-element real-new-input-termios VTIME))
                                   (equal? 0 (bitwise-and (term-attrs-lflag real-new-output-termios) the-lflags))))
                         (begin (reset-terminal)
-                               (srfi-170-error "a termios update failed" 'with-rare-mode input-port output-port proc)))))))
+                               (sanity-check-error "a termios update failed" 'with-rare-mode input-port output-port proc)))))))
         (lambda () (proc input-port output-port))
         (lambda ()
           (reset-terminal)))))
 
 (define (without-echo input-port output-port proc)
   (if (not (and (port? input-port) (port? output-port)))
-      (srfi-170-error "first two arguments must be ports" 'without-echo input-port output-port proc))
+      (sanity-check-error "first two arguments must be ports" 'without-echo input-port output-port proc))
   (if (not (and (terminal? input-port) (terminal? output-port)))
-      (srfi-170-error "first two arguments must be terminal ports" 'without-echo input-port output-port proc))
+      (sanity-check-error "first two arguments must be terminal ports" 'without-echo input-port output-port proc))
   (if (not (and (input-port? input-port) (output-port? output-port)))
-      (srfi-170-error "first two arguments must be an input and output ports, respectively" 'without-echo input-port output-port proc))
+      (sanity-check-error "first two arguments must be an input and output ports, respectively" 'without-echo input-port output-port proc))
 
   (let* ((initial-output-termios (%tcgetattr output-port))
          (new-output-termios (%tcgetattr output-port)) ;; ~~~~ because of tagging, how to copy is not obvious
@@ -817,7 +812,7 @@
          (the-lflags (bitwise-ior ECHO ECHOE ECHOK ECHONL)))
 
     (if (or (not initial-output-termios) (not new-output-termios))
-        (srfi-170-error "failure to get or set termios data" 'without-echo output-port proc))
+        (sanity-check-error "failure to get or set termios data" 'without-echo output-port proc))
     (term-attrs-lflag-set! new-output-termios
                            (bitwise-and (term-attrs-lflag new-output-termios) (bitwise-not the-lflags)))
     (dynamic-wind
@@ -834,7 +829,7 @@
                            (errno-error (errno) 'without-echo 'tcgetattr output-port proc))
                     (if (not (equal? 0 (bitwise-and (term-attrs-lflag real-new-output-termios) the-lflags)))
                         (begin (reset-terminal)
-                               (srfi-170-error "a termios update failed" 'without-echo output-port proc)))))))
+                               (sanity-check-error "a termios update failed" 'without-echo output-port proc)))))))
         (lambda () (proc input-port output-port))
         (lambda ()
           (reset-terminal)))))
