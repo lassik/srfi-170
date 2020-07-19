@@ -173,27 +173,32 @@ when the underlying system calls fail.  They are fully documented in
 <a href="http://srfi.schemers.org/srfi-198/srfi-198.html">SRFI 198</a>,
 which may not yet be finalized when you are reading this,
 so they are summarized here.</p>
-<p>The condition object signaled in case of an <code>errno</code>-based error
-has the predicate <code>syscall-error?</code> and the accessors
-<code>syscall-error:errno</code>,
-<code>syscall-error:message</code>,
-<code>syscall-error:procedure-name</code>,
-<code>syscall-error:syscall-name</code>,
-and <code>syscall-error:data</code>.
-The accessors return, respectively, the value of <code>errno</code>
-as an exact integer, a string describing the error situation, the
-name of the procedure (as a symbol) reporting the error,
-the C name of the syscall (as a symbol) reporting the error,
-a list of relevant objects, possibly the arguments of the system call.</p>
 
-<p>Errors unrelated to <code>errno</code> are signaled with condition
-objects that are detected by <code>srfi-170-error?</code>.
-The available accessors are <code>srfi-170-error:message</code>,
-<code>srfi-170-error:procedure-name</code>, and
-<code>srfi-170-error:data</code>,
-with the same semantics as the corrsponding <code>syscall-error</code>
-accessors.
-These procedures are not part of SRFI 198.</p>
+<p>The condition object signaled in case of an <code>errno</code>-based error
+has the predicate <code>foreign-error?</code>, and the accessors
+<code>foreign-error:error-set</code>,
+<code>foreign-error:code</code>,
+<code>foreign-error:scheme-procedure</code>,
+<code>foreign-error:foreign-interface</code>,
+<code>foreign-error:message</code>,
+and <code>foreign-error:data</code>.</p>
+
+<p>The accessors return, respectively, the value <code>'errno</code>,
+an alist with the <code>errno</code> as an exact integer keyed by
+<code>'number</code>, and a name (as a symbol) with the C define name of
+the <code>errno</code>, such as <code>errno/ENOENT</code>, keyed by
+<code>'symbol</code>, the name of the procedure (as a symbol)
+reporting the error, the C name of the syscall (as a symbol) reporting
+the error, a string describing the error situation, and an alist of
+relevant objects, ideally including the arguments of the system call
+keyed by <code>'arguments</code>.</p>
+
+<p>Errors unrelated to <code>errno</code> are signaled with the same
+condition object and accessor returns, except
+<code>foreign-error:error-set</code> is are set to <code>'error</code>,
+and <code>foreign-error:code</code> and
+<code>foreign-error:foreign-interface</code> are set to <code>#f</code>.</p>
+
 <a name="node_sec_3.2"></a>
 <h2>3.2&nbsp;&nbsp;I/O</h2>
 <p></p>
