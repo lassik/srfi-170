@@ -2,18 +2,101 @@
 
 ;; Common code that's included by both 170.sld and test.sld
 
-(define-record-type SRFI-170-Error
-    (make-srfi-170-error message procedure-name data)
-    srfi-170-error?
-  (message srfi-170-error:message)
-  (procedure-name srfi-170-error:procedure-name)
-  (data srfi-170-error:data))
+;;; 3.1  Errors
 
-(define (srfi-170-error message procedure-name . data)
-  (raise (make-srfi-170-error
-           (string-append (symbol->string procedure-name) ": " message)
-           procedure-name
-           data)))
+(define errno-map (make-hash-table))
+
+(map (lambda (errno-number errno-symbol) (hash-table-set! errno-map errno-number errno-symbol))
+     (list
+      errno/E2BIG errno/EACCES errno/EADDRINUSE errno/EADDRNOTAVAIL
+      errno/EAFNOSUPPORT errno/EAGAIN errno/EALREADY errno/EBADF
+      errno/EBADMSG errno/EBUSY errno/ECANCELED errno/ECHILD
+      errno/ECONNABORTED errno/ECONNREFUSED errno/ECONNRESET
+      errno/EDEADLK errno/EDESTADDRREQ errno/EDOM errno/EDQUOT
+      errno/EEXIST errno/EFAULT errno/EFBIG errno/EHOSTUNREACH
+      errno/EIDRM errno/EILSEQ errno/EINPROGRESS errno/EINTR errno/EINVAL
+      errno/EIO errno/EISCONN errno/EISDIR errno/ELOOP errno/EMFILE
+      errno/EMLINK errno/EMSGSIZE errno/ENAMETOOLONG errno/ENETDOWN
+      errno/ENETRESET errno/ENETUNREACH errno/ENFILE errno/ENOBUFS
+      errno/ENODEV errno/ENOENT errno/ENOEXEC errno/ENOLCK errno/ENOMEM
+      errno/ENOMSG errno/ENOPROTOOPT errno/ENOSPC errno/ENOSYS
+      errno/ENOTCONN errno/ENOTDIR errno/ENOTEMPTY errno/ENOTRECOVERABLE
+      errno/ENOTSOCK errno/ENOTSUP errno/ENOTTY errno/ENXIO
+      errno/EOPNOTSUPP errno/EOVERFLOW errno/EOWNERDEAD errno/EPERM
+      errno/EPIPE errno/EPROTO errno/EPROTONOSUPPORT errno/EPROTOTYPE
+      errno/ERANGE errno/EROFS errno/ESPIPE errno/ESRCH errno/ESTALE
+      errno/ETIMEDOUT errno/ETXTBSY errno/EWOULDBLOCK errno/EXDEV
+
+      (cond-expand ((not openbsd)
+                    errno/EMULTIHOP errno/ENOLINK
+                    ;; STREAMS:
+                    errno/ENODATA errno/ENOSTR errno/ENOSR errno/ETIME)))
+
+     (list
+      'errno/E2BIG 'errno/EACCES 'errno/EADDRINUSE 'errno/EADDRNOTAVAIL
+      'errno/EAFNOSUPPORT 'errno/EAGAIN 'errno/EALREADY 'errno/EBADF
+      'errno/EBADMSG 'errno/EBUSY 'errno/ECANCELED 'errno/ECHILD
+      'errno/ECONNABORTED 'errno/ECONNREFUSED 'errno/ECONNRESET
+      'errno/EDEADLK 'errno/EDESTADDRREQ 'errno/EDOM 'errno/EDQUOT
+      'errno/EEXIST 'errno/EFAULT 'errno/EFBIG 'errno/EHOSTUNREACH
+      'errno/EIDRM 'errno/EILSEQ 'errno/EINPROGRESS 'errno/EINTR 'errno/EINVAL
+      'errno/EIO 'errno/EISCONN 'errno/EISDIR 'errno/ELOOP 'errno/EMFILE
+      'errno/EMLINK 'errno/EMSGSIZE 'errno/ENAMETOOLONG 'errno/ENETDOWN
+      'errno/ENETRESET 'errno/ENETUNREACH 'errno/ENFILE 'errno/ENOBUFS
+      'errno/ENODEV 'errno/ENOENT 'errno/ENOEXEC 'errno/ENOLCK 'errno/ENOMEM
+      'errno/ENOMSG 'errno/ENOPROTOOPT 'errno/ENOSPC 'errno/ENOSYS
+      'errno/ENOTCONN 'errno/ENOTDIR 'errno/ENOTEMPTY 'errno/ENOTRECOVERABLE
+      'errno/ENOTSOCK 'errno/ENOTSUP 'errno/ENOTTY 'errno/ENXIO
+      'errno/EOPNOTSUPP 'errno/EOVERFLOW 'errno/EOWNERDEAD 'errno/EPERM
+      'errno/EPIPE 'errno/EPROTO 'errno/EPROTONOSUPPORT 'errno/EPROTOTYPE
+      'errno/ERANGE 'errno/EROFS 'errno/ESPIPE 'errno/ESRCH 'errno/ESTALE
+      'errno/ETIMEDOUT 'errno/ETXTBSY 'errno/EWOULDBLOCK 'errno/EXDEV
+
+      (cond-expand ((not openbsd)
+                    'errno/EMULTIHOP 'errno/ENOLINK
+                    ;; STREAMS:
+                    'errno/ENODATA 'errno/ENOSTR 'errno/ENOSR 'errno/ETIME))
+      ))
+
+(define (errno-string errno)
+  (if (not (exact-integer? errno))
+      (sanity-check-error "errno-string requires an exact integer" 'errno-string errno))
+  (%strerror errno))
+
+(define (errno-symbol errno)
+  (if (not (exact-integer? errno))
+      (sanity-check-error "errno-symbol requires an exact integer" 'errno-symbol errno))
+  (hash-table-ref errno-map errno))
+
+(define (errno-error errno procedure-symbol syscall-symbol . data)
+  (raise-foreign-error
+   (alist-cons 'message
+               (string-append (symbol->string procedure-symbol)
+                              " called "
+                              (symbol->string syscall-symbol)
+                              ": "
+                              (symbol->string (errno-symbol errno))
+                              ": "
+                              (errno-string errno))
+               (alist-cons 'scheme-procedure
+                           procedure-symbol
+                           (alist-cons 'foreign-interface
+                                       syscall-symbol
+                                       (alist-cons 'data
+                                                   (list (cons 'arguments data))
+                                                   (alist-cons 'code
+                                                               (list (cons 'number errno) (cons 'symbol (errno-symbol errno)))
+                                                               '((error-set . errno)))))))))
+
+(define (sanity-check-error message procedure-symbol . data)
+  (raise-foreign-error
+   (alist-cons 'message
+               (string-append (symbol->string procedure-symbol) ": " message)
+               (alist-cons 'scheme-procedure
+                           procedure-symbol
+                           (alist-cons 'data
+                                       (list (cons 'arguments data))
+                                       '((error-set . error)))))))
 
 
 (define (retry-if-EINTR the-lambda)
@@ -33,7 +116,7 @@
 
 (define (delete-filesystem-object fname)
   (if (not (string? fname))
-        (srfi-170-error "fname must be a string" 'delete-filesystem-object fname))
+        (sanity-check-error "fname must be a string" 'delete-filesystem-object fname))
   (if (file-exists? fname)
       (if (file-info-directory? (file-info fname #f))
           (if (not (delete-directory fname))

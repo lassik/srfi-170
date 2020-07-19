@@ -6,7 +6,6 @@ chibi-scheme/Makefile.libs
 
 chibi-scheme/lib/srfi/170.sld
 chibi-scheme/lib/srfi/174.sld
-chibi-scheme/lib/srfi/198.sld
 
 chibi-scheme/lib/srfi/170/170.scm
 chibi-scheme/lib/srfi/170/170.stub

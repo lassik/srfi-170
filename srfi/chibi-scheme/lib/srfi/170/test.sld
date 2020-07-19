@@ -15,12 +15,15 @@
   (export run-tests)
 
   (import (scheme base)
+
           (chibi)
           (only (chibi process) exit)
           (chibi optional) ;; Snow package for optional args
           (chibi test)
           (only (chibi filesystem) file-exists? delete-file)
-          (only (srfi 1) list-index)
+
+          (only (srfi 1) alist-cons list-index)
+          (only (srfi 69) make-hash-table hash-table-set! hash-table-ref)
           (only (srfi 98) get-environment-variable)
           (only (srfi 115) regexp-replace-all regexp-split)
           (only (srfi 132) list-sort) ;; note list-sort truncates ending pair cdr not being ()
@@ -29,12 +32,13 @@
           (srfi 170)
           (rename (only (srfi 174) timespec timespec? timespec-seconds timespec-nanoseconds)
                   (timespec make-timespec))
-          (only (srfi 198) errno-error errno-string)
+          (srfi 198)
           )
 
+  (include-shared "170")
+  (include-shared "aux")
+
   (include "common.scm")
-  (include "aux.so")
-  (include "170.so") ;; to get errno/*, no longer part of API
 
   (begin
 
@@ -45,6 +49,8 @@
       (syntax-rules ()
         ((_ expr) (test-assert (begin expr #t)))
         ((_ name expr) (test-assert name (begin expr #t)))))
+
+    (define the-error #f)
 
     (define the-string-port (open-input-string "plover"))
 
@@ -139,10 +145,37 @@
           (test-not-error (set-errno errno/E2BIG))
           (set-errno errno/E2BIG)
           (test errno/E2BIG (errno))
-          (test-assert (string? (errno-string)))
+          (test-assert (string? (errno-string (errno))))
           (test-assert (string? (errno-string errno/E2BIG)))
           (set-errno errno/E2BIG)
-          (test-assert (equal? (errno-string) (errno-string errno/E2BIG)))
+          (test-assert (equal? (errno-string (errno)) (errno-string errno/E2BIG)))
+
+          ;; Make sure the error raising code isn't malfunctioning and raising a different error
+          (test-error ((with-exception-handler
+                        (lambda (exception) (set! the-error exception))
+                        (lambda () (errno-error 2 'test-of-errno-error-procedure-symbol 'test-of-errno-error-syscall-symbol 1 2 3 4)))))
+          (test-assert (foreign-error? the-error))
+          (test 'errno (foreign-error:error-set the-error))
+          (test 2 (cdr (assq 'number (foreign-error:code the-error))))
+          (test 'errno/ENOENT (cdr (assq 'symbol (foreign-error:code the-error))))
+          (test 'test-of-errno-error-procedure-symbol (foreign-error:scheme-procedure the-error))
+          (test 'test-of-errno-error-syscall-symbol (foreign-error:foreign-interface the-error))
+          (test "test-of-errno-error-procedure-symbol called test-of-errno-error-syscall-symbol: errno/ENOENT: No such file or directory"
+                (foreign-error:message the-error))
+          (test '(1 2 3 4) (cdr (assq 'arguments (foreign-error:data the-error))))
+
+          (test-error ((with-exception-handler
+                        (lambda (exception) (set! the-error exception))
+                        (lambda () (sanity-check-error "Sanity check error test message" 'test-of-errno-error-procedure-symbol 1 2 3 4)))))
+          (test-assert (foreign-error? the-error))
+          (test 'error (foreign-error:error-set the-error))
+          (test #f (foreign-error:code the-error))
+          (test 'test-of-errno-error-procedure-symbol (foreign-error:scheme-procedure the-error))
+          (test #f (foreign-error:foreign-interface the-error))
+          (test "test-of-errno-error-procedure-symbol: Sanity check error test message"
+                (foreign-error:message the-error))
+          (test '(1 2 3 4) (cdr (assq 'arguments (foreign-error:data the-error))))
+
 
           ) ;; end errors
 
