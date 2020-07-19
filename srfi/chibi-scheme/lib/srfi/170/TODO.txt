@@ -1,3 +1,8 @@
+Add a Makefile target to run the REPL with the module loaded.
+
+Adjust README.md to describe all this.
+
+
 Needed to match the SRFI:
 
 Add optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
@@ -6,9 +11,6 @@ Finish call-with-temporary-filename
 
 
 Suggested enhancements:
-
-Have tests check for correct objects when error raised; now an error
-raised in the error handling code is not detected
 
 Make appropriate procedures thread safe or thread aware
 

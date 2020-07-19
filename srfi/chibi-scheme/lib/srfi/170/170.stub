@@ -6,9 +6,8 @@
   (c-system-include "sys/types.h")
   (c-system-include "fcntl.h"))
  (else
-
+  (c-system-include "string.h")
   (c-system-include "errno.h")
-
   (c-system-include "fcntl.h")
 
 ;;  (c-system-include "sys/file.h") ; Only needed for BSD low level file operations?
@@ -34,7 +33,9 @@
   ))
 
 
-;;; 3.1  Errors (note, no longer part of API)
+;;; 3.1  Errors
+
+;; All POSIX errno defines
 
 (define-c-const int (errno/E2BIG "E2BIG"))
 (define-c-const int (errno/EACCES "EACCES"))
@@ -113,7 +114,7 @@
 (define-c-const int (errno/EXDEV "EXDEV"))
 
 (cond-expand
- ((not bsd) ;; stand in for OpenBSD
+ ((not openbsd)
   (define-c-const int (errno/EMULTIHOP "EMULTIHOP"))
   (define-c-const int (errno/ENOLINK "ENOLINK"))
   ;; STREAMS
@@ -121,6 +122,9 @@
   (define-c-const int (errno/ENOSR "ENOSR"))
   (define-c-const int (errno/ENOSTR "ENOSTR"))
   (define-c-const int (errno/ETIME "ETIME"))))
+
+(define-c string (%strerror strerror) (int))
+
 
 ;;; 3.2  I/O
 
