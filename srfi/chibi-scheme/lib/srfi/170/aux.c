@@ -9,6 +9,12 @@
 #include <termios.h>
 #endif
 
+// This implementation of errno manipulation is unsatisfactory because
+// Chibi Scheme might set errno between any of 1) manually setting
+// errno, 2) a POSIX call possibly setting it, and 3) retrieving its
+// value.  See the SRFI 199 discussion for more details:
+// (https://srfi-email.schemers.org/srfi-199/)
+
 // errno takes no arguments and returns the current errno
 
 sexp sexp_errno (sexp ctx, sexp self, sexp_sint_t n) {
