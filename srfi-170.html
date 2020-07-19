@@ -914,16 +914,22 @@ and a Chibi Scheme <code>(srfi 170)</code> library (see build notes for scsh
 and the Chibi Scheme example implementation in its srfi subdirectory).
 They have the following exceptions and deviations:
 
-<h3>3.1&nbsp;&nbsp;I/O</h3>
-
+<h3>3.1&nbsp;&nbsp;Error handling</h3>
 <ul>
 <li><p>
-Scsh only exposes <code>errno-error</code>,
-because it uses specialized syntax to catch system errors.</p>
-<li><p>The Chibi version of error handling does not use the
-SRFI 198 implementation, which is inherently less portable.</p></li>
+Scsh does not use SRFI 198, and only exposes <code>errno-error</code>,
+because it uses specialized syntax to catch system errors.
+</p>
+</li>
+<li>
+<p>The Chibi Scheme implementation's setting and getting of errno are
+done at the Scheme level, and arbitrary Chibi Scheme code that might
+change errno can run between SRFI 170 setting, setting by a system or
+library call due to an error, and SRFI 170 getting the current errno.
+</p></li>
 </p></li>
 </ul>
+
 <h3>3.2&nbsp;&nbsp;I/O</h3>
 <ul>
 <li><p>
