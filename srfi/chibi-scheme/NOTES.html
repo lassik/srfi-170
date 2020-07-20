@@ -1,12 +1,15 @@
 <h1>Chibi implementation</h1>
 
+<p>
 There are two implementations of this SRFI, <a href="https://scsh.net/">Scsh</a> version 0.7,
 <a href="https://github.com/scheme/scsh">which can be found at GitHub in the scsh repository of scheme</a>,
-and a Chibi Scheme <code>(srfi 170)</code> library (see build notes for scsh
-<a href="https://github.com/scheme-requests-for-implementation/srfi-170">here</a>,
-and the Chibi Scheme example implementation in this subdirectory).
+and a Chibi Scheme <code>(srfi 170)</code> library.  You can find the Chibi Scheme example implementation,
+and build notes for scsh, in their own <code>srfi</code> subdirectories.
+</p>
+<p>
 This file documents the current exceptions and deviations
 of the Chibi Scheme implementation.
+</p>
 
 <h3>3.1&nbsp;&nbsp;Error handling</h3>
 <ul>
@@ -21,7 +24,7 @@ library call due to an error, and SRFI 170 getting the current errno.
 <ul>
 <li><p>
 The Chibi Scheme versions of the <code>fdes->*port</code> procedures
-support the <i>buffer-mode</i> argument.
+do not support the <i>buffer-mode</i> argument.
 </p></li>
 </ul>
 

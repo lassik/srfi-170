@@ -1,8 +1,12 @@
 MANIFEST (this file)
 
+glob.html
+
 chibi-scheme/README.md
+
 chibi-scheme/Makefile
 chibi-scheme/Makefile.libs
+chibi-scheme/NOTES.html
 
 chibi-scheme/lib/srfi/170.sld
 chibi-scheme/lib/srfi/174.sld
@@ -14,3 +18,7 @@ chibi-scheme/lib/srfi/170/COPYING
 chibi-scheme/lib/srfi/170/common.scm
 chibi-scheme/lib/srfi/170/test.sld
 chibi-scheme/lib/srfi/170/TODO.txt
+
+srfi/scsh/NOTES.html
+srfi/scsh/scsh-build-notes.html
+srfi/scsh/scsh-build-notes.org

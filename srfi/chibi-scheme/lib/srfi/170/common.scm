@@ -99,6 +99,11 @@
                                        '((error-set . error)))))))
 
 
+;; This suffers from the problems discussed in SRFI 199
+;; (https://srfi-email.schemers.org/srfi-199/), it needs to be done at
+;; the C level, because Chibi Scheme may set errno in the middle of
+;; the loop.
+
 (define (retry-if-EINTR the-lambda)
   (let loop ((ret (the-lambda)))
     (if ret
