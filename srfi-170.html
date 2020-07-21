@@ -1,23 +1,17 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <title>SRFI 170: POSIX API</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="/srfi.css" type="text/css" />
-    <link href="/favicon.png" rel="icon" sizes="192x192" type="image/png" />
-  </head>
-
+    <link href="/favicon.png" rel="icon" sizes="192x192" type="image/png">
+    <link rel="stylesheet" href="https://srfi.schemers.org/srfi.css" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1"></head>
   <body>
+    <h1><a href="https://srfi.schemers.org/"><img class="srfi-logo" src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo" /></a>170: POSIX API</h1>
 
-<h1>Title</h1>
+<p>by Olin Shivers (original author), John Cowan (editor and shepherd), Harold Ancell (implementer and editor)</p>
 
-POSIX API
-
-<h1>Authors</h1>
-
-Olin Shivers (original author), John Cowan (editor and shepherd), Harold Ancell (implementer and editor)
-
-<h1>Status</h1>
+<h2>Status</h2>
 
 <p>This SRFI is currently in <em>draft</em> status.  Here is <a
     href="https://srfi.schemers.org/srfi-process.html">an
@@ -45,7 +39,7 @@ Olin Shivers (original author), John Cowan (editor and shepherd), Harold Ancell 
 </ul>
 
 
-<h1>Abstract</h1>
+<h2>Abstract</h2>
 
 <p>
 The host environment is the set of resources, such as the filesystem,
@@ -57,11 +51,11 @@ Operating System Interface standardized by the IEEE.  Not all of the
 functions of this SRFI are available on all operating systems.
 </p>
 
-<h1>Issues</h1>
+<h2>Issues</h2>
 
 <p>None at present.</p>
 
-<h1>Rationale</h1>
+<h2>Rationale</h2>
 
 <p>The I/O and other environmental procedures provided by the various
 Scheme standards were designed at a time when operating systems were far
@@ -148,7 +142,7 @@ make it even longer.  However,
 <a href="https://github.com/scheme-requests-for-implementation/srfi-170/blob/master/srfi/chibi-scheme/lib/srfi/170/test.sld">the Chibi test suite</a>
 is a good source of usage examples.</p>
 
-<h1>Specification</h1>
+<h2>Specification</h2>
 
 <p>
 Implementations of this SRFI on non-P<small>OSIX</small> systems, especially Windows,
@@ -166,7 +160,7 @@ threads, the per-thread P<small>OSIX</small> functions may not do the
 right thing.
 </p>
 
-<h2>3.1&nbsp;&nbsp;Error handling</h2>
+<h3>3.1&nbsp;&nbsp;Error handling</h3>
 <p>
 As noted above, the procedures of this SRFI signal an exception
 when the underlying system calls fail.  They are fully documented in
@@ -200,7 +194,7 @@ and <code>foreign-error:code</code> and
 <code>foreign-error:foreign-interface</code> are set to <code>#f</code>.</p>
 
 <a name="node_sec_3.2"></a>
-<h2>3.2&nbsp;&nbsp;I/O</h2>
+<h3>3.2&nbsp;&nbsp;I/O</h3>
 <p></p>
 <p>Dealing with P<small>OSIX</small> file descriptors in a Scheme environment is difficult.
 In P<small>OSIX</small>, open files are part of the process environment, and are referenced
@@ -310,7 +304,7 @@ if the implementation permits them.
 </p>
 </blockquote>
 
-<h2>3.3&nbsp;&nbsp;File system</h2>
+<h3>3.3&nbsp;&nbsp;File system</h3>
 <p>The following procedures allow access to the
 computer's file system.
 <p>
@@ -635,11 +629,11 @@ or to return values other than the new filename (for example, an open port).</p>
 </blockquote>
 
 <a name="node_sec_3.4"></a>
-<h2>3.4&nbsp;&nbsp;[Intentionally omitted]</h2>
+<h3>3.4&nbsp;&nbsp;[Intentionally omitted]</h3>
 
 <p></p>
 <a name="node_sec_3.5"></a>
-<h2>3.5&nbsp;&nbsp;Process state</h2>
+<h3>3.5&nbsp;&nbsp;Process state</h3>
 <p></p>
 <p></p>
 <p></p>
@@ -717,7 +711,7 @@ For the calling process, these routines get the specified data.  The scsh procee
 </p>
 
 <a name="node_sec_3.6"></a>
-<h2>3.6&nbsp;&nbsp;User and group database access</h2>
+<h3>3.6&nbsp;&nbsp;User and group database access</h3>
 <p>These procedures are used to access the user and group databases
 (for example, the ones traditionally stored in <code>/etc/passwd</code> and <code>/etc/group</code>).</p>
 <p>
@@ -799,16 +793,16 @@ The <i>gid/name</i> argument is either an exact integer gid or a string group na
 </p>
 
 <a name="node_sec_3.7"></a>
-<h2>3.7&nbsp;&nbsp;[Intentionally omitted]</h2>
+<h3>3.7&nbsp;&nbsp;[Intentionally omitted]</h3>
 
 <a name="node_sec_3.8"></a>
-<h2>3.8&nbsp;&nbsp;[Intentionally omitted]</h2>
+<h3>3.8&nbsp;&nbsp;[Intentionally omitted]</h3>
 
 <a name="node_sec_3.9"></a>
-<h2>3.9&nbsp;&nbsp;[Intentionally omitted]</h2>
+<h3>3.9&nbsp;&nbsp;[Intentionally omitted]</h3>
 
 <a name="node_sec_3.10"></a>
-<h2>3.10&nbsp;&nbsp;Time</h2>
+<h3>3.10&nbsp;&nbsp;Time</h3>
 <p>
 A <a href="https://srfi.schemers.org/srfi-174/srfi-174.html">SRFI 174</a>
 timespec is an object containing two values, the number of elapsed seconds
@@ -841,7 +835,7 @@ is sometimes turned either forward or backward.
 </p>
 </blockquote>
 
-<h2>3.11&nbsp;&nbsp;Environment variables</h2>
+<h3>3.11&nbsp;&nbsp;Environment variables</h3>
 <p>R<sup>7</sup>RS provides two procedures (via SRFI 98) to get
 environment variables:</p>
 <ul>
@@ -892,7 +886,7 @@ are not aware of any Scheme implementation with the unsuffixed names,
 so the suffix is kept in this SRFI.</p>
 
 <a name="node_sec_3.12"></a>
-<h2>3.12&nbsp;&nbsp;Terminal device control</h2>
+<h3>3.12&nbsp;&nbsp;Terminal device control</h3>
 <p></p>
 <p>
 </p>
@@ -905,7 +899,7 @@ other than <code>ENOTTY</code>.
 This procedure is useful when writing programs that change their behavior
 when their standard input or output is a terminal.
 </blockquote>
-<h1>Implementation</h1>
+<h2>Implementation</h2>
 
 <p>
 There are two implementations of this SRFI, <a href="https://scsh.net/">Scsh</a> version 0.7,
@@ -923,7 +917,7 @@ and between this SRFI and scsh 0.7 in
 <code>srfi/scsh/NOTES.html</code></a>.
 </p>
 
-<h1>Acknowledgements</h1>
+<h2>Acknowledgements</h2>
 
 <p>Thanks to Olin Shivers, <i>sine quo non</i>, and all the Scheme implementors
 who have followed his work.  Thanks also to all the participants in the
@@ -933,7 +927,7 @@ SRFI mailing list.</p>
 the pronoun is feminine, agreeing with <i>re</i> 'thing' understood,
 whereas Olin is masculine.)</p>
 
-<h1>Copyright</h1>
+<h2>Copyright</h2>
 Copyright &copy; 2019 by John Cowan.
 
 <p>
