@@ -193,8 +193,7 @@ condition object and accessor returns, except
 and <code>foreign-error:code</code> and
 <code>foreign-error:foreign-interface</code> are set to <code>#f</code>.</p>
 
-<a name="node_sec_3.2"></a>
-<h3>3.2&nbsp;&nbsp;I/O</h3>
+<h3 id="node_sec_3.2">3.2&nbsp;&nbsp;I/O</h3>
 <p></p>
 <p>Dealing with P<small>OSIX</small> file descriptors in a Scheme environment is difficult.
 In P<small>OSIX</small>, open files are part of the process environment, and are referenced
@@ -243,7 +242,6 @@ a file descriptor that can then be converted to a port.
 </p>
 <p>
 <div><code>(open-file <i>fname flags [permission-bits]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>fd</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>open()</code>&nbsp;</div>
-</p>
 <blockquote>
 <i>Permission-bits</i> defaults to <code>#o666</code>, but are masked by the current umask.
 <i>Flags</i> is an integer bitmask, composed by adding together
@@ -256,7 +254,7 @@ one or more of the following constants:
 <code>open/exclusive</code>,
 <code>open/nofollow</code>,
 <code>open/truncate</code>.
-It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
+<p>It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
 <code>open/read+write</code> flags is provided.</p>
 </blockquote>
 
@@ -324,8 +322,7 @@ If you try to create a hard link
 and <i>old-fname</i> and <i>new-fname</i> refer to the same file, it is an error
 (and your file may be destroyed).
 </p></blockquote>
-</td></tr></tbody></table>
-<p></p>
+
 <div><code>(read-symlink <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>readlink()</code>&nbsp;</div>
 <blockquote>Return the filename referenced by the symlink <i>fname</i>.
 </blockquote>
@@ -348,10 +345,7 @@ prevent this problem; at least it is highly unlikely to occur in practice.
 <div><code>(delete-directory <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rmdir()</code>&nbsp;</div>
 <blockquote>This procedure deletes directories from the file system.
 It is an error if <i>fname</i> is not a directory or is not empty.
-</p>
-</blockquote><p>
-</p>
-<p></p>
+</blockquote>
 <div><code>(set-file-mode <i>fname mode-bits</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chmod()</code>&nbsp;</div>
 <div><code>(set-file-owner <i>fname uid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
 <div><code>(set-file-group <i>fname gid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
@@ -393,7 +387,7 @@ status-change (<code>ctime</code>) is set to the current time.
 <p></p>
 <p></p>
 <p></p>
-<div align="left"><code>(file-info <i>fname/port follow?</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stat()</code>&nbsp;</div>
+<div><code>(file-info <i>fname/port follow?</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stat()</code>&nbsp;</div>
 <blockquote>
 The <code>file-info</code> procedure
 returns a file-info record containing useful
@@ -420,7 +414,7 @@ The <i>follow?</i> flag is ignored if the file argument is a port.
 <div><code>(file-info:atime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div><code>(file-info:mtime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div><code>(file-info:ctime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns the device number, inode number, mode (permission and file type bits),
+<blockquote><p>Returns the device number, inode number, mode (permission and file type bits),
 number of hard links, user id, group id, device ID if file is special,
 size in bytes, optimal blocksize for I/O, number of 512B blocks allocated,
 last access time, last modification time, and
@@ -429,7 +423,7 @@ last change of status times (using SRFI 174 timespecs) stored in <i>file-info</i
 Although P<small>OSIX</small> does not standardize bit positions in the
 file mode, the following assignments are de facto standards
 (all except the socket, symlink, and fifo bits
-have been unchanged since the Sixth Edition of Research Unix):
+have been unchanged since the Sixth Edition of Research Unix):</p>
 
 <pre>
 #o140000   local domain socket
@@ -496,7 +490,6 @@ result list. That is,
 <blockquote><code>("/etc/chown" "/etc/exports" "/etc/fstab" <code>...</code>)</code></blockquote>To use the filenames in the returned list, the programmer can either manually
 prepend the directory,
 or change to the directory before using the filenames.
-</p>
 </blockquote>
 
 <div><code>(make-directory-files-generator <i>dir [dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>generator</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -621,19 +614,13 @@ To create a unique temporary directory:
 (call-with-temporary-filename&nbsp;(lambda&nbsp;(dir)&nbsp;(create-directory&nbsp;dir)&nbsp;dir)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/tmp/tempdir.")</code></blockquote>
 Similar operations can be used to generate unique fifos,
-or to return values other than the new filename (for example, an open port).</p>
-</p>
-</blockquote><p>
-</p>
-<p></p>
+or to return values other than the new filename (for example, an open port).
 </blockquote>
 
-<a name="node_sec_3.4"></a>
-<h3>3.4&nbsp;&nbsp;[Intentionally omitted]</h3>
+<h3 id="node_sec_3.4">3.4&nbsp;&nbsp;[Intentionally omitted]</h3>
 
 <p></p>
-<a name="node_sec_3.5"></a>
-<h3>3.5&nbsp;&nbsp;Process state</h3>
+<h3 id="node_sec_3.5">3.5&nbsp;&nbsp;Process state</h3>
 <p></p>
 <p></p>
 <p></p>
@@ -710,8 +697,7 @@ For the calling process, these routines get the specified data.  The scsh procee
 </blockquote><p>
 </p>
 
-<a name="node_sec_3.6"></a>
-<h3>3.6&nbsp;&nbsp;User and group database access</h3>
+<h3 id="node_sec_3.6">3.6&nbsp;&nbsp;User and group database access</h3>
 <p>These procedures are used to access the user and group databases
 (for example, the ones traditionally stored in <code>/etc/passwd</code> and <code>/etc/group</code>).</p>
 <p>
@@ -738,9 +724,7 @@ The <i>uid/name</i> argument is either an exact integer uid or a string user nam
 <blockquote>Returns the user name, user id, group id, home directory,
 and shell path stored in <i>user-info</i> respectively.
 Windows returns <code>#f</code> for any items it doesn't have.</blockquote>
-<p></p>
-</p>
-<p></p>
+
 <div><code>(user-info:full-name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the contents of the <code>pw_gecos</code> field
 stored in <i>user-info</i>.
@@ -750,9 +734,7 @@ the Sixth Edition of Research Unix.
 It normally contains the user's full name, but may contain additional
 system-specific information;
 on Windows, it contains exactly the full name.</blockquote>
-<p></p>
-</p>
-<p></p>
+
 <div><code>(user-info:parsed-full-name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote><p>Returns a parsed and expanded version of the raw string
 returned by <code>user-info:full-name</code>.
@@ -790,19 +772,14 @@ The <i>gid/name</i> argument is either an exact integer gid or a string group na
 <div><code>(group-info:name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div><code>(group-info:gid <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the group name and group id stored in <i>group-info</i>.  The list of group member ids can be retrieved with the above <code>(user-supplementary-gids)</code></blockquote>
-</p>
 
-<a name="node_sec_3.7"></a>
-<h3>3.7&nbsp;&nbsp;[Intentionally omitted]</h3>
+<h3 id="node_sec_3.7">3.7&nbsp;&nbsp;[Intentionally omitted]</h3>
 
-<a name="node_sec_3.8"></a>
-<h3>3.8&nbsp;&nbsp;[Intentionally omitted]</h3>
+<h3 id="node_sec_3.8">3.8&nbsp;&nbsp;[Intentionally omitted]</h3>
 
-<a name="node_sec_3.9"></a>
-<h3>3.9&nbsp;&nbsp;[Intentionally omitted]</h3>
+<h3 id="node_sec_3.9">3.9&nbsp;&nbsp;[Intentionally omitted]</h3>
 
-<a name="node_sec_3.10"></a>
-<h3>3.10&nbsp;&nbsp;Time</h3>
+<h3 id="node_sec_3.10">3.10&nbsp;&nbsp;Time</h3>
 <p>
 A <a href="https://srfi.schemers.org/srfi-174/srfi-174.html">SRFI 174</a>
 timespec is an object containing two values, the number of elapsed seconds
@@ -819,8 +796,7 @@ resolution, nor is anything guaranteed about accuracy.
 <i>timespec</i> since the P<small>OSIX</small> epoch (midnight January
 1, 1970 Universal Time), excluding leap seconds.
 </blockquote>
-</blockquote><p>
-</p>
+
 <div><code>(monotonic-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
 
 <blockquote>
@@ -885,8 +861,7 @@ the <code>!</code> suffix. MIT Scheme has the suffixed names and we
 are not aware of any Scheme implementation with the unsuffixed names,
 so the suffix is kept in this SRFI.</p>
 
-<a name="node_sec_3.12"></a>
-<h3>3.12&nbsp;&nbsp;Terminal device control</h3>
+<h3 id="node_sec_3.12">3.12&nbsp;&nbsp;Terminal device control</h3>
 <p></p>
 <p>
 </p>
