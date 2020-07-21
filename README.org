@@ -12,7 +12,7 @@ This repository hosts [[https://srfi.schemers.org/srfi-170/][SRFI 170]]: POSIX A
 
 This SRFI is in /draft/ status.
 
-See also [[https://srfi.schemers.org/srfi-198/][SRFI 198: POSIX system call exceptions]] and [[https://srfi.schemers.org/srfi-199/][SRFI 199: POSIX errno manipulation]].
+See also [[https://srfi.schemers.org/srfi-198/][SRFI 198: Foreign Interface Error Handling]] and [[https://srfi.schemers.org/srfi-199/][SRFI 199: POSIX errno manipulation]].
 
 The full documentation for this SRFI can be found in the [[https://srfi.schemers.org/srfi-170/srfi-170.html][SRFI Document]].
 
