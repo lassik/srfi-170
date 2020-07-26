@@ -770,8 +770,8 @@ The <i>gid/name</i> argument is either an exact integer gid or a string group na
 <div><code>(group-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns <code>#t</code> if <i>obj</i> is a group info object and <code>#f</code> otherwise.
 </blockquote>
-<div><code>(group-info:name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(group-info:gid <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(group-info:name <i>group-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(group-info:gid <i>group-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the group name and group id stored in <i>group-info</i>.  The list of group member ids can be retrieved with the above <code>(user-supplementary-gids)</code></blockquote>
 
 <h3 id="node_sec_3.7">3.7&nbsp;&nbsp;[Intentionally omitted]</h3>
