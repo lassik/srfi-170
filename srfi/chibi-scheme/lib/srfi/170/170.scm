@@ -502,16 +502,7 @@
   (if (not (%chdir fname))
       (errno-error (errno) 'set-current-directory 'chdir fname)))
 
-;; pid and parent-pid direct from stub, they can't error
-
-(define (process-group . o)
-  (let-optionals o ((process-object/pid 0))
-    (if (not (exact-integer? process-object/pid))
-        (sanity-check-error "process-object/pid must be an exact integer" 'process-group process-object/pid))
-    (let ((pgid (%getpgid process-object/pid)))
-      (if (equal? -1 pgid)
-          (errno-error (errno) 'process-group 'getpgid process-object/pid)
-          pgid))))
+;; pid, parent-pid, and process-group direct from stub, they can't error
 
 (define (nice . o)
   (let-optionals o ((delta 1))
