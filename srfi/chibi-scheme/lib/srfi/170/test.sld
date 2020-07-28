@@ -219,6 +219,26 @@
           ) ;; end I/O
 
 
+        ;; Here because needed for temp-file-prefix
+        (test-group "3.11  Environment variables"
+
+          (test #f (get-environment-variable "xyzzy"))
+          (test-not-error (set-environment-variable! "xyzzy" "one"))
+          (test "one" (get-environment-variable "xyzzy"))
+          (test-not-error (set-environment-variable! "xyzzy" "two"))
+          (test "two" (get-environment-variable "xyzzy"))
+          (test-error (set-environment-variable! "xyzzy=plover" "three"))
+          (test-not-error (delete-environment-variable! "xyzzy"))
+          (test #f (get-environment-variable "xyzzy"))
+          (test-error (delete-environment-variable! "xyzzy=plover"))
+          (test-not-error (set-environment-variable! "xyzzy" ""))
+          (test "" (get-environment-variable "xyzzy"))
+          (test-not-error (delete-environment-variable! "xyzzy"))
+
+
+          ) ;; end environment variables
+
+
         (test-group "3.3  File system"
 
           ;; ~~~~ test across filesystems, assuming /var is not in same as /tmp
@@ -455,17 +475,33 @@
           (test-not-error (set-current-directory! starting-dir))
 
           (test-assert (string? (temp-file-prefix)))
-          ;; ~~~ test with and without env variable
+          (set-environment-variable! "TMPDIR" "foo")
+          (parameterize ((temp-file-prefix "foo/"))
+            (test "foo/" (temp-file-prefix)))
+          (delete-environment-variable! "TMPDIR")
+          (test (string-append "/tmp/" (number->string (pid))) (temp-file-prefix))
 
           ;; can't test skipping past an existing temp file due to the
           ;; suffix being completely random....:
 
-          ;; ~~~ also test with supplied prefix, and wrapped in temp-file-prefix parameterize
           (let ((the-filename (create-temp-file)))
             (test-assert (file-exists? the-filename))
-            ;; cleaning up after self, but bad for debugging
-            (test-not-error (delete-file the-filename))
-            )
+            (test "/tmp/" (string-copy the-filename 0 5))
+            (test-not-error (delete-file the-filename))) ;; cleaning up after self, but bad for debugging
+
+          (let ((the-filename (create-temp-file tmp-containing-dir))
+                (the-prefix (string-append tmp-containing-dir ".")))
+            (test-assert (file-exists? the-filename))
+            (test the-prefix (string-copy the-filename 0 (string-length the-prefix)))
+            (test-not-error (delete-file the-filename))) ;; cleaning up after self, but bad for debugging
+
+          (parameterize ((temp-file-prefix tmp-dir-1))
+            (let ((the-filename (create-temp-file))
+                  (the-prefix (string-append tmp-dir-1 ".")))
+            (test-assert (file-exists? the-filename))
+            (test the-prefix (string-copy the-filename 0 (string-length the-prefix)))
+            (test-not-error (delete-file the-filename)))) ;; cleaning up after self, but bad for debugging
+
           (if (not (equal? 0 (user-effective-uid)))
               (test-error (create-temp-file "/xyzzy-plover-plugh.")))
 
@@ -556,25 +592,6 @@
                               (> (timespec-seconds t2) 0)
                               (> (timespec-nanoseconds t2) 0))))
           ) ;; end time
-
-
-        (test-group "3.11  Environment variables"
-
-          (test #f (get-environment-variable "xyzzy"))
-          (test-not-error (set-environment-variable! "xyzzy" "one"))
-          (test "one" (get-environment-variable "xyzzy"))
-          (test-not-error (set-environment-variable! "xyzzy" "two"))
-          (test "two" (get-environment-variable "xyzzy"))
-          (test-error (set-environment-variable! "xyzzy=plover" "three"))
-          (test-not-error (delete-environment-variable! "xyzzy"))
-          (test #f (get-environment-variable "xyzzy"))
-          (test-error (delete-environment-variable! "xyzzy=plover"))
-          (test-not-error (set-environment-variable! "xyzzy" ""))
-          (test "" (get-environment-variable "xyzzy"))
-          (test-not-error (delete-environment-variable! "xyzzy"))
-
-
-          ) ;; end environment variables
 
 
         (test-group "3.12  Terminal device control"
