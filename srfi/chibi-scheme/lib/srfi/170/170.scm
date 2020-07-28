@@ -378,16 +378,13 @@
           (get-random-character) (get-random-character) (get-random-character)))
 
 (define temp-file-prefix
-  (make-parameter 9
-                  (lambda (x) ;; ~~~~ maybe make it the size of the ending string?
-                    (let ((the-pair (assoc "TMPDIR" (get-environment-variables)))
-                          (the-suffix-string (suffix-string)))
-                      (if (pair? the-pair)
-                          (string-append (cdr the-pair) "/" (number->string (pid)) "." the-suffix-string)
-                          (string-append "/tmp/" (number->string (pid)) "." the-suffix-string))))))
+  (make-parameter (let ((the-pair (assoc "TMPDIR" (get-environment-variables)))
+                        (the-first-suffix-string (suffix-string)))
+                    (if (pair? the-pair)
+                        (string-append (cdr the-pair) "/" (number->string (pid)) "." the-first-suffix-string)
+                        (string-append "/tmp/" (number->string (pid)) "." the-first-suffix-string)))))
 
 (define (create-temp-file . o)
-  (if (equal? '() o) (temp-file-prefix #t)) ;; force new prefix if none supplied
   (let-optionals o ((prefix (temp-file-prefix)))
     (let loop ()
       (let ((the-filename (string-append prefix "." (suffix-string))))
@@ -464,7 +461,6 @@
 ;; part definitately not working, and not trivial, see above
 
 (define (call-with-temporary-filename maker . o)
-  (if (equal? '() o) (temp-file-prefix #t)) ;; force new prefix if none supplied
   (let-optionals o ((the-prefix (temp-file-prefix)))
     (let loop ((i 0))
       (if (> i 1000) (sanity-check-error "exceeded maximum number of tries" 'call-with-temporary-filename maker the-prefix) ~~~~ maybe a better errno (for now)?

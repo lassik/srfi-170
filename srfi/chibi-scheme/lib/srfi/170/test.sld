@@ -455,9 +455,7 @@
           (test-not-error (set-current-directory! starting-dir))
 
           (let ((tmp-filename (temp-file-prefix)))
-            (test-assert (string? tmp-filename))
-            (temp-file-prefix #t) ;; parementer object, and argument ignored
-            (test-assert (not (equal? tmp-filename (temp-file-prefix)))))
+            (test-assert (string? tmp-filename)))
 
           ;; can't test skipping past an existing temp file due to the
           ;; suffix being completely random....
