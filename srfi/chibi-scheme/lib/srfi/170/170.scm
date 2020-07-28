@@ -389,7 +389,7 @@
       (let ((the-filename (string-append prefix "." (suffix-string))))
         (if (file-exists? the-filename)
             (loop)
-            (let ((the-fileno (open the-filename (bitwise-ior open/write open/create) #o600)))
+            (let ((the-fileno (open the-filename (bitwise-ior open/write open/create open/exclusive) #o600)))
               (if (not the-fileno)
                   ;; ~~~~ adding the filename is not in the specs, but necessary for sane debugging
                   (sanity-check-error "failed to open a file name" 'create-temp-file prefix the-filename))
