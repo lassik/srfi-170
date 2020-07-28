@@ -454,12 +454,13 @@
           (test-error (real-path bogus-path))
           (test-not-error (set-current-directory! starting-dir))
 
-          (let ((tmp-filename (temp-file-prefix)))
-            (test-assert (string? tmp-filename)))
+          (test-assert (string? (temp-file-prefix)))
+          ;; ~~~ test with and without env variable
 
           ;; can't test skipping past an existing temp file due to the
-          ;; suffix being completely random....
+          ;; suffix being completely random....:
 
+          ;; ~~~ also test with supplied prefix, and wrapped in temp-file-prefix parameterize
           (let ((the-filename (create-temp-file)))
             (test-assert (file-exists? the-filename))
             ;; cleaning up after self, but bad for debugging

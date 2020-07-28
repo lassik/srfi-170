@@ -378,11 +378,10 @@
           (get-random-character) (get-random-character) (get-random-character)))
 
 (define temp-file-prefix
-  (make-parameter (let ((the-pair (assoc "TMPDIR" (get-environment-variables)))
-                        (the-first-suffix-string (suffix-string)))
+  (make-parameter (let ((the-pair (assoc "TMPDIR" (get-environment-variables))))
                     (if (pair? the-pair)
-                        (string-append (cdr the-pair) "/" (number->string (pid)) "." the-first-suffix-string)
-                        (string-append "/tmp/" (number->string (pid)) "." the-first-suffix-string)))))
+                        (string-append (cdr the-pair) "/" (number->string (pid)))
+                        (string-append "/tmp/" (number->string (pid)))))))
 
 (define (create-temp-file . o)
   (let-optionals o ((prefix (temp-file-prefix)))
