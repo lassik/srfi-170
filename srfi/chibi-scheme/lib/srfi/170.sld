@@ -73,7 +73,7 @@
 
    umask set-umask!
    current-directory set-current-directory!
-   pid parent-pid process-group
+   pid
    nice
 
    user-uid user-gid

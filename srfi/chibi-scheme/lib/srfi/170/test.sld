@@ -529,9 +529,6 @@
             (test-not-error (set-file-mode tmp-containing-dir #o755))))
 
           (test-assert (pid))
-          (test-assert (parent-pid))
-
-          (test-not-error (process-group))
 
           (test 0 (nice 0))
 
