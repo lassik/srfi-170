@@ -32,7 +32,7 @@ CHIBI_LOCATION_PATH environment variable set, or something like:
 LD_LIBRARY_PATH=".:/home/src/srfi/198-foreign-errors/srfi/chibi-scheme:/usr/local/src/chibi-scheme" DYLD_LIBRARY_PATH=".:/home/src/srfi/198-foreign-errors/srfi/chibi-scheme:/usr/local/src/chibi-scheme" CHIBI_IGNORE_SYSTEM_PATH=1 CHIBI_MODULE_PATH="./lib:/home/src/srfi/198-foreign-errors/srfi/chibi-scheme/lib:/usr/local/src/chibi-scheme/lib" /usr/local/src/chibi-scheme/chibi-scheme -m "(srfi 170 test)" -e "(run-tests)"
 
 Which run successfully on x86-64 Ubuntu 18.04 Linux kernel 4.15.0-111,
-gcc v7.5.0, and x86-64 OpenBSD 6.5, clang v7.0.1.
+gcc v7.5.0, and x86-64 OpenBSD 6.7, clang v8.0.1.
 
 The test suite 170/test.sld can be run as root, and needs to be to
 run as root to fully test some features, see the comments at its top.
