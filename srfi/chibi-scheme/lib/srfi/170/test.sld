@@ -564,7 +564,7 @@
           (test '("Test User") (parse-gecos "Test User" ""))
           (test '("") (parse-gecos "" "test"))
           (test '("Test User" "" "" "") (parse-gecos "Test User,,," "test"))
-          (test '("Test UserTest" "" "" "") (parse-gecos "Test User@,,," "test"))
+          (test '("Test UserTest" "" "" "") (parse-gecos "Test User&,,," "test"))
           (test '("Test User" "@" "" "") (parse-gecos "Test User,@,," "test"))
 
           (test-assert (group-info? (group-info 0)))

@@ -136,5 +136,5 @@
     (if (> (string-length user-name) 0)
         (let ((capitalized-user-name (string-copy user-name))) ;; we are NOT being functional
           (string-set! capitalized-user-name 0 (char-upcase (string-ref capitalized-user-name 0)))
-          (set-car! the-gecos-list (regexp-replace-all "@" (car the-gecos-list) capitalized-user-name))))
+          (set-car! the-gecos-list (regexp-replace-all "&" (car the-gecos-list) capitalized-user-name))))
     the-gecos-list))
