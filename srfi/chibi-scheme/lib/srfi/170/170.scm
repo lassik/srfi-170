@@ -253,6 +253,13 @@
 (define (file-info-regular? file-info-record)
   (S_ISREG (file-info:mode file-info-record)))
 
+(define (file-info-socket? file-info-record)
+  (S_ISSOCK (file-info:mode file-info-record)))
+
+(define (file-info-device? file-info-record)
+  (or (S_ISBLK (file-info:mode file-info-record))
+      (S_ISCHR (file-info:mode file-info-record))))
+
 (define-record-type Directory-Object
     (make-directory-object the-DIR is-open? dot-files?)
     directory-object?

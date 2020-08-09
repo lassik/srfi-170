@@ -56,8 +56,8 @@
    ;; file-info:blksize file-info:blocks are below, not in Windows
    file-info:atime file-info:mtime file-info:ctime
 
-   file-info-directory? file-info-fifo? file-info-symlink? file-info-regular?
-
+   file-info-directory? file-info-fifo? file-info-symlink?
+   file-info-regular? file-info-socket? file-info-device?
    directory-files
    make-directory-files-generator
    open-directory read-directory close-directory

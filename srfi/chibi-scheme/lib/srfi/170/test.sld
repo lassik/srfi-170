@@ -17,10 +17,10 @@
   (import (scheme base)
 
           (chibi)
-          (only (chibi process) exit)
-          (chibi optional) ;; Snow package for optional args
-          (chibi test)
           (only (chibi filesystem) file-exists? delete-file)
+          (chibi optional) ;; Snow package for optional args
+          (only (chibi process) exit)
+          (chibi test)
 
           (only (srfi 1) alist-cons list-index)
           (only (srfi 69) make-hash-table hash-table-set! hash-table-ref)
@@ -68,7 +68,7 @@
     (define tmp-symlink-basename "symlink")
 
     (define tmp-no-filesystem-object "/tmp/chibi-scheme-srfi-170-test-xyzzy/no-filesystem-object")
-    (define bogus-path "/foo/bar/baz/quux")
+    (define bogus-path "/foo/bar/baz/quux/xyzzy/plover/plugh")
 
     (define the-text-string "The quick brown fox jumps over the lazy quux")
     (define the-text-string-length (string-length the-text-string))
@@ -109,6 +109,10 @@
             (cons the-item
                   (generator->list g)))))
 
+    (define (maybe-test-socket fname)
+      (if (file-exists? fname)
+          (file-info-socket? (file-info fname #f))
+          #t))
 
     (define (run-tests)
 
@@ -412,8 +416,9 @@
                                 (> (timespec-nanoseconds ctime) 0))))
             (test-not (file-info-directory? fi))
             (test-not (file-info-fifo? fi))
-            (test-not (file-info-symlink? fi))
             (test-assert (file-info-regular? fi))
+            (test-not (file-info-socket? fi))
+            (test-not (file-info-device? fi))
             )
 
           (let* ((the-port (open-input-file tmp-file-1))
@@ -439,12 +444,39 @@
             (test-not (file-info-fifo? fi))
             (test-not (file-info-symlink? fi))
             (test-assert (file-info-regular? fi))
+            (test-not (file-info-socket? fi))
+            (test-not (file-info-device? fi))
             (test-not-error (close-input-port the-port))
             )
 
           (test-assert (file-info-directory? (file-info tmp-containing-dir #t)))
           (test-assert (file-info-fifo? (file-info tmp-fifo #t)))
           (test-assert (file-info-symlink? (file-info tmp-symlink #f)))
+
+          ;; hopefully find a standard socket file and test the predicate
+          ;; test harmlessness of maybe-test-socket with non-existant file
+          (test-assert (maybe-test-socket bogus-path))
+
+          ;; From hga's Ubuntu Bionic Beaver desktop system:
+          (cond-expand (linux
+            (test-assert (maybe-test-socket "/var/lib/lxd/unix.socket"))
+            (test-assert (maybe-test-socket "/var/spool/postfix/dev/log"))
+            (test-assert (maybe-test-socket "/run/cups/cups.sock"))
+            (test-assert (maybe-test-socket "/run/acpid.socket"))
+            (test-assert (maybe-test-socket "/run/dbus/system_bus_socket"))
+            (test-assert (maybe-test-socket "/run/uuidd/request"))
+            (test-assert (maybe-test-socket "/run/systemd/private"))
+            (test-assert (maybe-test-socket "/run/systemd/notify"))
+            (test-assert (maybe-test-socket "/run/udev/control"))))
+
+          ;; OpenBSD 6.7
+          (cond-expand (openbsd
+             (test-assert (maybe-test-socket "/var/run/ntpd.sock"))
+             (test-assert (maybe-test-socket "/var/run/smtpd.sock"))
+             (test-assert (maybe-test-socket "/var/run/cron.sock"))
+             (test-assert (maybe-test-socket "/dev/log"))))
+
+          (test-assert (file-info-device? (file-info "/dev/tty" #f))) ;; pretty sure this is safe
 
           (test-not-error (create-tmp-test-file tmp-dot-file))
 
@@ -503,7 +535,7 @@
             (test-not-error (delete-file the-filename)))) ;; cleaning up after self, but bad for debugging
 
           (if (not (equal? 0 (user-effective-uid)))
-              (test-error (create-temp-file "/xyzzy-plover-plugh.")))
+              (test-error (create-temp-file bogus-path)))
 
           ;; call-with-temporary-filename
 
@@ -521,7 +553,7 @@
           (test tmp-containing-dir (current-directory))
           (test-not-error (file-info tmp-file-1-basename #t)) ; are we there?
 
-          (cond-expand (bsd
+          (cond-expand (openbsd
             (test-not-error (set-file-mode tmp-containing-dir #o000))
             (if (equal? 0 (user-effective-uid))
                 (test-not-error (current-directory))
