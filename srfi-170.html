@@ -93,7 +93,7 @@ even those which were non-Posix at the time (2006) are now included in Posix, an
 few or no operations that aren't Posix at all.  In addition, it is politically fairly neutral,
 being tied to an obsolete version of Scheme 48, which is not being actively developed.
 Scsh 0.7 exists (see Implementation section), but was
-not used in creating this SRFI because it is incompletely documented.
+not used in designing this SRFI because it is incompletely documented.
 </p>
 <p>
 This SRFI makes no effort to provide all 81 headers, 1191 interfaces, and 51
@@ -166,33 +166,11 @@ right thing.
 The procedures of this SRFI signal an exception
 when the underlying system calls fail.  This is fully documented in
 <a href="https://srfi.schemers.org/srfi-198/srfi-198.html">SRFI 198</a>,
-which may not yet be finalized when you are reading this,
-so they are summarized here.</p>
-
-<p>The condition object signaled in case of an <code>errno</code>-based error
-has the predicate <code>foreign-error?</code>, and the accessors
-<code>foreign-error:error-set</code>,
-<code>foreign-error:code</code>,
-<code>foreign-error:scheme-procedure</code>,
-<code>foreign-error:foreign-interface</code>,
-<code>foreign-error:message</code>,
-and <code>foreign-error:data</code>.</p>
-
-<p>The accessors return, respectively, the value <code>'errno</code>,
-an alist with the <code>errno</code> as an exact integer keyed by
-<code>'number</code>, and a name (as a symbol) with the C define name of
-the <code>errno</code>, such as <code>errno/ENOENT</code>, keyed by
-<code>'symbol</code>, the name of the procedure (as a symbol)
-reporting the error, the C name of the syscall (as a symbol) reporting
-the error, a string describing the error situation, and an alist of
-relevant objects, ideally including the arguments of the system call
-keyed by <code>'arguments</code>.</p>
-
-<p>Errors unrelated to <code>errno</code> are signaled with the same
-condition object and accessor returns, except
-<code>foreign-error:error-set</code> is are set to <code>'error</code>,
-and <code>foreign-error:code</code> and
-<code>foreign-error:foreign-interface</code> are set to <code>#f</code>.</p>
+which may not yet be finalized when you are reading this.
+However, the <code>foreign-status?</code> predicate from that SRFI
+will detect the condition objects raised by the procedures
+of this SRFI.
+</p>
 
 <h3 id="node_sec_3.2">3.2&nbsp;&nbsp;I/O</h3>
 <p></p>
@@ -279,7 +257,7 @@ by default in the underlying implementation.</p>
   When <i>buffer-mode</i> is <code>block</code>, bytes are intended
   to be transmitted as a fixed size block when a buffer is filled.
   When <i>buffer-mode</i> is <code>line</code>, bytes are intended
-  to be transmitted as a block when a newline byte is encountered.
+  to be transmitted as a block when a newline byte <code>#xA</code> is encountered.
 </p>
 </blockquote>
 
