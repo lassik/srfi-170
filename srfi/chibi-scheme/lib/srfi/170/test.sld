@@ -588,6 +588,9 @@
           (test-assert (user-info? (user-info "root")))
           (test 0 (user-info:uid (user-info "root")))
 
+          (test-not (user-info? (user-info (- 60000 39)))) ;; Normal OpenBSD max - random number
+          (test-not (user-info? (user-info bogus-path)))
+
           (let ((the-parsed-user-name (user-info:parsed-full-name (user-info 0))))
             (test-assert (list? the-parsed-user-name))
             (test-assert (string? (car the-parsed-user-name))))
@@ -604,6 +607,9 @@
           ;; group 0 is wheel on OpenBSD, daemon works for it and Bionic Beaver
           (test-assert (group-info? (group-info "daemon")))
           (test 1 (group-info:gid (group-info "daemon")))
+
+          (test-not (group-info? (group-info (- 60000 39))))
+          (test-not (group-info? (group-info bogus-path)))
 
           ) ;; end user and group database access
 

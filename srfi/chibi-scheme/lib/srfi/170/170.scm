@@ -545,7 +545,7 @@
 
     (if (not ui)
         (if (equal? 0 (errno))
-            (sanity-check-error "user not found" 'user-info user)
+            #f
             (errno-error (errno)
                          'user-info
                          (if (string? user)
@@ -574,7 +574,7 @@
 
     (if (not gi)
         (if (equal? 0 (errno))
-            (sanity-check-error "group not found" 'group-info group)
+            #f
             (errno-error
              (errno)
              'group-info
