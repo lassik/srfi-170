@@ -360,15 +360,18 @@ prevent this problem; at least it is highly unlikely to occur in practice.
 It is an error if <i>fname</i> is not a directory or is not empty.
 </blockquote>
 <div><code>(set-file-mode <i>fname mode-bits</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chmod()</code>&nbsp;</div>
-<div><code>(set-file-owner <i>fname uid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
-<div><code>(set-file-group <i>fname gid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
+<blockquote>
+This procedure sets the mode bits of a
+file specified by supplying the filename.
+This procedure follows symlinks and changes the files to which they refer.
+</blockquote><p>
+<div><code>(set-file-owner <i>fname uid gid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
 
 <blockquote>
-These procedures set the mode bits, owner id, and group id of a
-file, respectively, specified by supplying the filename.
+This procedure sets the owner and group of a
+file specified by supplying the filename.
 Setting file ownership usually requires root privileges.
-These procedures follow symlinks and change
-the files to which they refer.
+This procedure follows symlinks and changes the files to which they refer.
 </blockquote><p>
 </p>
 <p></p>
