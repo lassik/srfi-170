@@ -90,8 +90,8 @@ of version 0.6.7 of the <i>Scsh Reference Manual</i>.
 The numbered headers are aligned with those used in the Reference Manual.
 </p>
 <p>Scsh 0.6.7 was chosen for two main reasons.  It is fairly old, so most of its operations,
-even those which were non-Posix at the time (2006) are now included in Posix, and it has
-few or no operations that aren't Posix at all.  In addition, it is politically fairly neutral,
+even those which were non-P<small>OSIX</small> at the time (2006) are now included in P<small>OSIX</small>, and it has
+few or no operations that aren't P<small>OSIX</small> at all.  In addition, it is politically fairly neutral,
 being tied to an obsolete version of Scheme 48, which is not being actively developed.
 Scsh 0.7 exists (see Implementation section), but was
 not used in designing this SRFI because it is incompletely documented.
@@ -181,27 +181,27 @@ finalized when you are reading this.  Therefore, a full explanation
 of foreign-status objects is deferred to SRFI 198.
 </p>
 <p>
-SRFI 198 does provide the procedure <code>foreign-status-ref</code>,
+For the purposes of this SRFI, it is sufficient to know that it
+provides the procedure <code>foreign-status-ref</code>,
 which takes a foreign status object and a key (a symbol), and returns
-a value *bol/associated with the key from the object the object.
+a value associated with the key from the object.
 The only key required by SRFI 198 key is <code>facility</code>,
 which in the case of SRFI 170 errors will always be the symbol
 <code>errno</code>.
 </p>
 <p>
-This SRFI additionally requires that the keys <code>name</code>
-and <code>code</code> be associated with the Posix error name (E2BIG,
-EACCES, EADDRINUSE, etc.), which is the most important thing to
-know about an error, and with the system-dependent value of
-<code>errno</code> itself, respectively.  The following additional keys are
-recommended but not required:
+This SRFI additionally requires that the following keys are provided in
+a foreign-status object:
 </p>
 <ul>
+<li><code>name</code> for the P<small>OSIX</small> error name (E2BIG,
+EACCES, EADDRINUSE, etc.)</li>
+<li><code>code</code> for the corresponding value of <code>errno</code></li>
 <li><code>message</code> for a (possibly localized) error message</li>
 <li><code>scheme-function</code> for the name of the Scheme function
 (a symbol) that raised the error</li>
 <li><code>args</code> for a list of its arguments</li>
-<li><code>foreign-interface</code> for the name of the Posix C function
+<li><code>foreign-interface</code> for the name of the P<small>OSIX</small> C function
 that set <code>errno</code></li>
 </ul>
 </p>
@@ -484,7 +484,7 @@ First, there's an
 atomicity issue. In between checking permissions for a file and then trying
 an operation on the file, another process could change the permissions,
 so a return value from these functions guarantees nothing. Second,
-Posix special-cases permission checking when the uid is 0 (<code>root</code>)
+P<small>OSIX</small> special-cases permission checking when the uid is 0 (<code>root</code>)
 &mdash; if the file exists, root is assumed to have the requested permission.
 However, not even root can write a file stored on a read-only file system,
 such as a CD-ROM.</p>
