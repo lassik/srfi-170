@@ -145,12 +145,11 @@ is a good source of usage examples.</p>
 
 <h2>Specification</h2>
 
-<p>
 Implementations of this SRFI on non-P<small>OSIX</small> systems, especially Windows,
 must provide all the procedure names and syntax keywords.
 However, if the specified action is not possible, the procedure should
 either take no action and return some reasonable default value,
-or raise an exception.
+or signal an exception.
 </p>
 <p>A Scheme implementation that supports both this SRFI and multiple
 threads of control must ensure that when a thread invokes a blocking I/O
@@ -163,13 +162,28 @@ right thing.
 
 <h3>3.1&nbsp;&nbsp;Error handling</h3>
 <p>
-The procedures of this SRFI signal an exception
-when the underlying system calls fail.  This is fully documented in
+The C binding of P<small>OSIX</small> places an error number in the global variable <code>errno</code>
+to report an error, along with (in most cases) returning a sentinel value such as -1.
+The <code>errno</code> codes are not standardized across different
+P<small>OSIX</small> systems, but the associated names (bound by a <code>#define</code>)
+are the same for the most part. 
+</p>
+<p>
+However, the procedures of this SRFI work differently.  Rather than reporting errors
+as return values, they report errors by signaling objects satisfying the predicate
+<code>foreign-status?</code>, defined in
 <a href="https://srfi.schemers.org/srfi-198/srfi-198.html">SRFI 198</a>,
+when the underlying system calls fail.
+Foreign-status objects are fully documented in that SRFI,
 which may not yet be finalized when you are reading this.
-However, the <code>foreign-status?</code> predicate from that SRFI
-will detect the condition objects raised by the procedures
-of this SRFI.
+</p>
+<p>
+Therefore, a full explanation of SRFI 170's use of SRFI 198 is deferred to SRFI 198.
+But the Posix error name (E2BIG, EACCES, EADDRINUSE, etc.),
+which is the most important thing to know about an error,
+can be retrieved by the SRFI 198 procedure call
+<code>(foreign-status-ref</code> <i>status-object</i> <code>'name)</code>, which
+will return the name as a Scheme symbol.
 </p>
 
 <h3 id="node_sec_3.2">3.2&nbsp;&nbsp;I/O</h3>
@@ -292,7 +306,7 @@ computer's file system.
 
 <blockquote><p>
 These procedures create objects of various kinds in the file system.
-If an object with the same name already exists, an exception is raised.</p>
+If an object with the same name already exists, an exception is signaled.</p>
 <p>
 The <i>permission-bits</i> for <code>create-directory</code> default to <code>#o775</code>, and for <code>create-fifo</code> <code>#o664</code>, but are masked by the current umask.
 <p>
@@ -567,7 +581,7 @@ concatenating <i>prefix</i>
 with a varying string.<p>
 The <i>maker</i> procedure is called serially on each filename
 generated.  It must return at least one value; it may return multiple
-values. If the first return value is <code>#f</code> or if <i>maker</i> raises an
+values. If the first return value is <code>#f</code> or if <i>maker</i> signals an
 exception indicating that the file exists
 <code>call-with-temporary-filename</code> will loop,
 generating a new filename and calling <i>maker</i> again. If the first
@@ -585,9 +599,8 @@ To rename a file to a temporary name:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;backup)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".temp.")&nbsp;;&nbsp;Keep&nbsp;link&nbsp;in&nbsp;current working directory.<br>
 (delete-file&nbsp;old-file)</code></blockquote>
-Recall that this SRFI reports procedure failure by raising an error
-exception, not by returning an error code. This is critical for
-this example &mdash; the programmer can assume that if the
+Recall that this SRFI reports procedure failure by signaling an error$.
+This is critical for this example &mdash; the programmer can assume that if the
 <code>call-with-temporary-filename</code> call returns, it returns successfully.
 So the following <code>delete-file</code> call can be reliably invoked,
 safe in the knowledge that the backup link has definitely been established.<p>
@@ -815,7 +828,7 @@ be <i>value</i>. Both <i>name</i> and <i>value</i> are strings.
 If <i>name</i> is not defined at the time of call, a new variable is
 added; if <i>name</i> is defined, its old value is discarded and
 replaced by <i>value</i>. If <i>name</i> or <i>value</i> are invalid
-according to the operating system, an exception is raised.
+according to the operating system, an exception is signaled.
 Mutating <i>name</i> or <i>value</i> after the call must not change
 the name or value of the environment variable.
 </blockquote>
@@ -827,7 +840,7 @@ the name or value of the environment variable.
 Remove the environment variable <i>name</i> such that a
 subsequent <code>(get-environment-variable <i>name</i>)</code> would
 return <code>#f</code>. If the variable cannot be removed, an
-exception is raised. If <i>name</i> does not currently have a value,
+exception is signaled. If <i>name</i> does not currently have a value,
 the call silently succeeds.
 </blockquote>
 
