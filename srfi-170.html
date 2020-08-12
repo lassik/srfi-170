@@ -196,13 +196,13 @@ a foreign-status object:
 <ul>
 <li><code>name</code> for the P<small>OSIX</small> error name (E2BIG,
 EACCES, EADDRINUSE, etc.)</li>
-<li><code>code</code> for the corresponding value of <code>errno</code></li>
-<li><code>message</code> for a (possibly localized) error message</li>
-<li><code>scheme-function</code> for the name of the Scheme function
+<li><code>number</code> for the corresponding value of <code>errno</code></li>
+<li><code>message</code> for a (possibly localized or localizable) error message</li>
+<li><code>scheme-procedure</code> for the name of the Scheme procedure
 (a symbol) that raised the error</li>
-<li><code>args</code> for a list of its arguments</li>
 <li><code>foreign-interface</code> for the name of the P<small>OSIX</small> C function
 that set <code>errno</code></li>
+<li><code>args</code> for a list of the Scheme procedure's arguments</li>
 </ul>
 </p>
 
