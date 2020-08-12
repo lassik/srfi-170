@@ -46,7 +46,7 @@
    read-symlink
    rename-file
    delete-directory
-   set-file-mode set-file-owner set-file-group
+   set-file-mode set-file-owner
    set-file-timespecs timespec/now timespec/omit
    truncate-file
 
