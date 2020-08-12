@@ -163,28 +163,47 @@ right thing.
 
 <h3>3.1&nbsp;&nbsp;Error handling</h3>
 <p>
-The C binding of P<small>OSIX</small> places an error number in the global variable <code>errno</code>
-to report an error, along with (in most cases) returning a sentinel value such as -1.
-The <code>errno</code> codes are not standardized across different
-P<small>OSIX</small> systems, but the associated names (bound by a <code>#define</code>)
-are the same for the most part. 
+The C binding of P<small>OSIX</small> places an error number in the
+global variable <code>errno</code> to report an error, along with
+(in most cases) returning a sentinel value such as -1.  The
+<code>errno</code> codes are not standardized across different
+P<small>OSIX</small> systems, but the associated names (bound by a
+<code>#define</code>) are the same for the most part.
 </p>
 <p>
-However, the procedures of this SRFI work differently.  Rather than reporting errors
-as return values, they report errors by signaling objects satisfying the predicate
-<code>foreign-status?</code>, defined in
-<a href="https://srfi.schemers.org/srfi-198/srfi-198.html">SRFI 198</a>,
-when the underlying system calls fail.
-Foreign-status objects are fully documented in that SRFI,
-which may not yet be finalized when you are reading this.
+However, the procedures of this SRFI work differently.  Rather than
+reporting errors as return values, they report errors by signaling
+objects satisfying the predicate <code>foreign-status?</code>,
+defined in <a href="https://srfi.schemers.org/srfi-198/srfi-198.html">SRFI
+198</a>, when the underlying system calls fail.  Foreign-status
+objects are fully documented in that SRFI, which may not yet be
+finalized when you are reading this.  Therefore, a full explanation
+of foreign-status objects is deferred to SRFI 198.
 </p>
 <p>
-Therefore, a full explanation of SRFI 170's use of SRFI 198 is deferred to SRFI 198.
-But the Posix error name (E2BIG, EACCES, EADDRINUSE, etc.),
-which is the most important thing to know about an error,
-can be retrieved by the SRFI 198 procedure call
-<code>(foreign-status-ref</code> <i>status-object</i> <code>'name)</code>, which
-will return the name as a Scheme symbol.
+SRFI 198 does provide the procedure <code>foreign-status-ref</code>,
+which takes a foreign status object and a key (a symbol), and returns
+a value *bol/associated with the key from the object the object.
+The only key required by SRFI 198 key is <code>facility</code>,
+which in the case of SRFI 170 errors will always be the symbol
+<code>errno</code>.
+</p>
+<p>
+This SRFI additionally requires that the keys <code>name</code>
+and <code>code</code> be associated with the Posix error name (E2BIG,
+EACCES, EADDRINUSE, etc.), which is the most important thing to
+know about an error, and with the system-dependent value of
+<code>errno</code> itself, respectively.  The following additional keys are
+recommended but not required:
+</p>
+<ul>
+<li><code>message</code> for a (possibly localized) error message</li>
+<li><code>scheme-function</code> for the name of the Scheme function
+(a symbol) that raised the error</li>
+<li><code>args</code> for a list of its arguments</li>
+<li><code>foreign-interface</code> for the name of the Posix C function
+that set <code>errno</code></li>
+</ul>
 </p>
 
 <h3 id="node_sec_3.2">3.2&nbsp;&nbsp;I/O</h3>
