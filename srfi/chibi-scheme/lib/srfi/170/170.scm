@@ -253,6 +253,13 @@
 (define (file-info-regular? file-info-record)
   (S_ISREG (file-info:mode file-info-record)))
 
+(define (file-info-socket? file-info-record)
+  (S_ISSOCK (file-info:mode file-info-record)))
+
+(define (file-info-device? file-info-record)
+  (or (S_ISBLK (file-info:mode file-info-record))
+      (S_ISCHR (file-info:mode file-info-record))))
+
 (define-record-type Directory-Object
     (make-directory-object the-DIR is-open? dot-files?)
     directory-object?
@@ -538,7 +545,7 @@
 
     (if (not ui)
         (if (equal? 0 (errno))
-            (sanity-check-error "user not found" 'user-info user)
+            #f
             (errno-error (errno)
                          'user-info
                          (if (string? user)
@@ -567,7 +574,7 @@
 
     (if (not gi)
         (if (equal? 0 (errno))
-            (sanity-check-error "group not found" 'group-info group)
+            #f
             (errno-error
              (errno)
              'group-info

@@ -282,10 +282,13 @@
 (define-c (free DIR) (%opendir opendir) (string))
 (define-c dirent (%readdir readdir) ((link (pointer DIR))))
 
+(define-c boolean S_ISBLK (mode_t))
+(define-c boolean S_ISCHR (mode_t))
 (define-c boolean S_ISDIR (mode_t))
-(define-c boolean S_ISREG (mode_t))
 (define-c boolean S_ISFIFO (mode_t))
+(define-c boolean S_ISREG (mode_t))
 (define-c boolean S_ISLNK (mode_t))
+(define-c boolean S_ISSOCK (mode_t))
 
 (define-c-const int (posix/path-max "PATH_MAX"))
 
