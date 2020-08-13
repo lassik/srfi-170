@@ -24,26 +24,26 @@ because it uses specialized syntax to catch system errors.
 <h3>3.2&nbsp;&nbsp;I/O</h3>
 <ul>
 <li><p>
-The scsh version of <code>open-file</code> returns a port
-rather than a file descriptor.
+The scsh version of <code>open-fd</code> returns a port
+rather than a file descriptor, and so is called <code>open-file</code>.
 </p></li>
 <li><p>
 Scsh does not distinguish between textual and binary ports,
 so there are only two procedures to convert file descriptors to ports,
-<code>fdes->inport</code> in place of <code>fdes->textual-input-port</code>
-and <code>fdes->binary-input-port</code>, and
-<code>fdes->outport</code> in place of <code>fdes->textual-output-port</code>
-and <code>fdes->binary-output-port</code>.
+<code>fdes->inport</code> in place of <code>fd->textual-input-port</code>
+and <code>fd->binary-input-port</code>, and
+<code>fdes->outport</code> in place of <code>fd->textual-output-port</code>
+and <code>fd->binary-output-port</code>.
 </p></li>
 <li><p>
 The scsh versions of the <code>fdes->*port</code> procedures
 do not support the <i>buffer-mode</i> argument.
 </p></li>
-<li><p>The <code>port-fdes</code> procedure is called <code>port->fdes</code> in scsh.
+<li><p>The <code>port-fd</code> procedure is called <code>port->fdes</code> in scsh.
 The name was changed because the use of the arrow suggests a conversion of the
 port to a file descriptor, which is not the case.
 </p></li>
-<li><p>There is no <code>close-fdes</code> procedure in scsh, as the standard <code>close-port</code>
+<li><p>There is no <code>close-fd</code> procedure in scsh, as the standard <code>close-port</code>
 procedure suffices.
 </p></li>
 </ul>

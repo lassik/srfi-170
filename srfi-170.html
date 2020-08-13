@@ -68,7 +68,8 @@ mainstream software development.  Consequently, none of the standards
 provide more than a limited set of operations.  Individual implementations
 often provide much more, but in incompatible ways.</p>
 
-<p>This SRFI uses the IEEE 1003 P<small>OSIX</small>.1-2017 standard
+<p>This SRFI uses the
+<a href="https://pubs.opengroup.org/onlinepubs/9699919799">IEEE 1003 P<small>OSIX</small>.1-2017 standard</a>
 to provide maximally portable
 access to the services of the operating system on which typical Scheme
 implementations run.  Almost all operating systems today support all
@@ -84,7 +85,7 @@ machines.
 This SRFI describes a specific P<small>OSIX</small> API for Scheme.
 Rather than attempting to compromise between existing implementations,
 the scsh system call specification was chosen as a base document.
-Consequently, this SRFI is a reduced version of
+Consequently, this SRFI is a reduced and heavily edited version of
 <a href="https://scsh.net/docu/html/man-Z-H-4.html#node_chap_3">Chapter 3, "System Calls"</a>
 of version 0.6.7 of the <i>Scsh Reference Manual</i>.
 The numbered headers are aligned with those used in the Reference Manual.
@@ -92,8 +93,10 @@ The numbered headers are aligned with those used in the Reference Manual.
 <p>Scsh 0.6.7 was chosen for two main reasons.  It is fairly old, so most of its operations,
 even those which were non-P<small>OSIX</small> at the time (2006) are now included in P<small>OSIX</small>, and it has
 few or no operations that aren't P<small>OSIX</small> at all.  In addition, it is politically fairly neutral,
-being tied to an obsolete version of Scheme 48, which is not being actively developed.
-Scsh 0.7 exists (see Implementation section), but was
+being tied to an obsolete version of Scheme 48,
+an implementation which is not being actively developed.
+Scsh 0.7 exists and runs on the current version of Scheme 48
+(see Implementation section), but was
 not used in designing this SRFI because it is incompletely documented.
 </p>
 <p>
@@ -119,7 +122,7 @@ P<small>OSIX</small> date and time operations are irregular and awkward.
 This SRFI provides only the current time.
 </p></li><li><p>
 Access to command-line arguments and environment variables, as well
-as provisions for exiting a process, as they are already provided by R7RS-small.
+as provisions for exiting a process, as they are already provided by R<sup>7</sup>RS-small.
 </p></li><li><p>
 P<small>OSIX</small> file locking, which is notoriously
 <a href="http://0pointer.de/blog/projects/locking.html">broken as designed</a>.
@@ -174,35 +177,44 @@ P<small>OSIX</small> systems, but the associated names (bound by a
 However, the procedures of this SRFI work differently.  Rather than
 reporting errors as return values, they report errors by signaling
 objects satisfying the predicate <code>foreign-status?</code>,
-defined in <a href="https://srfi.schemers.org/srfi-198/srfi-198.html">SRFI
-198</a>, when the underlying system calls fail.  Foreign-status
+defined in <a href="https://srfi.schemers.org/srfi-198/srfi-198.html">SRFI 198</a>,
+when the underlying system calls fail.  Foreign-status
 objects are fully documented in that SRFI, which may not yet be
-finalized when you are reading this.  Therefore, a full explanation
+finalized as you read this.  Therefore, a full explanation
 of foreign-status objects is deferred to SRFI 198.
 </p>
 <p>
-For the purposes of this SRFI, it is sufficient to know that SRFI 198
-provides the procedure <code>foreign-status-ref</code>,
-which takes a foreign status object and a key (a symbol), and returns
-a value associated with the key from the object.
-The only key required by SRFI 198 key is <code>facility</code>,
-which in the case of SRFI 170 errors will always be the symbol
-<code>errno</code>.
+However, two convenience procedures have been added to this SRFI
+to make it simpler to deal with foreign-status objects:
 </p>
+
+<div><code>(posix-error? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
+<blockquote>
+This procedure returns <code>#t</code> if <code>obj</code> is
+a foreign-status object that describes a P<small>OSIX</small> error,
+and <code>#f</code> otherwise.
+</blockquote>
+<div><code>(posix-error-name <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>symbol</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
+<blockquote>
+This procedure returns a symbol that is the name associated,
+as explained above, with the value of <code>errno</code> when
+the P<small>OSIX</small> function reported an error.
+This can be used to provide programmatic recovery
+when a P<small>OSIX</small> function can return
+more than one value of <code>errno</code>.
+</blockquote>
 <p>
-This SRFI additionally requires that the following keys are provided in
-a foreign-status object:
+This SRFI also requires that the following additional information can be
+retrieved through the SRFI 198 interface from a P<small>OSIX</small>
+error object:
 </p>
 <ul>
-<li><code>name</code> for the P<small>OSIX</small> error name (E2BIG,
-EACCES, EADDRINUSE, etc.)</li>
-<li><code>number</code> for the corresponding value of <code>errno</code></li>
-<li><code>message</code> for a (possibly localized or localizable) error message</li>
-<li><code>scheme-procedure</code> for the name of the Scheme procedure
-(a symbol) that raised the error</li>
-<li><code>foreign-interface</code> for the name of the P<small>OSIX</small> C function
+<li>the value of <code>errno</code> (an exact integer)</li>
+<li>a (possibly localized or localizable) error message (a string)</li>
+<li>the name of the Scheme procedure (a symbol) that raised the error</li>
+<li>the name of the P<small>OSIX</small> C function (a symbol)
 that set <code>errno</code></li>
-<li><code>args</code> for a list of the Scheme procedure's arguments</li>
+<li>a list of the Scheme procedure's arguments</li>
 </ul>
 </p>
 
@@ -310,8 +322,6 @@ file descriptor (a string port, for example).
 <p>Closes the file descriptor <i>fd</i>.</p>
 <p>If <i>fd</i> is associated with a port, it is an error
 to do any further operations on that port.
-The same is true of calls to <code>close-port</code> on a file descriptor,
-if the implementation permits them.
 </p>
 </blockquote>
 
@@ -328,12 +338,13 @@ computer's file system.
 These procedures create objects of various kinds in the file system.
 If an object with the same name already exists, an exception is signaled.</p>
 <p>
-The <i>permission-bits</i> for <code>create-directory</code> default to <code>#o775</code>, and for <code>create-fifo</code> <code>#o664</code>, but are masked by the current umask.
+The <i>permission-bits</i> for <code>create-directory</code>
+default to <code>#o775</code>, and for <code>create-fifo</code>
+to <code>#o664</code>, but are masked by the current umask.
 <p>
 </p><p>
-If you try to create a hard link
-and <i>old-fname</i> and <i>new-fname</i> refer to the same file, it is an error
-(and your file may be destroyed).
+It is an error to try to create a hard link when <i>old-fname</i>
+and <i>new-fname</i> refer to the same file, and your file may be destroyed.
 </p></blockquote>
 
 <div><code>(read-symlink <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>readlink()</code>&nbsp;</div>
@@ -359,12 +370,6 @@ prevent this problem; at least it is highly unlikely to occur in practice.
 <blockquote>This procedure deletes directories from the file system.
 It is an error if <i>fname</i> is not a directory or is not empty.
 </blockquote>
-<div><code>(set-file-mode <i>fname mode-bits</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chmod()</code>&nbsp;</div>
-<blockquote>
-This procedure sets the mode bits of a
-file specified by supplying the filename.
-This procedure follows symlinks and changes the files to which they refer.
-</blockquote><p>
 <div><code>(set-file-owner <i>fname uid gid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
 
 <blockquote>
@@ -380,7 +385,9 @@ This procedure follows symlinks and changes the files to which they refer.
 
 <blockquote>
 This procedure sets the access and modified times for the file
-<i>fname</i> to the supplied SRFI 174 timespec values.
+<i>fname</i> to the supplied 
+<a href="https://srfi.schemers.org/srfi-174/srfi-174.html">SRFI 174</a>
+timespec values.
 If neither time argument is supplied, they are both taken to be
 the current time.
 The constants <code>timespec/now</code> and <code>timespec/omit</code>
@@ -493,13 +500,19 @@ However, not even root can write a file stored on a read-only file system,
 such as a CD-ROM.</p>
 </blockquote>
 <p></p>
+<div><code>(set-file-mode <i>fname mode-bits</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chmod()</code>&nbsp;</div>
+<blockquote>
+This procedure sets the mode bits of a
+file specified by supplying the filename.
+This procedure follows symlinks and changes the files to which they refer.
+</blockquote><p>
 <p></p>
 <div><code>(directory-files <i>dir [dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 Return a list of filenames in directory <i>dir</i>.
-The <i>dotfiles?</i> flag (default <code>#f</code>) causes dot files to be
-included in the list.
+The <i>dotfiles?</i> flag (default <code>#f</code>) causes files
+beginning with <code>.</code> to be included in the list.
 Regardless of the value of <i>dotfiles?</i>, the two files <code>.</code> and
 <code>..</code> are <i>never</i> returned.<p>
 The directory <i>dir</i> is not prepended to each filename in the
@@ -515,9 +528,11 @@ or change to the directory before using the filenames.
 <div><code>(make-directory-files-generator <i>dir [dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>generator</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-Return a SRFI 158 generator of the filenames in directory <i>dir</i>.
-The <i>dotfiles?</i> flag (default <code>#f</code>) causes dot files to be
-included in the list.
+Return a
+<a href="https://srfi.schemers.org/srfi-158/srfi-158.html">SRFI 158</a>
+ generator of the filenames in directory <i>dir</i>.
+The <i>dotfiles?</i> flag (default <code>#f</code>) causes files
+beginning with <code>.</code> to be included in the list.
 Regardless of the value of <i>dotfiles?</i>, the two files <code>.</code> and
 <code>..</code> are <i>never</i> returned.
 <p>Like <code>directory-files</code> above, the directory <i>dir</i>
@@ -533,7 +548,7 @@ open directory object.</p>
 <div><code>(read-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string or eof-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>readdir()</code>&nbsp;</div>
 <div><code>(close-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>closedir()</code>&nbsp;</div>
 <p>
-These functions implement an interface to the
+These procedures implement an interface to the
 <code>opendir()</code>/
 <code>readdir()</code>/
 <code>closedir()</code>
@@ -559,7 +574,8 @@ and whose resolution does not involve <code>.</code>, <code>..</code>, or symlin
 <div><code>temp-file-prefix</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>string parameter</i>&nbsp;</div>
 <p></p>
 <blockquote>
-A SRFI 39 or R7RS parameter that returns a string when invoked.  Its initial value is
+<a href="https://srfi.schemers.org/srfi-39/srfi-39.html">SRFI 39</a>
+ or R<sup>7</sup>RS parameter that returns a string when invoked.  Its initial value is
 the value of the environment variable <code>TMPDIR</code> concatenated with <code>"/<i>pid</i>"</code>
 if <code>TMPDIR</code> is set and to
 <code>"/tmp/<i>pid</i>"</code> otherwise, where <i>pid</i> is the id of the current process.
@@ -833,14 +849,19 @@ is sometimes turned either forward or backward.
 </blockquote>
 
 <h3>3.11&nbsp;&nbsp;Environment variables</h3>
-<p>R<sup>7</sup>RS provides two procedures (via SRFI 98) to get
-environment variables:</p>
+<p>R<sup>7</sup>RS provides two procedures , originally from
+<a href="https://srfi.schemers.org/srfi-98/srfi-98.html">SRFI 98</a>,
+to get access to environment variables:</p>
 <ul>
 <li><code>(get-environment-variables)</code></li>
 <li><code>(get-environment-variable <i>name</i>)</code></li>
 </ul>
-<p> Setters have not yet been standardized, so this SRFI provides
-them:</p>
+<p> Setters have not yet been standardized, so this SRFI provides them.
+The main reason to set environment variables is that some C libraries
+depend on their values: for example, localization depends on <code>LANG</code>.
+If a program needs to change to a different locale, the most reliable way
+is to set the <code>LANG</code> variable to a new value.
+</p>
 
 <div><code>(set-environment-variable! <i>name</i> <i>value</i>)</code>
 &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i>
@@ -875,8 +896,8 @@ implementations should guard against race conditions.</p>
 use the short procedure names <code>getenv</code>
 and <code>setenv</code> (or minor variations). Since the long
 name <code>get-environment-variable</code> has been canonized by
-R<sup>n</sup>RS and SRFI 98, this SRFI matches it instead. Since
-environment variables are OS variables rather than Scheme variables,
+R<sup>7</sup>RS and SRFI 98, this SRFI uses those names instead.
+Since environment variables are OS variables rather than Scheme variables,
 it's debatable whether procedures to modify them should bear
 the <code>!</code> suffix. MIT Scheme has the suffixed names and we
 are not aware of any Scheme implementation with the unsuffixed names,
