@@ -191,34 +191,34 @@
           (test-error (open-file "foo" 1 "baz"))
           (test-error (open-file bogus-path open/read))
 
-          (let ((the-port (fdes->binary-output-port
+          (let ((the-port (fd->binary-output-port
                            (open-file tmp-file-1 open-write-create-truncate))))
             (test-not-error (write-bytevector the-binary-bytevector the-port))
             (test-not-error (close-port the-port)))
-          (let ((the-port (fdes->binary-input-port
+          (let ((the-port (fd->binary-input-port
                            (open-file tmp-file-1 open/read))))
             (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
             (test-not-error (close-port the-port)))
 
-          (let ((the-port (fdes->textual-output-port
+          (let ((the-port (fd->textual-output-port
                            (open-file tmp-file-1 open-write-create-truncate))))
             (test-not-error (write-string the-text-string the-port))
             (test-not-error (close-port the-port)))
-          (let ((the-port (fdes->textual-input-port
+          (let ((the-port (fd->textual-input-port
                            (open-file tmp-file-1 open/read))))
             (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
             (test-not-error (close-port the-port)))
 
-          (test 0 (port-fdes (current-input-port)))
-          (test 1 (port-fdes (current-output-port)))
-          (test 2 (port-fdes (current-error-port)))
-          (test-not (port-fdes the-string-port))
+          (test 0 (port-fd (current-input-port)))
+          (test 1 (port-fd (current-output-port)))
+          (test 2 (port-fd (current-error-port)))
+          (test-not (port-fd the-string-port))
 
           (let* ((dev-zero-fd (open-file "/dev/zero" open/read)))
-            (test-not-error (close-fdes dev-zero-fd))
-            (test-error (close-fdes dev-zero-fd)))
+            (test-not-error (close-fd dev-zero-fd))
+            (test-error (close-fd dev-zero-fd)))
 
           ) ;; end I/O
 
