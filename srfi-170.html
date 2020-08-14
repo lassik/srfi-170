@@ -421,7 +421,7 @@ the procedure checks the actual file itself, even if it's a symlink.
 The <i>follow?</i> flag is ignored if the file argument is a port.
 </blockquote>
 <div><code>(file-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns <code>#t</code> if <i>obj</i> is a file-info object and <code>#f</code> otherwise.
+<blockquote>Returns <code>#t</code> if <i>obj</i> is a file-info record and <code>#f</code> otherwise.
 </blockquote>
 
 <div><code>(file-info:device <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -632,22 +632,29 @@ and signal an error.</p>
 <p>
 To rename a file to a temporary name:
 </p>
-<blockquote><code>
-(call-with-temporary-filename&nbsp;(lambda&nbsp;(backup)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(create-hard-link&nbsp;old-file&nbsp;backup)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;backup)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".temp.")&nbsp;;&nbsp;Keep&nbsp;link&nbsp;in&nbsp;current working directory.<br>
-(delete-file&nbsp;old-file)</code></blockquote>
-Recall that this SRFI reports procedure failure by signaling an error$.
+<blockquote><pre>
+(call-with-temporary-filename
+  (lambda (backup)
+    (create-hard-link old-file backup)
+    backup)
+  ".temp.") ; Keep link in current working directory
+(delete-file old-file)
+</pre></blockquote>
+Recall that this SRFI reports procedure failure by signaling an error.
 This is critical for this example &mdash; the programmer can assume that if the
 <code>call-with-temporary-filename</code> call returns, it returns successfully.
 So the following <code>delete-file</code> call can be reliably invoked,
 safe in the knowledge that the backup link has definitely been established.<p>
 To create a unique temporary directory:
 </p>
-<blockquote><code>
-(call-with-temporary-filename&nbsp;(lambda&nbsp;(dir)&nbsp;(create-directory&nbsp;dir)&nbsp;dir)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/tmp/tempdir.")</code></blockquote>
+<blockquote><pre>
+(call-with-temporary-filename
+  (lambda (dir)
+    (create-directory dir)
+    dir)
+  "/tmp/tempdir.")
+</pre></blockquote>
+
 Similar operations can be used to generate unique fifos,
 or to return values other than the new filename (for example, an open port).
 </blockquote>
@@ -659,13 +666,13 @@ or to return values other than the new filename (for example, an open port).
 <p></p>
 <p></p>
 <p></p>
-<div><code>(umask)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
+<div><code>(umask)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> <code>umask()</code>&nbsp;</div>
 <blockquote>
 Returns the current file protection mask, or umask, as an exact integer.
 Whenever a file is created, the specified or default permissions are
 bitwise-anded with the complement of the umask before they are used.
 </blockquote>
-<div><code>(set-umask!&nbsp;<i>umask</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>unspecified</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> umask()&nbsp;</div>
+<div><code>(set-umask!&nbsp;<i>umask</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>unspecified</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> <code>umask()</code>&nbsp;</div>
 <blockquote>
 <p>Sets the file protection mask to the exact integer <i>umask</i>
 and returns an unspecified value.</p>
@@ -724,7 +731,7 @@ If <code><i>delta</i></code> is not specified, the increment is 1.
 <div><code>(user-supplementary-gids<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i> list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgroups()</code>&nbsp;</div>
 
 <blockquote>
-For the calling process, these routines get the specified data.  The scsh proceedure <code>user-login-name</code> that uses <code>getlogin()</code> or <code>getlogin_r()</code> can be simulated with <code>(user-info.name (user-info (user-uid)))</code>, using procedures that are described in the next section.
+For the calling process, these routines get the specified data.  The scsh proceedure <code>user-login-name</code>, which uses <code>getlogin()</code> or <code>getlogin_r()</code>, can be simulated with <code>(user-info:name (user-info (user-uid)))</code>, using procedures that are described in the next section.
 </blockquote><p>
 </p>
 
@@ -748,7 +755,7 @@ and callers must be prepared to handle it.
 </p>
 <p></p>
 <div><code>(user-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns <code>#t</code> if <i>obj</i> is a user info object and <code>#f</code> otherwise.
+<blockquote>Returns <code>#t</code> if <i>obj</i> is a user-info record and <code>#f</code> otherwise.
 </blockquote>
 <div><code>(user-info:name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div><code>(user-info:uid <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -804,7 +811,7 @@ and callers must be prepared to handle it.
 </blockquote>
 
 <div><code>(group-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<blockquote>Returns <code>#t</code> if <i>obj</i> is a group info object and <code>#f</code> otherwise.
+<blockquote>Returns <code>#t</code> if <i>obj</i> is a group-info record and <code>#f</code> otherwise.
 </blockquote>
 <div><code>(group-info:name <i>group-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div><code>(group-info:gid <i>group-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
@@ -832,6 +839,7 @@ resolution, nor is anything guaranteed about accuracy.
 <p>The <code>posix-time</code> procedure returns the current time as a
 <i>timespec</i> since the P<small>OSIX</small> epoch (midnight January
 1, 1970 Universal Time), excluding leap seconds.
+It uses the P<small>OSIX</small> <code>CLOCK_REALTIME</code> clock.
 </blockquote>
 
 <div><code>(monotonic-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
@@ -844,7 +852,9 @@ It is guaranteed that a call to <code>monotonic-time</code>
 cannot return a time earlier than a previous call to <i>monotonic-time</i>.
 This is not guaranteed for <code>posix-time</code>
 because the system's P<small>OSIX</small> clock
-is sometimes turned either forward or backward.
+is sometimes turned either forward or backward
+to correct local clock drift.
+It uses the P<small>OSIX</small> <code>CLOCK_MONOTONIC</code> clock.
 </p>
 </blockquote>
 
@@ -863,9 +873,7 @@ If a program needs to change to a different locale, the most reliable way
 is to set the <code>LANG</code> variable to a new value.
 </p>
 
-<div><code>(set-environment-variable! <i>name</i> <i>value</i>)</code>
-&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div>
+<div><code>(set-environment-variable! <i>name</i> <i>value</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>setenv</code></div>
 <blockquote>
 Change the value of the environment variable <i>name</i> to
 be <i>value</i>. Both <i>name</i> and <i>value</i> are strings.
@@ -877,9 +885,7 @@ Mutating <i>name</i> or <i>value</i> after the call must not change
 the name or value of the environment variable.
 </blockquote>
 
-<div><code>(delete-environment-variable! <i>name</i>)</code>
-&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)</div>
+<div><code>(delete-environment-variable! <i>name</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>unsetenv</code></div>
 <blockquote>
 Remove the environment variable <i>name</i> such that a
 subsequent <code>(get-environment-variable <i>name</i>)</code> would
@@ -896,7 +902,7 @@ implementations should guard against race conditions.</p>
 use the short procedure names <code>getenv</code>
 and <code>setenv</code> (or minor variations). Since the long
 name <code>get-environment-variable</code> has been canonized by
-R<sup>7</sup>RS and SRFI 98, this SRFI uses those names instead.
+R<sup>7</sup>RS and SRFI 98, this SRFI follows that pattern instead.
 Since environment variables are OS variables rather than Scheme variables,
 it's debatable whether procedures to modify them should bear
 the <code>!</code> suffix. MIT Scheme has the suffixed names and we
