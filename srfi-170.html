@@ -110,6 +110,10 @@ In particular, this SRFI excludes:
 <li><p>Most operations on file descriptors
   other than converting between them and Scheme ports.
 </p></li><li><p>
+The ability to manipulate the file system based on
+file descriptors rather than names, as with
+<code>openat()</code>.
+</p></li><li><p>
 Everything to do with the creation and management of subprocesses and
 communication with them.  The low-level P<small>OSIX</small> operations
 are tricky to use, and a future SRFI will provide a higher-level interface.
