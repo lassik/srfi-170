@@ -285,11 +285,11 @@ one or more of the following constants:
 
 <p>The following routines allow conversion between ports and file
 descriptors.</p>
-<div><code>(fdes->textual-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(fdes->binary-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(fd->textual-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(fd->binary-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
-<div><code>(fdes->textual-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(fdes->binary-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(fd->textual-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(fd->binary-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
 <p>These procedures wrap a newly created port around the specified file descriptor,
 effectively importing it into the Scheme world.
@@ -307,7 +307,7 @@ by default in the underlying implementation.</p>
 </p>
 </blockquote>
 
-<div><code>(port-fdes <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(port-fd <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
 This procedure exposes the file descriptor of a port,
@@ -316,7 +316,7 @@ Alternatively, <code>#f</code> is returned if <i>port</i> does not have a
 file descriptor (a string port, for example).
 </blockquote><p>
 </p>
-<div><code>(close-fdes <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code>&nbsp;</div>
+<div><code>(close-fd <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code>&nbsp;</div>
 <p></p>
 <blockquote>
 <p>Closes the file descriptor <i>fd</i>.</p>
