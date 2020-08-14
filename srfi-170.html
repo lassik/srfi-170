@@ -688,7 +688,7 @@ As a result, the effects of this procedure in a multi-threaded
 program are only partly predictable.
 This SRFI recommends that in multi-threaded programs the mask
 be set in the primordial thread before any other threads are created
-and never changed again.</p>
+<i>and never changed again</i>.</p>
 </blockquote>
 <p></p>
 <p></p>
@@ -710,7 +710,7 @@ As a result, the effects of this procedure in a multi-threaded
 program are only partly predictable.
 This SRFI recommends that in multi-threaded programs the current directory
 be set in the primordial thread before any other threads are created
-and never changed again.</p>
+<i>and never changed again</i>.</p>
 </blockquote>
 <p></p>
 <p></p>
@@ -751,7 +751,7 @@ For the calling process, these routines get the specified data.  The scsh procee
 <blockquote>
 Return a <code>user-info</code> record giving the recorded information for a
 particular user.
-The <i>uid/name</i> argument is either an exact integer uid or a string user name.
+The <i>uid/name</i> argument is either an exact integer user id or a string user name.
 If <i>uid/name</i> does not identify an existing user, <code>#f</code> is returned;
 this does not constitute an error situation,
 and callers must be prepared to handle it.
@@ -808,7 +808,7 @@ entries in the <code>/etc/nsswitch.conf</code> file.</p>
 <blockquote>
 Return a <code>group-info</code> record giving the recorded information for a
 particular group.
-The <i>gid/name</i> argument is either an exact integer gid or a string group name.
+The <i>gid/name</i> argument is either an exact integer group id or a string group name.
 If <i>gid/name</i> does not identify an existing group, <code>#f</code> is returned;
 this does not constitute an error situation,
 and callers must be prepared to handle it.
