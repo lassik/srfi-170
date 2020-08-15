@@ -18,28 +18,28 @@
 ;; seems Chibi handles bogus fds OK, reading input returns eof, output
 ;; raises errors
 
-(define (fdes->textual-input-port the-fd)
+(define (fd->textual-input-port the-fd)
   (%file_descriptor_to_port the-fd #t #f))
 
-(define (fdes->binary-input-port the-fd)
+(define (fd->binary-input-port the-fd)
   (%file_descriptor_to_port the-fd #t #t))
 
-(define (fdes->textual-output-port the-fd)
+(define (fd->textual-output-port the-fd)
   (%file_descriptor_to_port the-fd #f #f))
 
-(define (fdes->binary-output-port the-fd)
+(define (fd->binary-output-port the-fd)
   (%file_descriptor_to_port the-fd #f #t))
 
-(define (port-fdes the-port)
+(define (port-fd the-port)
   (if (not (port? the-port))
-      (sanity-check-error "argument must be a port" 'port-fdes the-port))
+      (sanity-check-error "argument must be a port" 'port-fd the-port))
   (port-fileno the-port))
 
-(define (close-fdes the-fd)
+(define (close-fd the-fd)
   (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (sanity-check-error "argument must be a fixnum" 'close-fdes the-fd))
+      (sanity-check-error "argument must be a fixnum" 'close-fd the-fd))
   (if (not (retry-if-EINTR (lambda () (%close the-fd))))
-      (errno-error (errno) 'close-fdes 'close the-fd)))
+      (errno-error (errno) 'close-fd 'close the-fd)))
 
 
 ;;; 3.3  File system
@@ -150,7 +150,7 @@
          (if (not (retry-if-EINTR (lambda () (%truncate fname/port len))))
              (errno-error (errno) 'truncate-file 'truncate fname/port len)))
         ((port? fname/port)
-         (if (not (retry-if-EINTR (lambda () (%ftruncate (port-fdes fname/port) len))))
+         (if (not (retry-if-EINTR (lambda () (%ftruncate (port-fd fname/port) len))))
              (errno-error (errno) 'truncate-file 'ftruncate fname/port len)))
         (else (sanity-check-error "first argument must be a file name or a port" 'truncate-file fname/port len))))
 
@@ -203,7 +203,7 @@
                                        'lstat)
                                    fname/port))))
                ((port? fname/port)
-                (let ((the-file-info (%fstat (port-fdes fname/port))))
+                (let ((the-file-info (%fstat (port-fd fname/port))))
                   (if the-file-info
                       the-file-info
                       (errno-error (errno) 'file-info 'fstat fname/port follow?))))
@@ -615,7 +615,7 @@
 (define (terminal? the-port)
   (if (not (port? the-port))
       (sanity-check-error "argument must be a port" 'terminal? the-port))
-  (let ((the-fd (port-fdes the-port)))
+  (let ((the-fd (port-fd the-port)))
     (if (not the-fd)
         #f)
     (begin
@@ -635,7 +635,7 @@
 (define (terminal-file-name the-port)
   (if (not (port? the-port))
       (sanity-check-error "argument must be a port" 'terminal-file-name the-port))
-  (let ((the-fd (port-fdes the-port)))
+  (let ((the-fd (port-fd the-port)))
     (if (not the-fd)
         (sanity-check-error "port must have a file descriptor associated with it" 'terminal-file-name the-port))
     (let ((the-file-name (%ttyname_r the-fd)))
