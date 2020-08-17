@@ -188,7 +188,7 @@ finalized as you read this.  Therefore, a full explanation
 of foreign-status objects is deferred to SRFI 198.
 </p>
 <p>
-However, two convenience procedures have been added to this SRFI
+However, three convenience procedures have been added to this SRFI
 to make it simpler to deal with foreign-status objects:
 </p>
 
@@ -207,19 +207,30 @@ This can be used to provide programmatic recovery
 when a P<small>OSIX</small> function can return
 more than one value of <code>errno</code>.
 </blockquote>
+<div><code>(posix-error-message <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
+<blockquote>
+This procedure returns a string that is the error message associated,
+as explained above, with the value of <code>errno</code> when
+the P<small>OSIX</small> function reported an error.
+This string can be obtained from the <code>strerror()</code> function,
+and is useful for reporting the cause of the error to the user.
+It may or may not be localized.
+</blockquote>
 <p>
-This SRFI also requires that the following additional information can be
+This SRFI also recommends (but does not require)
+that the following additional information can be
 retrieved through the SRFI 198 interface from a P<small>OSIX</small>
 error object:
 </p>
 <ul>
 <li>the value of <code>errno</code> (an exact integer)</li>
-<li>a (possibly localized or localizable) error message (a string)</li>
 <li>the name of the Scheme procedure (a symbol) that raised the error</li>
 <li>the name of the P<small>OSIX</small> C function (a symbol)
 that set <code>errno</code></li>
 <li>a list of the Scheme procedure's arguments</li>
 </ul>
+<p>For documentation on how to retrieve this information,
+see SRFI 198.</p>
 </p>
 
 <h3 id="node_sec_3.2">3.2&nbsp;&nbsp;I/O</h3>
@@ -686,7 +697,8 @@ affects all threads in the current process, some Scheme implementations
 maintain a separate simulated umask for each thread.
 As a result, the effects of this procedure in a multi-threaded
 program are only partly predictable.
-This SRFI recommends that in multi-threaded programs the mask
+This SRFI recommends (but does not require)
+that in multi-threaded programs the mask
 be set in the primordial thread before any other threads are created
 <i>and never changed again</i>.</p>
 </blockquote>
@@ -708,7 +720,8 @@ affects all threads in the current process, some Scheme implementations
 maintain a separate simulated current directory for each thread.
 As a result, the effects of this procedure in a multi-threaded
 program are only partly predictable.
-This SRFI recommends that in multi-threaded programs the current directory
+This SRFI recommends (but does not require)
+that in multi-threaded programs the current directory
 be set in the primordial thread before any other threads are created
 <i>and never changed again</i>.</p>
 </blockquote>
