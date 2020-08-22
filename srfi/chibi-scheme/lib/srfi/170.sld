@@ -34,10 +34,10 @@
    open-file
    open/read open/write open/read+write
    open/append open/create open/exclusive open/nofollow open/truncate
-   fdes->textual-input-port fdes->binary-input-port
-   fdes->textual-output-port fdes->binary-output-port
-   port-fdes
-   close-fdes
+   fd->textual-input-port fd->binary-input-port
+   fd->textual-output-port fd->binary-output-port
+   port-fd
+   close-fd
 
 
    ;; 3.3  File system
