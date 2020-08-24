@@ -3,9 +3,11 @@
 (define-library (srfi 170)
   (export
 
-#|
    ;; 3.1  Errors
 
+   posix-error? posix-error-name posix-error-message
+
+#|
    ;; useful for debuging
 
    errno/E2BIG errno/EACCES errno/EADDRINUSE errno/EADDRNOTAVAIL
