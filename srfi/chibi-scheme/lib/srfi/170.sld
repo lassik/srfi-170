@@ -48,8 +48,8 @@
    read-symlink
    rename-file
    delete-directory
-   set-file-mode set-file-owner
-   set-file-timespecs timespec/now timespec/omit
+   set-file-mode set-file-owner owner/unchanged group/unchanged
+   set-file-timespecs timespec/now timespec/unchanged
    truncate-file
 
    file-info file-info?

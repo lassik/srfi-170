@@ -113,6 +113,9 @@
   (if (not (retry-if-EINTR (lambda () (%chmod fname permission-bits))))
       (errno-error (errno) 'set-file-mode 'chmod fname permission-bits)))
 
+(define owner/unchanged -1)
+(define group/unchanged -1)
+
 (define (set-file-owner fname uid gid)
   (if (not (string? fname))
       (sanity-check-error "fname must be a string" 'set-file-owner fname))
@@ -124,7 +127,7 @@
       (errno-error (errno) 'set-file-owner 'chown fname uid gid)))
 
 (define timespec/now (make-timespec -1 utimens/utime_now))
-(define timespec/omit (make-timespec -1 utimens/utime_omit))
+(define timespec/unchanged (make-timespec -1 utimens/utime_omit))
 
 (define set-file-timespecs
   (case-lambda
