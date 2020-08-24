@@ -310,14 +310,14 @@ descriptors.</p>
 effectively importing it into the Scheme world.
 In particular, the textual ports use the same character encoding applied
 by default in the underlying implementation.</p>
-<p>The <i>buffer-mode</i> argument, if present, is one of the symbols <code>none</code>,
-  <code>block</code> (the default), or <code>line</code>.
-  When <i>buffer-mode</i> is <code>none</code>,
+<p>The <i>buffer-mode</i> argument, if present, is one of the constants <code>buffer/none</code>,
+  <code>buffer/block</code> (the default), or <code>buffer/line</code>.
+  When <i>buffer-mode</i> is <code>buffer/none</code>,
   bytes are intended to appear from the source or at the destination as soon as possible;
   otherwise, bytes may be accumulated and transmitted as a block.
-  When <i>buffer-mode</i> is <code>block</code>, bytes are intended
+  When <i>buffer-mode</i> is <code>buffer/block</code>, bytes are intended
   to be transmitted as a fixed size block when a buffer is filled.
-  When <i>buffer-mode</i> is <code>line</code>, bytes are intended
+  When <i>buffer-mode</i> is <code>buffer/line</code>, bytes are intended
   to be transmitted as a block when a newline byte <code>#xA</code> is encountered.
 </p>
 </blockquote>
@@ -390,6 +390,10 @@ It is an error if <i>fname</i> is not a directory or is not empty.
 <blockquote>
 This procedure sets the owner and group of a
 file specified by supplying the filename.
+If the uid argument is the constant <code>owner/unchanged</code>,
+the owner is not changed;
+if the gid argument is the constant <code>group/unchanged</code>,
+the group is not changed.
 Setting file ownership usually requires root privileges.
 This procedure follows symlinks and changes the files to which they refer.
 </blockquote><p>
@@ -405,7 +409,7 @@ This procedure sets the access and modified times for the file
 timespec values.
 If neither time argument is supplied, they are both taken to be
 the current time.
-The constants <code>timespec/now</code> and <code>timespec/omit</code>
+The constants <code>timespec/now</code> and <code>timespec/unchanged</code>
 are bound to values used to specify the current time and an unchanged
 time respectively.
 It is an error if exactly one time is provided.
