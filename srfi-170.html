@@ -183,22 +183,18 @@ P<small>OSIX</small> systems, but the associated names (bound by a
 <p>
 However, the procedures of this SRFI work differently.  Rather than
 reporting errors as return values, they report errors by signaling
-objects satisfying the predicate <code>foreign-status?</code>,
-defined in <a href="https://srfi.schemers.org/srfi-198/srfi-198.html">SRFI 198</a>,
-when the underlying system calls fail.  Foreign-status
-objects are fully documented in that SRFI, which may not yet be
-finalized as you read this.  Therefore, a full explanation
-of foreign-status objects is deferred to SRFI 198.
+condition objects satisfying the predicate <code>posix-error?</code>
+defined below.
 </p>
 <p>
-However, three convenience procedures have been added to this SRFI
-to make it simpler to deal with foreign-status objects:
+This SRFI provides three procedures which will typically be shims
+over whatever the implementation uses to report such errors:
 </p>
 
 <div><code>(posix-error? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
 <blockquote>
 This procedure returns <code>#t</code> if <code>obj</code> is
-a foreign-status object that describes a P<small>OSIX</small> error,
+a condition object that describes a P<small>OSIX</small> error,
 and <code>#f</code> otherwise.
 </blockquote>
 <div><code>(posix-error-name <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>symbol</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
@@ -213,7 +209,7 @@ more than one value of <code>errno</code>.
 <div><code>(posix-error-message <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
 <blockquote>
 This procedure returns a string that is the error message associated,
-as explained above, with the value of <code>errno</code> when
+with the value of <code>errno</code> when
 the P<small>OSIX</small> function reported an error.
 This string can be obtained from the <code>strerror()</code> function,
 and is useful for reporting the cause of the error to the user.
@@ -222,8 +218,7 @@ It may or may not be localized.
 <p>
 This SRFI also recommends (but does not require)
 that the following additional information can be
-retrieved through the SRFI 198 interface from a P<small>OSIX</small>
-error object:
+retrieved by other means:
 </p>
 <ul>
 <li>the value of <code>errno</code> (an exact integer)</li>
@@ -232,9 +227,6 @@ error object:
 that set <code>errno</code></li>
 <li>a list of the Scheme procedure's arguments</li>
 </ul>
-<p>For documentation on how to retrieve this information,
-see SRFI 198.</p>
-</p>
 
 <h3 id="node_sec_3.2">3.2&nbsp;&nbsp;I/O</h3>
 <p></p>
