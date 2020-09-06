@@ -413,8 +413,8 @@ This procedure follows symlinks and changes the files to which they refer.
 
 <blockquote>
 This procedure sets the access and modified times for the file
-<i>fname</i> to the supplied 
-time object values, which must be of type <code>time-utc</code>.
+<i>fname</i> to the supplied time object values.  It is an error
+if they are not of type <code>time-utc</code>.
 If neither time argument is supplied, they are both taken to be
 the current time.
 The constants <code>time/now</code> and <code>time/unchanged</code>
