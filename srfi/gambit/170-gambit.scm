@@ -16,15 +16,19 @@
 (define (make-foreign-status . plist)
   (%make-foreign-status plist))
 
-(define (make-errno-error errno-value c-function)
+(define (make-errno-error c-function errno-value)
   (make-foreign-status
    'foreign-interface  c-function
    'errno              errno-value
    'message            (%strerror errno-value)))
 
-;; Return value is of type int, 0 means success, -1 means error, other
-;; values shouldn't happen. Upon -1 return, errno has the error code.
-(define-macro (call/errno-int c-function . args)
+(define (raise-unexpected-retval c-function)
+  (error "Unexpected return value" c-function))
+
+;; Return value is of the given signed integer type. Non-negative
+;; means success, -1 means error, other negative values shouldn't
+;; happen. Upon -1 return, errno has the error code.
+(define-macro (call/errno-integral rettype c-function . args)
   (define (resolve-typedef type)
     (case type
       ((mode_t) 'unsigned-long)
@@ -33,12 +37,16 @@
     (if (null? args)
         (let ((values (reverse values))
               (types  (reverse types))
-              (rv     (gensym 'rv)))
-          `(let ((,rv ((c-lambda ,types int ,c-function) ,@values)))
-             (case ,rv
-               ((0) #f)
-               ((-1) (raise (make-errno-error (%errno) ,c-function)))
-               (else (error "Unexpected return value" ,c-function ,rv)))))
+              (retval (gensym 'retval)))
+          `(let ((,retval ((c-lambda ,types ,(resolve-typedef rettype)
+                             ,c-function)
+                           ,@values)))
+             (cond ((>= ,retval 0)
+                    ,retval)
+                   ((= ,retval -1)
+                    (raise (make-errno-error ,c-function (%errno))))
+                   (else
+                    (raise-unexpected-retval ,c-function)))))
         (let ((value (car args))
               (type (resolve-typedef (cadr args)))
               (args (cddr args)))
@@ -46,17 +54,22 @@
                 (cons type  types)
                 args)))))
 
+(define-macro (call/classic c-function . args)
+  `(if (= 0 (call/errno-integral int ,c-function ,@args))
+       #f
+       (raise-unexpected-retval ,c-function)))
+
 (define (open-file fname flags #!optional permission-bits)
-  (call/errno-int "open"
-                  fname            nonnull-char-string
-                  flags            int
-                  permission-bits  mode_t))
+  (call/classic "open"
+                fname            nonnull-char-string
+                flags            int
+                permission-bits  mode_t))
 
 (define (close-fdes fd)
-  (call/errno-int "close"
-                  fd int))
+  (call/classic "close"
+                fd int))
 
 (define (create-directory fname #!optional permission-bits)
-  (call/errno-int "mkdir"
-                  fname            nonnull-char-string
-                  permission-bits  mode_t))
+  (call/classic "mkdir"
+                fname            nonnull-char-string
+                permission-bits  mode_t))
