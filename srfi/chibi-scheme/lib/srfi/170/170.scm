@@ -139,6 +139,8 @@
 (define (set-file-times* fname atime mtime)
   (if (or (not (time? atime)) (not (time? mtime)))
       (sanity-check-error "atime and mtime must be SRFI 19 times" 'set-file-times* fname atime mtime))
+  (if (or (not (eq? time-utc (time-type atime))) (not (eq? time-utc (time-type mtime))))
+      (sanity-check-error "atime and mtime must have a time-type of time-utc" 'set-file-times* fname atime mtime))
   (if (not (%utimensat utimens/at_fdcwd
                        fname
                        ;; This underlying representation will do for now,
