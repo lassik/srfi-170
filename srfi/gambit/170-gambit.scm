@@ -82,6 +82,8 @@
                 fname            nonnull-char-string
                 permission-bits  mode_t))
 
+;; - POSIX says readlink() may or may not null-terminate the result.
+;; - A truncated result doesn't result in a -1 return value.
 (define (read-symlink fname)
   (let loop ((limit 64))
     (if (>= limit sane-length-limit)
