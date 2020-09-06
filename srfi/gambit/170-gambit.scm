@@ -22,8 +22,23 @@
    'errno              errno-value
    'message            (%strerror errno-value)))
 
+(define sane-length-limit 65536)
+
+(define (null-terminate! bytes)
+  (let ((n (u8vector-length bytes)))
+    (let loop ((i 0))
+      (if (and (< i n) (not (= 0 (u8vector-ref bytes i))))
+          (loop (+ i 1))
+          (begin (u8vector-shrink! bytes i)
+                 bytes)))))
+
 (define (raise-unexpected-retval c-function)
   (error "Unexpected return value" c-function))
+
+(define (handle/errno-integral c-function retval)
+  (cond ((>= retval 0) retval)
+        ((= retval -1) (raise (make-errno-error c-function (%errno))))
+        (else          (raise-unexpected-retval c-function))))
 
 ;; Return value is of the given signed integer type. Non-negative
 ;; means success, -1 means error, other negative values shouldn't
@@ -36,17 +51,10 @@
   (let loop ((values '()) (types '()) (args args))
     (if (null? args)
         (let ((values (reverse values))
-              (types  (reverse types))
-              (retval (gensym 'retval)))
-          `(let ((,retval ((c-lambda ,types ,(resolve-typedef rettype)
-                             ,c-function)
-                           ,@values)))
-             (cond ((>= ,retval 0)
-                    ,retval)
-                   ((= ,retval -1)
-                    (raise (make-errno-error ,c-function (%errno))))
-                   (else
-                    (raise-unexpected-retval ,c-function)))))
+              (types  (reverse types)))
+          `(handle/errno-integral
+            ((c-lambda ,types ,(resolve-typedef rettype) ,c-function)
+             ,@values)))
         (let ((value (car args))
               (type (resolve-typedef (cadr args)))
               (args (cddr args)))
@@ -73,3 +81,19 @@
   (call/classic "mkdir"
                 fname            nonnull-char-string
                 permission-bits  mode_t))
+
+(define (read-symlink fname)
+  (let loop ((limit 64))
+    (if (>= limit sane-length-limit)
+        (error "Too long")
+        (let* ((bytes  (make-bytevector limit 0))
+               (length (handle/errno-integral
+                        "readlink"
+                        ((c-lambda (nonnull-char-string scheme-object size_t)
+                             int
+                           "___U8 *bytes = ___CAST(___U8 *, ___BODY(___arg2));
+                            ___return(readlink(___arg1, bytes, ___arg3));")
+                         fname bytes limit))))
+          (if (< length (- limit 1))
+              (utf8->string (null-terminate! bytes))
+              (loop (* limit 2)))))))
