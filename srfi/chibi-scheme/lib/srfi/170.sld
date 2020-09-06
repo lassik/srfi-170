@@ -3,9 +3,11 @@
 (define-library (srfi 170)
   (export
 
-#|
    ;; 3.1  Errors
 
+   posix-error? posix-error-name posix-error-message
+
+#|
    ;; useful for debuging
 
    errno/E2BIG errno/EACCES errno/EADDRINUSE errno/EADDRNOTAVAIL
@@ -46,8 +48,8 @@
    read-symlink
    rename-file
    delete-directory
-   set-file-mode set-file-owner
-   set-file-timespecs timespec/now timespec/omit
+   set-file-mode set-file-owner owner/unchanged group/unchanged
+   set-file-timespecs timespec/now timespec/unchanged
    truncate-file
 
    file-info file-info?
