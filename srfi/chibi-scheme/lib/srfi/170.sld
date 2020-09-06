@@ -49,7 +49,7 @@
    rename-file
    delete-directory
    set-file-mode set-file-owner owner/unchanged group/unchanged
-   set-file-timespecs timespec/now timespec/unchanged
+   set-file-times time/now time/unchanged
    truncate-file
 
    file-info file-info?
@@ -145,13 +145,12 @@
 
      (only (srfi 1) alist-cons take)
      (only (srfi 8) receive) ;; the only export, but let us maintain form
+     (only (srfi 19) time-monotonic time-utc make-time time? time-second time-nanosecond)
      (only (srfi 27) random-integer)
      (only (srfi 69) make-hash-table hash-table-set! hash-table-ref)
      (only (srfi 98) get-environment-variables)
      (only (srfi 115) regexp-replace-all regexp-split)
      (srfi 151) ;; bitwise operators
-     (rename (only (srfi 174) timespec timespec? timespec-seconds timespec-nanoseconds)
-             (timespec make-timespec))
      (only (srfi 198) raise-foreign-error)
      )
 

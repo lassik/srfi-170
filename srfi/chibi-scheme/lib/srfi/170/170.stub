@@ -376,8 +376,8 @@
 ;;> Returns the current time as a timespec, clock behavior including
 ;;> epoch defined by clck-id
 
-(define-c-const int (clck-id/realtime "CLOCK_REALTIME"))
-(define-c-const int (clck-id/monotonic "CLOCK_MONOTONIC"))
+(define-c-const int (time-utc "CLOCK_REALTIME"))
+(define-c-const int (time-monotonic "CLOCK_MONOTONIC"))
 
 (define-c-int-type clockid_t)
 

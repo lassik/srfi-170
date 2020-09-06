@@ -126,25 +126,27 @@
   (if (not (retry-if-EINTR (lambda () (%chown fname uid gid))))
       (errno-error (errno) 'set-file-owner 'chown fname uid gid)))
 
-(define timespec/now (make-timespec -1 utimens/utime_now))
-(define timespec/unchanged (make-timespec -1 utimens/utime_omit))
+;; For the purposes of the SRFI 170 API, the time-type as used here is
+;; irrelevant ~~~ but this could be confusing
+(define time/now (make-time time-utc -1 utimens/utime_now))
+(define time/unchanged (make-time time-utc -1 utimens/utime_omit))
 
-(define set-file-timespecs
+(define set-file-times
   (case-lambda
-   ((fname) (set-file-timespecs* fname timespec/now timespec/now))
-   ((fname atime mtime) (set-file-timespecs* fname atime mtime))))
+   ((fname) (set-file-times* fname time/now time/now))
+   ((fname atime mtime) (set-file-times* fname atime mtime))))
 
-(define (set-file-timespecs* fname atime mtime)
-  (if (or (not (timespec? atime)) (not (timespec? mtime)))
-      (sanity-check-error "atime and mtime must be timespecs" 'set-file-timespecs* fname atime mtime))
+(define (set-file-times* fname atime mtime)
+  (if (or (not (time? atime)) (not (time? mtime)))
+      (sanity-check-error "atime and mtime must be SRFI 19 times" 'set-file-times* fname atime mtime))
   (if (not (%utimensat utimens/at_fdcwd
                        fname
-                       ;; don't change underlying representation until timespec SRFI finalized
-                       ;; and maybe not even then, a cons cell is very simple
-                       (cons (timespec-seconds atime) (timespec-nanoseconds atime))
-                       (cons (timespec-seconds mtime) (timespec-nanoseconds mtime))
+                       ;; This underlying representation will do for now,
+                       ;; a cons cell is very simple
+                       (cons (time-second atime) (time-nanosecond atime))
+                       (cons (time-second mtime) (time-nanosecond mtime))
                        0))
-      (errno-error (errno) 'set-file-timespecs 'utimensat fname atime mtime)))
+      (errno-error (errno) 'set-file-times 'utimensat fname atime mtime)))
 
 (define (truncate-file fname/port len)
   (if (not (exact-integer? len))
@@ -232,9 +234,9 @@
      (stat:size file-stat)
      (stat:blksize file-stat)
      (stat:blocks file-stat)
-     (make-timespec (posix-timespec:seconds (stat:atime file-stat)) (posix-timespec:nanoseconds (stat:atime file-stat)))
-     (make-timespec (posix-timespec:seconds (stat:mtime file-stat)) (posix-timespec:nanoseconds (stat:mtime file-stat)))
-     (make-timespec (posix-timespec:seconds (stat:ctime file-stat)) (posix-timespec:nanoseconds (stat:ctime file-stat))))))
+     (make-time time-utc (posix-timespec:seconds (stat:atime file-stat)) (posix-timespec:nanoseconds (stat:atime file-stat)))
+     (make-time time-utc (posix-timespec:seconds (stat:mtime file-stat)) (posix-timespec:nanoseconds (stat:mtime file-stat)))
+     (make-time time-utc (posix-timespec:seconds (stat:ctime file-stat)) (posix-timespec:nanoseconds (stat:ctime file-stat))))))
 
 (define (file-info-directory? file-info-record)
   (S_ISDIR (file-info:mode file-info-record)))
@@ -584,16 +586,16 @@
 ;;; 3.10  Time
 
 (define (posix-time)
-  (let ((t (%clock_gettime clck-id/realtime)))
+  (let ((t (%clock_gettime time-utc)))
     (if (not t)
         (errno-error (errno) 'posix-time 'clock_gettime)
-        (make-timespec (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
+        (make-time time-utc (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
 
 (define (monotonic-time)
-  (let ((t (%clock_gettime clck-id/monotonic)))
+  (let ((t (%clock_gettime time-monotonic)))
     (if (not t)
         (errno-error (errno) 'monotonic-time 'clock_gettime)
-        (make-timespec (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
+        (make-time time-monotonic (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
 
 
 ;;; 3.11  Environment variables
