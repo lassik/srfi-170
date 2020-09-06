@@ -172,18 +172,17 @@ right thing.
 </p>
 
 <p>
-Several of this SRFI's procedures either accept or return a <i>timespec</i>.
-A timespec is an object conforming to the
-<a href="https://github.com/scheme-requests-for-implementation/srfi-174/srfi-174.html">
-SRFI 174</a> interface.  It contains at least two values, the number of elapsed seconds
-since a P<small>OSIX</small> epoch, and the number of
-elapsed nanoseconds since the beginning of the current second.
+Several of this SRFI's procedures either accept or return a <i>time object</i>
+that is fully compatible with the time objects of
+<a href="https://github.com/scheme-requests-for-implementation/srfi-19/srfi-19.html">
+SRFI 19</a>.  It contains at least three values: the number of elapsed seconds
+since a given epoch, the number of
+elapsed nanoseconds since the beginning of the specified second,
+and a symbol that represents the epoch and is the same as
+the value of either <code>time-utc</code> or <code>time-monotonic</code>
+as exported by SRFI 19.
 The system clock is not required to report time at full nanosecond
 resolution, nor is anything guaranteed about accuracy.
-If a timespec is implemented as a
-<a href="https://github.com/scheme-requests-for-implementation/srfi-174/srfi-174.html">
-SRFI 19</a> time object, then it is an error if the time type is not
-<code>time-utc</code>, except as noted.
 </p>
 
 <h3>3.1&nbsp;&nbsp;Error handling</h3>
@@ -410,15 +409,15 @@ This procedure follows symlinks and changes the files to which they refer.
 </p>
 <p></p>
 <p></p>
-<div><code>(set-file-timespecs <i>fname [access-timespec modify-timespec]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>utimensat()</code>&nbsp;</div>
+<div><code>(set-file-times <i>fname [access-time-object modify-time-object]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>utimensat()</code>&nbsp;</div>
 
 <blockquote>
 This procedure sets the access and modified times for the file
 <i>fname</i> to the supplied 
-timespec values.
+time object values, which must be of type <code>time-utc</code>.
 If neither time argument is supplied, they are both taken to be
 the current time.
-The constants <code>timespec/now</code> and <code>timespec/unchanged</code>
+The constants <code>time/now</code> and <code>time/unchanged</code>
 are bound to values used to specify the current time and an unchanged
 time respectively.
 It is an error if exactly one time is provided.
@@ -462,14 +461,15 @@ The <i>follow?</i> flag is ignored if the file argument is a port.
 <div><code>(file-info:size <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div><code>(file-info:blksize <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div><code>(file-info:blocks <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:atime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:mtime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:ctime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(file-info:atime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(file-info:mtime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(file-info:ctime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote><p>Returns the device number, inode number, mode (permission and file type bits),
 number of hard links, user id, group id, device ID if file is special,
 size in bytes, optimal blocksize for I/O, number of 512B blocks allocated,
 last access time, last modification time, and
-last change of status times (using timespecs) stored in <i>file-info</i> respectively.
+last change of status times (using time objects of type <code>time-utc</code>)
+stored in <i>file-info</i> respectively.
 </p><p>
 Although P<small>OSIX</small> does not standardize bit positions in the
 file mode, the following assignments are de facto standards
@@ -854,31 +854,30 @@ and callers must be prepared to handle it.
 <h3 id="node_sec_3.9">3.9&nbsp;&nbsp;[Intentionally omitted]</h3>
 
 <h3 id="node_sec_3.10">3.10&nbsp;&nbsp;Time</h3>
-<div><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
+<div><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr;&nbsp;&nbsp;&nbsp;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
 
 <blockquote>
 <p>The <code>posix-time</code> procedure returns the current time as a
-<i>timespec</i> since the P<small>OSIX</small> epoch (midnight January
+time object of type <code>time-utc</code>, which represents the time
+since the P<small>OSIX</small> epoch (midnight January
 1, 1970 Universal Time), excluding leap seconds.
 It uses the P<small>OSIX</small> <code>CLOCK_REALTIME</code> clock.
 </blockquote>
 
-<div><code>(monotonic-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr;&nbsp;&nbsp;&nbsp;<i>timespec</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
+<div><code>(monotonic-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr;&nbsp;&nbsp;&nbsp;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
 
 <blockquote>
-<p>The same as <code>posix-time</code>, except that the epoch is arbitrary.
-This epoch cannot change after the current
+<p>The <code>monotonic-time</code> procedure returns the current time as a
+time object of type <code>time-monotonic</code>, which represents the time
+since an arbitrary epoch.
+This epoch is arbitrary, but cannot change after the current
 program begins to run.
 It is guaranteed that a call to <code>monotonic-time</code>
-cannot return a time earlier than a previous call to <i>monotonic-time</i>.
+cannot return a time earlier than a previous call to <code>monotonic-time</code>.
 This is not guaranteed for <code>posix-time</code>
 because the system's P<small>OSIX</small> clock
-is sometimes turned either forward or backward
-to correct local clock drift.
+is sometimes turned backward to correct local clock drift.
 It uses the P<small>OSIX</small> <code>CLOCK_MONOTONIC</code> clock.</p>
-<p>If the timespec is a SRFI 19 time object, the time type is set to
-<code>time-monotonic</code>.</p>
-</p>
 </blockquote>
 
 <h3>3.11&nbsp;&nbsp;Environment variables</h3>

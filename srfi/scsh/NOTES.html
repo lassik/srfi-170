@@ -61,8 +61,7 @@ When scsh <code>create-hard-link</code> is asked to make a link across file syst
 rather than erroring it creates a copy of the file at <i>newname</i>.
 </p></li>
 <li><p>
-<code>set-file-timespecs</code> is <code>set-file-times</code> in scsh,
-and <code>access-timespec</code> and <code>mod-timespec</code> are rational numbers,
+<code>access-time</code> and <code>mod-time</code> are rational numbers,
 which are coerced to exact integers, and treated as the number of elapsed seconds
 since the POSIX epoch of midnight January 1, 1970.
 </p></li>
@@ -74,7 +73,7 @@ The scsh <code>file-info mode</code> record field is masked to only return the n
 omitting the bits for <code>set-user-ID</code>, <code>set-group-ID</code>, and the save text
 or "sticky" bit.
 The scsh <code>file-info</code> record fields <code>atime</code>, <code>mtime</code>, and <code>ctime</code>
-fields are exact integers instead of <code><i>timespecs</i></code>, and are the number of elapsed seconds
+fields are exact integers instead of <code>time objects</code>, and are the number of elapsed seconds
 (excluding leap seconds) since the POSIX epoch of midnight January 1, 1970.
 It does not implement the <code>rdev</code>, <code>blksize</code>, and <code>blocks</code> fields.
 </p></li>
