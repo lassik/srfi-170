@@ -343,18 +343,23 @@
                          (test my-starting-gid (file-info:gid fi-ending))))
 
           (test-error (set-file-times tmp-file-1 1 2))
+          (test-error (set-file-times tmp-file-1 (make-time time-monotonic 0 0) (make-time time-utc 0 0))) ;; the epoch
+          (test-error (set-file-times tmp-file-1 (make-time time-monotonic 0 0) (make-time time-monotonic 0 0))) ;; the epoch
           (test-not-error (set-file-times tmp-file-1 (make-time time-utc 0 0) (make-time time-utc 0 0))) ;; the epoch
           (let ((fi (file-info tmp-file-1 #t)))
             (let ((atime (file-info:atime fi))
                   (mtime (file-info:mtime fi))
                   (ctime (file-info:ctime fi)))
               (test-assert (and (time? atime)
+                                (eq? time-utc (time-type atime))
                                 (equal? (time-second atime) 0)
                                 (equal? (time-nanosecond atime) 0)
                                 (time? mtime)
+                                (eq? time-utc (time-type mtime))
                                 (equal? (time-second mtime) 0)
                                 (equal? (time-nanosecond mtime) 0)
                                 (time? ctime)
+                                (eq? time-utc (time-type ctime))
                                 (> (time-second ctime) 0)
                                 (> (time-nanosecond ctime) 0)))))
           (test-not-error (set-file-times tmp-file-1 time/unchanged time/now))

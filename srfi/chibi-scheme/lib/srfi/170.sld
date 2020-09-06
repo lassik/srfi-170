@@ -145,7 +145,7 @@
 
      (only (srfi 1) alist-cons take)
      (only (srfi 8) receive) ;; the only export, but let us maintain form
-     (only (srfi 19) time-monotonic time-utc make-time time? time-second time-nanosecond)
+     (only (srfi 19) time-monotonic time-utc make-time time? time-type time-second time-nanosecond)
      (only (srfi 27) random-integer)
      (only (srfi 69) make-hash-table hash-table-set! hash-table-ref)
      (only (srfi 98) get-environment-variables)
