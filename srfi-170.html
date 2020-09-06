@@ -231,8 +231,8 @@ It may or may not be localized.
 </blockquote>
 <p>
 This SRFI also recommends (but does not require)
-that the following additional information can be
-retrieved by other means:
+that the following additional information be
+retrievable by other means:
 </p>
 <ul>
 <li>the value of <code>errno</code> (an exact integer)</li>
@@ -315,8 +315,9 @@ descriptors.</p>
 <div><code>(fd->textual-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <div><code>(fd->binary-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>
-<p>These procedures wrap a newly created port around the specified file descriptor,
-effectively importing it into the Scheme world.
+<p>These procedures wrap a newly created port around a duplicate of
+the specified file descriptor, effectively importing it into the
+Scheme world.
 In particular, the textual ports use the same character encoding applied
 by default in the underlying implementation.</p>
 <p>The <i>buffer-mode</i> argument, if present, is one of the constants <code>buffer/none</code>,
@@ -329,15 +330,25 @@ by default in the underlying implementation.</p>
   When <i>buffer-mode</i> is <code>buffer/line</code>, bytes are intended
   to be transmitted as a block when a newline byte <code>#xA</code> is encountered.
 </p>
+<p>It is the responsibility of the caller
+to make sure the file descriptor is closed independently of the
+port being closed.
+Note that the port and the file descriptor will continue to share
+the same position, so that reads and writes on one are visible from the other.</p>
 </blockquote>
 
-<div><code>(port-fd <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(port->fd <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 
 <blockquote>
-This procedure exposes the file descriptor of a port,
-effectively exporting it from the Scheme world.
+This procedure returns a file descriptor that has been duplicated
+from <i>port</i>, effectively exporting it from the Scheme world.
 Alternatively, <code>#f</code> is returned if <i>port</i> does not have a
 file descriptor (a string port, for example).
+<p>It is the responsibility of the caller
+to make sure the file descriptor is closed independently of the
+port being closed.
+Note that the port and the file descriptor will continue to share
+the same position, so that reads and writes on one are visible from the other.</p>
 </blockquote><p>
 </p>
 <div><code>(close-fd <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code>&nbsp;</div>
