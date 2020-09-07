@@ -8,10 +8,38 @@
 (define %errno (c-lambda () int "___return(errno);"))
 (define %strerror (c-lambda (int) char-string "strerror"))
 
+(define group/unchanged #f)
+(define owner/unchanged #f)
+
+(define time/now       'time/now)
+(define time/unchanged 'time/unchanged)
+
+(define AT_FDCWD
+  ((c-lambda () int   "___return(AT_FDCWD);")))
+
+(define gid_t-1
+  ((c-lambda () unsigned-long "___return((unsigned long)(gid_t)-1);")))
+
+(define uid_t-1
+  ((c-lambda () unsigned-long "___return((unsigned long)(uid_t)-1);")))
+
+(define UTIME_NOW
+  ((c-lambda () long "___return((long)UTIME_NOW);")))
+
+(define UTIME_OMIT
+  ((c-lambda () long "___return((long)UTIME_OMIT);")))
+
 (define-record-type <foreign-status>
   (%make-foreign-status plist)
   foreign-status?
   (plist %foreign-status-plist))
+
+(define-record-type <time-type>
+  (make-time type nanosecond second)
+  srfi-19-time?
+  (type       time-type)
+  (nanosecond time-nanosecond)
+  (second     time-second))
 
 (define (make-foreign-status . plist)
   (%make-foreign-status plist))
@@ -46,7 +74,10 @@
 (define-macro (call/errno-integral rettype c-function . args)
   (define (resolve-typedef type)
     (case type
+      ((time_t) 'unsigned-long)
       ((mode_t) 'unsigned-long)
+      ((uid_t)  'unsigned-long)
+      ((gid_t)  'unsigned-long)
       (else type)))
   (let loop ((values '()) (types '()) (args args))
     (if (null? args)
@@ -72,6 +103,60 @@
                 fname            nonnull-char-string
                 flags            int
                 permission-bits  mode_t))
+
+(define (rename-file old-fname new-fname)
+  (call/classic "rename"
+                old-fname nonnull-char-string
+                new-fname nonnull-char-string))
+
+(define (delete-directory fname)
+  (call/classic "rmdir"
+                fname nonnull-char-string))
+
+(define (set-file-mode fname mode-bits)
+  (call/classic "chmod"
+                fname      nonnull-char-string
+                mode-bits  mode_t))
+
+(define (set-file-owner fname uid gid)
+  (let ((uid (if (eqv? uid owner/unchanged) uid_t-1 uid))
+        (gid (if (eqv? gid group/unchanged) gid_t-1 gid)))
+    (call/classic "chown"
+                  fname  nonnull-char-string
+                  uid    uid_t
+                  gid    gid_t)))
+
+(define (set-file-times fname
+                        #!optional
+                        access-time-object
+                        modify-time-object)
+  (define (get-sec time)
+    (cond ((equal? time time/now)       0)
+          ((equal? time time/unchanged) 0)
+          (else                         (time-second time))))
+  (define (get-nsec time)
+    (cond ((equal? time time/now)       UTIME_NOW)
+          ((equal? time time/unchanged) UTIME_OMIT)
+          (else                         (time-nanosecond time))))
+  (handle/errno-integral
+   "utimensat"
+   ((c-lambda (nonnull-char-string
+               long
+               long
+               long
+               long)
+        int
+      "struct timespec tv[2];
+       tv[0].tv_sec = ___arg2;
+       tv[1].tv_sec = ___arg3;
+       tv[0].tv_nsec = ___arg4;
+       tv[1].tv_nsec = ___arg5;
+       ___return(utimensat(AT_FDCWD, ___arg1, tv, 0));")
+    fname
+    (get-sec access-time-object)
+    (get-sec modify-time-object)
+    (get-nsec access-time-object)
+    (get-nsec modify-time-object))))
 
 (define (close-fdes fd)
   (call/classic "close"
