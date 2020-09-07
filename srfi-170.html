@@ -315,7 +315,8 @@ one or more of the following constants:
 <div><code>(port-internal-fd <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>fd</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <p></p>
 <blockquote>
-<p>Returns the file descriptor used by <i>port</i>.
+<p>Returns the file descriptor used by <i>port</i>,
+or <code>#f</code> if there is no such port.
 This procedure is made available in order to invoke
 P<small>OSIX</small> functions not provided by this SRFI.
 <b>It should be used only when absolutely necessary.</b>
