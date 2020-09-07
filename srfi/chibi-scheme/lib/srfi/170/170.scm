@@ -472,7 +472,7 @@
           (let ((fname (string-append the-prefix "." (number->string i))))
             (receive retvals (with-errno-handler ;; ~~~~ "THEN A MIRACLE OCCURS..."
                                ((errno data)
-                                ((errno/EEXIST errno/EACCES) #f))
+                                ((EEXIST EACCES) #f))
                                (maker fname))
               (if (car retvals) (apply values retvals) ;; ~~~~ don't understand the use of values at all
                   (loop (+ i 1)))))))))
@@ -631,7 +631,7 @@
         (if (equal? 1 ret)
             #t
             (if (or (not (equal? 0 ret))
-                    (not (equal? errno/ENOTTY (errno))))
+                    (not (equal? ENOTTY (errno))))
                 (errno-error (errno) 'terminal? 'isatty the-port)
                 #f))))))
 

@@ -6,6 +6,10 @@
    ;; 3.1  Errors
 
    posix-error? posix-error-name posix-error-message
+   ;; these are extra and allowed additions to the official SRFI namespace:
+   posix-error-number posix-error-scheme-procedure
+   posix-error-posix-interface posix-error-data
+
 
 #|
    ;; useful for debuging
@@ -151,7 +155,11 @@
      (only (srfi 98) get-environment-variables)
      (only (srfi 115) regexp-replace-all regexp-split)
      (srfi 151) ;; bitwise operators
-     (only (srfi 198) raise-foreign-error)
+
+     (only (srfi 170 posix-error) posix-error? posix-error-name posix-error-message
+                                  posix-error-number posix-error-scheme-procedure
+                                  posix-error-posix-interface posix-error-data
+                                  raise-posix-error)
      )
 
     (include-shared "170/170")
