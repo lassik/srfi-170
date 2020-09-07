@@ -189,10 +189,7 @@ resolution, nor is anything guaranteed about accuracy.
 <p>
 The C binding of P<small>OSIX</small> places an error number in the
 global variable <code>errno</code> to report an error, along with
-(in most cases) returning a sentinel value such as -1.  The
-<code>errno</code> codes are not standardized across different
-P<small>OSIX</small> systems, but the associated names (bound by a
-<code>#define</code>) are the same for the most part.
+(in most cases) returning a sentinel value such as -1.  
 </p>
 <p>
 However, the procedures of this SRFI work differently.  Rather than
@@ -213,12 +210,25 @@ and <code>#f</code> otherwise.
 </blockquote>
 <div><code>(posix-error-name <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>symbol</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
 <blockquote>
-This procedure returns a symbol that is the name associated,
-as explained above, with the value of <code>errno</code> when
+<p>This procedure returns a symbol that is the name associated
+with the value of <code>errno</code> when
 the P<small>OSIX</small> function reported an error.
 This can be used to provide programmatic recovery
 when a P<small>OSIX</small> function can return
-more than one value of <code>errno</code>.
+more than one value of <code>errno</code>.</p>
+<p>Because the
+<code>errno</code> codes are not standardized across different
+P<small>OSIX</small> systems,
+but the associated names (bound by a
+<code>#define</code> in the file <code>/usr/include/errno.h</code>)
+are the same for the most part,
+this function returns the name (in lower case) rather than the code.</p>
+<p>For example, ENOENT (a reference was made to a file or a directory
+that does not exist) almost always corresponds to an <code>errno</code>
+value of 2.
+But <code>ETIMEDOUT</code>, meaning that a TCP connection
+has been unresponsive for too long, is standardized by P<small>OSIX</small>,
+has a <code>errno</code> value of 110 on Linux, but 60 on FreeBSD and 116 on Cygwin.</p>
 </blockquote>
 <div><code>(posix-error-message <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
 <blockquote>
