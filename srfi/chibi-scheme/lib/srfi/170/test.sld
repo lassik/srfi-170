@@ -243,6 +243,20 @@
                 (posix-error-message the-error))
           (test '(1 2 3 4) (cdr (assq 'arguments (posix-error-data the-error))))
 
+          ;; Make sure the error raising code works for a real error
+          (test-error ((with-exception-handler
+                        (lambda (exception) (set! the-error exception))
+                        (lambda () (open-file bogus-path open/read)))))
+          (test-assert (posix-error? the-error))
+          (test 'errno (posix-error-error-set the-error))
+          (test 2 (posix-error-number the-error))
+          (test 'ENOENT (posix-error-name the-error))
+          (test 'open-file (posix-error-scheme-procedure the-error))
+          (test 'open (posix-error-posix-interface the-error))
+          (test "open-file called open: ENOENT: No such file or directory"
+                (posix-error-message the-error))
+          (test (list bogus-path open/read #o666) (cdr (assq 'arguments (posix-error-data the-error))))
+
           (test-error ((with-exception-handler
                         (lambda (exception) (set! the-error exception))
                         (lambda () (sanity-check-error "Sanity check error test message" 'test-of-errno-error-procedure-symbol 1 2 3 4)))))
