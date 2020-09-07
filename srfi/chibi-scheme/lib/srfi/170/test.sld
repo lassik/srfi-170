@@ -281,34 +281,57 @@
           (test-error (open-file "foo" 1 "baz"))
           (test-error (open-file bogus-path open/read))
 
-          (let ((the-port (fd->binary-output-port
-                           (open-file tmp-file-1 open-write-create-truncate))))
-            (test-not-error (write-bytevector the-binary-bytevector the-port))
-            (test-not-error (close-port the-port)))
-          (let ((the-port (fd->binary-input-port
-                           (open-file tmp-file-1 open/read))))
-            (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
-            (test-assert (eof-object? (read-char the-port)))
-            (test-not-error (close-port the-port)))
-
-          (let ((the-port (fd->textual-output-port
-                           (open-file tmp-file-1 open-write-create-truncate))))
-            (test-not-error (write-string the-text-string the-port))
-            (test-not-error (close-port the-port)))
-          (let ((the-port (fd->textual-input-port
-                           (open-file tmp-file-1 open/read))))
-            (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
-            (test-assert (eof-object? (read-char the-port)))
-            (test-not-error (close-port the-port)))
-
-          (test 0 (port-fd (current-input-port)))
-          (test 1 (port-fd (current-output-port)))
-          (test 2 (port-fd (current-error-port)))
-          (test-not (port-fd the-string-port))
+          (test-error (close-fd "a"))
+          (test-error (close-fd -1))
 
           (let* ((dev-zero-fd (open-file "/dev/zero" open/read)))
             (test-not-error (close-fd dev-zero-fd))
             (test-error (close-fd dev-zero-fd)))
+
+          (test-error (fd->textual-input-port "a"))
+          (test-error (fd->textual-input-port -1))
+          (test-error (fd->binary-input-port "a"))
+          (test-error (fd->binary-input-port -1))
+          (test-error (fd->textual-output-port "a"))
+          (test-error (fd->textual-output-port -1))
+          (test-error (fd->binary-output-port "a"))
+          (test-error (fd->binary-output-port -1))
+
+          (let* ((new-fd (open-file tmp-file-1 open-write-create-truncate))
+                 (the-port (fd->binary-output-port new-fd)))
+            (test-not-error (write-bytevector the-binary-bytevector the-port))
+            (test-not-error (close-port the-port))
+            (test-not-error (close-fd new-fd)))
+          (let* ((new-fd (open-file tmp-file-1 open/read))
+                 (the-port (fd->binary-input-port new-fd)))
+            (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
+            (test-assert (eof-object? (read-char the-port)))
+            (test-not-error (close-port the-port))
+            (test-not-error (close-fd new-fd)))
+          (let* ((new-fd (open-file tmp-file-1 open-write-create-truncate))
+                 (the-port (fd->textual-output-port new-fd)))
+            (test-not-error (write-string the-text-string the-port))
+            (test-not-error (close-port the-port))
+            (test-not-error (close-fd new-fd)))
+          (let* ((new-fd (open-file tmp-file-1 open/read))
+                 (the-port (fd->textual-input-port new-fd)))
+            (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
+            (test-assert (eof-object? (read-char the-port)))
+            (test-not-error (close-port the-port))
+            (test-not-error (close-fd new-fd)))
+
+          (let ((new-fd (port->fd (current-input-port))))
+            (test-assert (fixnum? new-fd))
+            (test-assert (> new-fd 2))
+            (test 3 new-fd) ;; a bit dangerous, but on normal systems, if all of the above worked, should be true.
+            (test-assert (not (eq? 0 new-fd)))
+            (test-not-error (close-fd new-fd)))
+
+          (test 0 (port-real-fd (current-input-port)))
+          (test 1 (port-real-fd (current-output-port)))
+          (test 2 (port-real-fd (current-error-port)))
+          (test-not (port-real-fd the-string-port))
+
 
           ) ;; end I/O
 

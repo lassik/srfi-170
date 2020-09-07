@@ -146,6 +146,11 @@
 
 (define-c errno (%close close) (int))
 
+;;> Duplicates the given file descriptor, returning the new value,
+;; or -1 on failure.
+
+(define-c int (%dup dup) (int))
+
 
 ;;; 3.3  File system
 

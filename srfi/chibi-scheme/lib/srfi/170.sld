@@ -41,10 +41,11 @@
    open-file
    open/read open/write open/read+write
    open/append open/create open/exclusive open/nofollow open/truncate
+   close-fd
    fd->textual-input-port fd->binary-input-port
    fd->textual-output-port fd->binary-output-port
-   port-fd
-   close-fd
+   port->fd
+   port-real-fd ;; ~~~ keep this here unless it's decided to dispense with it, if so move it to common.scm.
 
 
    ;; 3.3  File system
