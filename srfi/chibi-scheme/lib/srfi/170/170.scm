@@ -18,26 +18,47 @@
 ;; seems Chibi handles bogus fds OK, reading input returns eof, output
 ;; raises errors
 
+(define (dup-file-descriptor the-fd) ;; not "duplicate" because that's a Chibi procedure.
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'dup-file-descriptor the-fd))
+  (let ((ret (%dup the-fd)))
+    (if (eq? -1 ret)
+        (errno-error (errno) 'dup-file-descriptor 'dup the-fd)
+        ret)))
+
 (define (fd->textual-input-port the-fd)
-  (%file_descriptor_to_port the-fd #t #f))
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->textual-input-port the-fd))
+  (%file_descriptor_to_port (dup-file-descriptor the-fd) #t #f))
 
 (define (fd->binary-input-port the-fd)
-  (%file_descriptor_to_port the-fd #t #t))
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->binary-input-port the-fd))
+  (%file_descriptor_to_port (dup-file-descriptor the-fd) #t #t))
 
 (define (fd->textual-output-port the-fd)
-  (%file_descriptor_to_port the-fd #f #f))
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->textual-output-port the-fd))
+  (%file_descriptor_to_port (dup-file-descriptor the-fd) #f #f))
 
 (define (fd->binary-output-port the-fd)
-  (%file_descriptor_to_port the-fd #f #t))
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->binary-output-port the-fd))
+  (%file_descriptor_to_port (dup-file-descriptor the-fd) #f #t))
 
-(define (port-fd the-port)
+(define (port-real-fd the-port)
   (if (not (port? the-port))
-      (sanity-check-error "argument must be a port" 'port-fd the-port))
+      (sanity-check-error "argument must be a port" 'port-real-fd the-port))
   (port-fileno the-port))
+
+(define (port->fd the-port)
+  (if (not (port? the-port))
+      (sanity-check-error "argument must be a port" 'port->fd the-port))
+  (dup-file-descriptor (port-fileno the-port)))
 
 (define (close-fd the-fd)
   (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (sanity-check-error "argument must be a fixnum" 'close-fd the-fd))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'close-fd the-fd))
   (if (not (retry-if-EINTR (lambda () (%close the-fd))))
       (errno-error (errno) 'close-fd 'close the-fd)))
 
@@ -157,7 +178,7 @@
          (if (not (retry-if-EINTR (lambda () (%truncate fname/port len))))
              (errno-error (errno) 'truncate-file 'truncate fname/port len)))
         ((port? fname/port)
-         (if (not (retry-if-EINTR (lambda () (%ftruncate (port-fd fname/port) len))))
+         (if (not (retry-if-EINTR (lambda () (%ftruncate (port-real-fd fname/port) len))))
              (errno-error (errno) 'truncate-file 'ftruncate fname/port len)))
         (else (sanity-check-error "first argument must be a file name or a port" 'truncate-file fname/port len))))
 
@@ -210,7 +231,7 @@
                                        'lstat)
                                    fname/port))))
                ((port? fname/port)
-                (let ((the-file-info (%fstat (port-fd fname/port))))
+                (let ((the-file-info (%fstat (port-real-fd fname/port))))
                   (if the-file-info
                       the-file-info
                       (errno-error (errno) 'file-info 'fstat fname/port follow?))))
@@ -472,7 +493,7 @@
           (let ((fname (string-append the-prefix "." (number->string i))))
             (receive retvals (with-errno-handler ;; ~~~~ "THEN A MIRACLE OCCURS..."
                                ((errno data)
-                                ((errno/EEXIST errno/EACCES) #f))
+                                ((EEXIST EACCES) #f))
                                (maker fname))
               (if (car retvals) (apply values retvals) ;; ~~~~ don't understand the use of values at all
                   (loop (+ i 1)))))))))
@@ -622,7 +643,7 @@
 (define (terminal? the-port)
   (if (not (port? the-port))
       (sanity-check-error "argument must be a port" 'terminal? the-port))
-  (let ((the-fd (port-fd the-port)))
+  (let ((the-fd (port-real-fd the-port)))
     (if (not the-fd)
         #f)
     (begin
@@ -631,7 +652,7 @@
         (if (equal? 1 ret)
             #t
             (if (or (not (equal? 0 ret))
-                    (not (equal? errno/ENOTTY (errno))))
+                    (not (equal? ENOTTY (errno))))
                 (errno-error (errno) 'terminal? 'isatty the-port)
                 #f))))))
 

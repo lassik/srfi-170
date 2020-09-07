@@ -1,26 +1,30 @@
 ;; please see copyright notice in 198/COPYING
 
-(define-library (srfi 198)
+;; Must be a library so test.sld has the same type of record to check
+;; against.
+
+(define-library (srfi 170 posix-error)
   (export
 
-   foreign-error?
+   posix-error?
 
-   foreign-error:error-set foreign-error:code
-   foreign-error:scheme-procedure
-   foreign-error:foreign-interface
-   foreign-error:message foreign-error:data
+   posix-error-error-set
+   posix-error-number
+   posix-error-name
+   posix-error-scheme-procedure
+   posix-error-posix-interface
+   posix-error-message
+   posix-error-data
 
-   make-foreign-error
-   raise-foreign-error
+   make-posix-error
+   raise-posix-error
    )
 
   (import
    (scheme base)
 
-   (chibi optional) ;; Snow package for optional args
-
    (only (srfi 1) alist-cons)
    )
 
-  (include "198/198.scm")
+  (include "posix-error.scm")
   )

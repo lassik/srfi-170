@@ -31,7 +31,8 @@
           (srfi 151) ;; bitwise operators
           ;; (only (srfi 158) generator->list) ;; not in Chibi Scheme, SRFI supplied implemention is very complicated....
           (srfi 170)
-          (srfi 198)
+
+          (srfi 170 posix-error)
           )
 
   (include-shared "170")
@@ -144,40 +145,130 @@
 
         (test-group "3.1  Errors"
 
+          ;; tests from old SRFI 198 implementation
+
+          (set! the-error (make-posix-error 1))
+          (test 'error (posix-error-error-set the-error))
+          (test #f (posix-error-number the-error))
+          (test #f (posix-error-name the-error))
+          (test 'make-posix-error (posix-error-scheme-procedure the-error))
+          (test #f (posix-error-posix-interface the-error))
+          (test "Malformed call to make-posix-error, not a list; see data for details" (posix-error-message the-error))
+          (test '((arguments . 1)) (posix-error-data the-error))
+
+          (set! the-error (make-posix-error '(1)))
+          (test 'error (posix-error-error-set the-error))
+          (test #f (posix-error-number the-error))
+          (test #f (posix-error-name the-error))
+          (test 'make-posix-error (posix-error-scheme-procedure the-error))
+          (test #f (posix-error-posix-interface the-error))
+          (test "Malformed call to make-posix-error, not an alist; see data for details" (posix-error-message the-error))
+          (test '((arguments 1)) (posix-error-data the-error))
+
+          (set! the-error (make-posix-error '((1 . 1))))
+          (test 'error (posix-error-error-set the-error))
+          (test #f (posix-error-number the-error))
+          (test #f (posix-error-name the-error))
+          (test 'make-posix-error (posix-error-scheme-procedure the-error))
+          (test #f (posix-error-posix-interface the-error))
+          (test "Malformed call to make-posix-error, first key must be a symbol; see data for details" (posix-error-message the-error))
+          (test '((arguments (1 . 1))) (posix-error-data the-error))
+
+          (set! the-error (make-posix-error '((foo . 1))))
+          (test 'error (posix-error-error-set the-error))
+          (test #f (posix-error-number the-error))
+          (test #f (posix-error-name the-error))
+          (test 'make-posix-error (posix-error-scheme-procedure the-error))
+          (test #f (posix-error-posix-interface the-error))
+          (test "Malformed call to make-posix-error, missing error-set; see data for details" (posix-error-message the-error))
+          (test '((arguments (foo . 1))) (posix-error-data the-error))
+
+          (set! the-error (make-posix-error '((error-set . error))))
+          (test 'error (posix-error-error-set the-error))
+          (test #f (posix-error-number the-error))
+          (test #f (posix-error-name the-error))
+          (test #f (posix-error-scheme-procedure the-error))
+          (test #f (posix-error-posix-interface the-error))
+          (test #f (posix-error-message the-error))
+          (test #f (posix-error-data the-error))
+
+          ;; Make sure the error raising code isn't malfunctioning and raising a different error
+          (test-error ((with-exception-handler
+                        (lambda (exception) (set! the-error exception))
+                        (lambda () (raise-posix-error '((error-set . error)))))))
+          (test-assert (posix-error? the-error))
+
+          ;; Make a "real" error
+          (set! the-error (make-posix-error '((error-set . errno)
+                                              (errno-number . 2)
+                                              (errno-name . ENOENT)
+                                              (scheme-procedure . open-file)
+                                              (posix-interface . open)
+                                              (message . "open-file called open: ENOENT: No such file or directory")
+                                              (data . ((arguments . ("not-a-valid-filename" 0 428))
+                                                       (heritage . "SRFI 170"))))))
+
+          (test 'errno (posix-error-error-set the-error))
+          (test 2 (posix-error-number the-error))
+          (test 'ENOENT (posix-error-name the-error))
+          (test 'open-file (posix-error-scheme-procedure the-error))
+          (test 'open (posix-error-posix-interface the-error))
+          (test "open-file called open: ENOENT: No such file or directory" (posix-error-message the-error))
+          (test '("not-a-valid-filename" 0 428) (cdr (assq 'arguments (posix-error-data the-error))))
+          (test "SRFI 170" (cdr (assq 'heritage (posix-error-data the-error))))
+
+
+          ;; tests using the above
+
           (test 0 (errno))
-          (test-not-error (set-errno errno/E2BIG))
-          (set-errno errno/E2BIG)
-          (test errno/E2BIG (errno))
+          (test-not-error (set-errno E2BIG))
+          (set-errno E2BIG)
+          (test E2BIG (errno))
           (test-assert (string? (errno-string (errno))))
-          (test-assert (string? (errno-string errno/E2BIG)))
-          (set-errno errno/E2BIG)
-          (test-assert (equal? (errno-string (errno)) (errno-string errno/E2BIG)))
+          (test-assert (string? (errno-string E2BIG)))
+          (set-errno E2BIG)
+          (test-assert (equal? (errno-string (errno)) (errno-string E2BIG)))
 
           ;; Make sure the error raising code isn't malfunctioning and raising a different error
           (test-error ((with-exception-handler
                         (lambda (exception) (set! the-error exception))
                         (lambda () (errno-error 2 'test-of-errno-error-procedure-symbol 'test-of-errno-error-syscall-symbol 1 2 3 4)))))
-          (test-assert (foreign-error? the-error))
-          (test 'errno (foreign-error:error-set the-error))
-          (test 2 (cdr (assq 'number (foreign-error:code the-error))))
-          (test 'errno/ENOENT (cdr (assq 'symbol (foreign-error:code the-error))))
-          (test 'test-of-errno-error-procedure-symbol (foreign-error:scheme-procedure the-error))
-          (test 'test-of-errno-error-syscall-symbol (foreign-error:foreign-interface the-error))
-          (test "test-of-errno-error-procedure-symbol called test-of-errno-error-syscall-symbol: errno/ENOENT: No such file or directory"
-                (foreign-error:message the-error))
-          (test '(1 2 3 4) (cdr (assq 'arguments (foreign-error:data the-error))))
+          (test-assert (posix-error? the-error))
+          (test 'errno (posix-error-error-set the-error))
+          (test 2 (posix-error-number the-error))
+          (test 'ENOENT (posix-error-name the-error))
+          (test 'test-of-errno-error-procedure-symbol (posix-error-scheme-procedure the-error))
+          (test 'test-of-errno-error-syscall-symbol (posix-error-posix-interface the-error))
+          (test "test-of-errno-error-procedure-symbol called test-of-errno-error-syscall-symbol: ENOENT: No such file or directory"
+                (posix-error-message the-error))
+          (test '(1 2 3 4) (cdr (assq 'arguments (posix-error-data the-error))))
+
+          ;; Make sure the error raising code works for a real error
+          (test-error ((with-exception-handler
+                        (lambda (exception) (set! the-error exception))
+                        (lambda () (open-file bogus-path open/read)))))
+          (test-assert (posix-error? the-error))
+          (test 'errno (posix-error-error-set the-error))
+          (test 2 (posix-error-number the-error))
+          (test 'ENOENT (posix-error-name the-error))
+          (test 'open-file (posix-error-scheme-procedure the-error))
+          (test 'open (posix-error-posix-interface the-error))
+          (test "open-file called open: ENOENT: No such file or directory"
+                (posix-error-message the-error))
+          (test (list bogus-path open/read #o666) (cdr (assq 'arguments (posix-error-data the-error))))
 
           (test-error ((with-exception-handler
                         (lambda (exception) (set! the-error exception))
                         (lambda () (sanity-check-error "Sanity check error test message" 'test-of-errno-error-procedure-symbol 1 2 3 4)))))
-          (test-assert (foreign-error? the-error))
-          (test 'error (foreign-error:error-set the-error))
-          (test #f (foreign-error:code the-error))
-          (test 'test-of-errno-error-procedure-symbol (foreign-error:scheme-procedure the-error))
-          (test #f (foreign-error:foreign-interface the-error))
+          (test-assert (posix-error? the-error))
+          (test 'sanity-check (posix-error-error-set the-error))
+          (test #f (posix-error-number the-error))
+          (test #f (posix-error-name the-error))
+          (test 'test-of-errno-error-procedure-symbol (posix-error-scheme-procedure the-error))
+          (test #f (posix-error-posix-interface the-error))
           (test "test-of-errno-error-procedure-symbol: Sanity check error test message"
-                (foreign-error:message the-error))
-          (test '(1 2 3 4) (cdr (assq 'arguments (foreign-error:data the-error))))
+                (posix-error-message the-error))
+          (test '(1 2 3 4) (cdr (assq 'arguments (posix-error-data the-error))))
 
 
           ) ;; end errors
@@ -190,34 +281,57 @@
           (test-error (open-file "foo" 1 "baz"))
           (test-error (open-file bogus-path open/read))
 
-          (let ((the-port (fd->binary-output-port
-                           (open-file tmp-file-1 open-write-create-truncate))))
-            (test-not-error (write-bytevector the-binary-bytevector the-port))
-            (test-not-error (close-port the-port)))
-          (let ((the-port (fd->binary-input-port
-                           (open-file tmp-file-1 open/read))))
-            (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
-            (test-assert (eof-object? (read-char the-port)))
-            (test-not-error (close-port the-port)))
-
-          (let ((the-port (fd->textual-output-port
-                           (open-file tmp-file-1 open-write-create-truncate))))
-            (test-not-error (write-string the-text-string the-port))
-            (test-not-error (close-port the-port)))
-          (let ((the-port (fd->textual-input-port
-                           (open-file tmp-file-1 open/read))))
-            (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
-            (test-assert (eof-object? (read-char the-port)))
-            (test-not-error (close-port the-port)))
-
-          (test 0 (port-fd (current-input-port)))
-          (test 1 (port-fd (current-output-port)))
-          (test 2 (port-fd (current-error-port)))
-          (test-not (port-fd the-string-port))
+          (test-error (close-fd "a"))
+          (test-error (close-fd -1))
 
           (let* ((dev-zero-fd (open-file "/dev/zero" open/read)))
             (test-not-error (close-fd dev-zero-fd))
             (test-error (close-fd dev-zero-fd)))
+
+          (test-error (fd->textual-input-port "a"))
+          (test-error (fd->textual-input-port -1))
+          (test-error (fd->binary-input-port "a"))
+          (test-error (fd->binary-input-port -1))
+          (test-error (fd->textual-output-port "a"))
+          (test-error (fd->textual-output-port -1))
+          (test-error (fd->binary-output-port "a"))
+          (test-error (fd->binary-output-port -1))
+
+          (let* ((new-fd (open-file tmp-file-1 open-write-create-truncate))
+                 (the-port (fd->binary-output-port new-fd)))
+            (test-not-error (write-bytevector the-binary-bytevector the-port))
+            (test-not-error (close-port the-port))
+            (test-not-error (close-fd new-fd)))
+          (let* ((new-fd (open-file tmp-file-1 open/read))
+                 (the-port (fd->binary-input-port new-fd)))
+            (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
+            (test-assert (eof-object? (read-char the-port)))
+            (test-not-error (close-port the-port))
+            (test-not-error (close-fd new-fd)))
+          (let* ((new-fd (open-file tmp-file-1 open-write-create-truncate))
+                 (the-port (fd->textual-output-port new-fd)))
+            (test-not-error (write-string the-text-string the-port))
+            (test-not-error (close-port the-port))
+            (test-not-error (close-fd new-fd)))
+          (let* ((new-fd (open-file tmp-file-1 open/read))
+                 (the-port (fd->textual-input-port new-fd)))
+            (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
+            (test-assert (eof-object? (read-char the-port)))
+            (test-not-error (close-port the-port))
+            (test-not-error (close-fd new-fd)))
+
+          (let ((new-fd (port->fd (current-input-port))))
+            (test-assert (fixnum? new-fd))
+            (test-assert (> new-fd 2))
+            (test 3 new-fd) ;; a bit dangerous, but on normal systems, if all of the above worked, should be true.
+            (test-assert (not (eq? 0 new-fd)))
+            (test-not-error (close-fd new-fd)))
+
+          (test 0 (port-real-fd (current-input-port)))
+          (test 1 (port-real-fd (current-output-port)))
+          (test 2 (port-real-fd (current-error-port)))
+          (test-not (port-real-fd the-string-port))
+
 
           ) ;; end I/O
 
