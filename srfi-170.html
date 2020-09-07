@@ -190,8 +190,6 @@ resolution, nor is anything guaranteed about accuracy.
 The C binding of P<small>OSIX</small> places an error number in the
 global variable <code>errno</code> to report an error, along with
 (in most cases) returning a sentinel value such as -1.  
-</p>
-<p>
 However, the procedures of this SRFI work differently.  Rather than
 reporting errors as return values, they report errors by signaling
 condition objects satisfying the predicate <code>posix-error?</code>
@@ -216,13 +214,11 @@ the P<small>OSIX</small> function reported an error.
 This can be used to provide programmatic recovery
 when a P<small>OSIX</small> function can return
 more than one value of <code>errno</code>.</p>
-<p>Because the
-<code>errno</code> codes are not standardized across different
-P<small>OSIX</small> systems,
-but the associated names (bound by a
-<code>#define</code> in the file <code>/usr/include/errno.h</code>)
-are the same for the most part,
-this function returns the name (in lower case) rather than the code.</p>
+<p>Because the <code>errno</code> codes are not standardized across
+different P<small>OSIX</small> systems, but the associated names
+(bound by a <code>#define</code> in the file
+<code>/usr/include/errno.h</code>) are the same for the most part,
+this function returns the name rather than the code.</p>
 <p>For example, ENOENT (a reference was made to a file or a directory
 that does not exist) almost always corresponds to an <code>errno</code>
 value of 2.
