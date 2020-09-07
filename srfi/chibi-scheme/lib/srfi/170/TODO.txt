@@ -1,3 +1,6 @@
+Rename existing port-fd and move to common.scm for truncate-file,
+file-info, and terminal?.
+
 Needed to match the SRFI:
 
 Add optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
