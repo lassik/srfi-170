@@ -40,7 +40,7 @@
                                                          (alist-or-#f 'errno-number the-alist)
                                                          (alist-or-#f 'errno-name the-alist)
                                                          (alist-or-#f 'scheme-procedure the-alist)
-                                                         (alist-or-#f 'foreign-interface the-alist)
+                                                         (alist-or-#f 'posix-interface the-alist)
                                                          (alist-or-#f 'message the-alist)
                                                          (alist-or-#f 'data the-alist)))))))
 

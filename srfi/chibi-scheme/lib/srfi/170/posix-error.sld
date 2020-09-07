@@ -8,6 +8,7 @@
 
    posix-error?
 
+   posix-error-error-set
    posix-error-number
    posix-error-name
    posix-error-scheme-procedure
@@ -15,6 +16,7 @@
    posix-error-message
    posix-error-data
 
+   make-posix-error
    raise-posix-error
    )
 

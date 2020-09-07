@@ -80,7 +80,7 @@
                               (errno-string errno))
                (alist-cons 'scheme-procedure
                            procedure-symbol
-                           (alist-cons 'foreign-interface
+                           (alist-cons 'posix-interface
                                        syscall-symbol
                                        (alist-cons 'data
                                                    (list (cons 'arguments data))
@@ -99,7 +99,7 @@
                            procedure-symbol
                            (alist-cons 'data
                                        (list (cons 'arguments data))
-                                       '())))))
+                                       '((error-set . sanity-check)))))))
 
 
 ;; This suffers from the problems discussed in SRFI 199
