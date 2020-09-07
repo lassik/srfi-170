@@ -281,6 +281,11 @@
           (test-error (open-file "foo" 1 "baz"))
           (test-error (open-file bogus-path open/read))
 
+          (test 0 (port-internal-fd (current-input-port)))
+          (test 1 (port-internal-fd (current-output-port)))
+          (test 2 (port-internal-fd (current-error-port)))
+          (test-not (port-internal-fd the-string-port))
+
           (test-error (close-fd "a"))
           (test-error (close-fd -1))
 
@@ -326,11 +331,7 @@
             (test 3 new-fd) ;; a bit dangerous, but on normal systems, if all of the above worked, should be true.
             (test-assert (not (eq? 0 new-fd)))
             (test-not-error (close-fd new-fd)))
-
-          (test 0 (port-real-fd (current-input-port)))
-          (test 1 (port-real-fd (current-output-port)))
-          (test 2 (port-real-fd (current-error-port)))
-          (test-not (port-real-fd the-string-port))
+          (test-not (port-internal-fd the-string-port))
 
 
           ) ;; end I/O
