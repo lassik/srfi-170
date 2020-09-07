@@ -1,10 +1,4 @@
-Rename existing port-fd and move to common.scm for truncate-file,
-file-info, and terminal?.
-
-Document how implementation adds posix-error-number
-posix-error-scheme-procedure posix-error-posix-interface
-posix-error-data to the namespace.
-
+Hide port-real-fd ??
 
 
 Needed to match the SRFI:
@@ -19,8 +13,7 @@ Needed for correctness, not production quality without this:
 errno manipulation needs to be done at the C level, for Chibi Scheme
 might set errno between any of 1) manually setting errno, 2) a POSIX
 call possibly setting it, and 3) retrieving its value.  See the SRFI
-199 discussion for more details:
-https://srfi-email.schemers.org/srfi-199/
+199 discussion for more details: https://srfi-email.schemers.org/srfi-199/
 
 The functionality of retry-if-EINTR in common.scm needs to be done at
 the C level, for Chibi Scheme might set errno between the retry of the
