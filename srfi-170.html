@@ -316,16 +316,28 @@ one or more of the following constants:
 <p>It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
 <code>open/read+write</code> flags is provided.</p>
 </blockquote>
+<div><code>(port-internal-fd <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>fd</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<p></p>
+<blockquote>
+<p>Returns the file descriptor used by <i>port</i>.
+This procedure is made available in order to invoke
+P<small>OSIX</small> functions not provided by this SRFI.
+<b>It should be used only when absolutely necessary.</b>
+If <i>fd</i> is closed with <code>close-fd</code>
+or otherwise, it is an error
+to do any further operations on <i>port</i>.
+</p>
+</blockquote>
 <div><code>(close-fd <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code>&nbsp;</div>
 <p></p>
 <blockquote>
-<p>Closes the file descriptor <i>fd</i>.</p>
-<p>If <i>fd</i> is associated with a port, it is an error
+<p>Closes the file descriptor <i>fd</i>.
+If <i>fd</i> is the internal file descriptor of a port, it is an error
 to do any further operations on that port.
 </p>
 </blockquote>
 
-<p>The following routines allow conversion between ports and file
+<p>The following routines allow reasonably safe conversion between ports and file
 descriptors.
 More precisely, the port returned by the first four procedures
 contains a duplicate of the file descriptor passed to them,
@@ -334,18 +346,18 @@ a duplicate of the one held by the port.</p>
 <p>It is the responsibility of the caller
 to make sure the file descriptor is closed independently of the
 port being closed.
-By the same token, closing the port may close the associated
+By the same token, closing the port may safely close the associated
 file descriptor when <code>close-port</code> is called on it
 or when the port object is garbage-collected.
 However, as long as both are open,  the port and the file descriptor will share
 the same position, so that reads and writes on one are visible from the other.
-Therefore, use extreme caution when reading or writing to the file descriptor
-(something this SRFI does not provide a mechanism for doing).</p>
-<div><code>(fd->textual-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(fd->binary-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-
-<div><code>(fd->textual-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(fd->binary-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+Therefore, use caution when reading or writing to the file descriptor
+(something this SRFI does not provide a mechanism for doing),
+especially in the presence of buffering.</p>
+<div><code>(fd->textual-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->binary-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->textual-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->binary-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
 <blockquote>
 <p>These procedures wrap a newly created port around a duplicate of
 the specified file descriptor, effectively importing it into the
@@ -364,7 +376,7 @@ by default in the underlying implementation.</p>
 </p>
 </blockquote>
 
-<div><code>(port->fd <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(port->fd <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
 
 <blockquote>
 <p>This procedure returns a file descriptor that has been duplicated
