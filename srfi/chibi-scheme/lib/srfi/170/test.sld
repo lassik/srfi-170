@@ -31,7 +31,8 @@
           (srfi 151) ;; bitwise operators
           ;; (only (srfi 158) generator->list) ;; not in Chibi Scheme, SRFI supplied implemention is very complicated....
           (srfi 170)
-          (srfi 198)
+
+          (srfi 170 posix-error)
           )
 
   (include-shared "170")
@@ -143,6 +144,76 @@
 
 
         (test-group "3.1  Errors"
+
+          ;; tests from old SRFI 198 implementation
+
+          (set! the-error (make-foreign-error 1))
+          (test 'error (foreign-error:error-set the-error))
+          (test #f (foreign-error:code the-error))
+          (test 'make-foreign-error (foreign-error:scheme-procedure the-error))
+          (test #f (foreign-error:foreign-interface the-error))
+          (test "Malformed call to make-foreign-error, not a list; see data for details" (foreign-error:message the-error))
+          (test '((arguments . 1)) (foreign-error:data the-error))
+
+          (set! the-error (make-foreign-error '(1)))
+          (test 'error (foreign-error:error-set the-error))
+          (test #f (foreign-error:code the-error))
+          (test 'make-foreign-error (foreign-error:scheme-procedure the-error))
+          (test #f (foreign-error:foreign-interface the-error))
+          (test "Malformed call to make-foreign-error, not an alist; see data for details" (foreign-error:message the-error))
+          (test '((arguments 1)) (foreign-error:data the-error))
+
+          (set! the-error (make-foreign-error '((1 . 1))))
+          (test 'error (foreign-error:error-set the-error))
+          (test #f (foreign-error:code the-error))
+          (test 'make-foreign-error (foreign-error:scheme-procedure the-error))
+          (test #f (foreign-error:foreign-interface the-error))
+          (test "Malformed call to make-foreign-error, first key must be a symbol; see data for details" (foreign-error:message the-error))
+          (test '((arguments (1 . 1))) (foreign-error:data the-error))
+
+          (set! the-error (make-foreign-error '((foo . 1))))
+          (test 'error (foreign-error:error-set the-error))
+          (test #f (foreign-error:code the-error))
+          (test 'make-foreign-error (foreign-error:scheme-procedure the-error))
+          (test #f (foreign-error:foreign-interface the-error))
+          (test "Malformed call to make-foreign-error, missing error-set; see data for details" (foreign-error:message the-error))
+          (test '((arguments (foo . 1))) (foreign-error:data the-error))
+
+          (set! the-error (make-foreign-error '((error-set . error))))
+          (test 'error (foreign-error:error-set the-error))
+          (test #f (foreign-error:code the-error))
+          (test #f (foreign-error:scheme-procedure the-error))
+          (test #f (foreign-error:foreign-interface the-error))
+          (test #f (foreign-error:message the-error))
+          (test #f (foreign-error:data the-error))
+
+          ;; Make sure the error raising code isn't malfunctioning and raising a different error
+          (test-error ((with-exception-handler
+                        (lambda (exception) (set! the-error exception))
+                        (lambda () (raise-foreign-error '((error-set . error)))))))
+          (test-assert (foreign-error? the-error))
+
+          ;; Make a "real" error
+          (set! the-error (make-foreign-error '((error-set . errno)
+                                                (code . ((number . 2)
+                                                         (symbol . errno/ENOENT)))
+                                                (scheme-procedure . open-file)
+                                                (foreign-interface . open)
+                                                (message . "open-file called open: errno/ENOENT: No such file or directory")
+                                                (data . ((arguments . ("not-a-valid-filename" 0 428))
+                                                         (heritage . "SRFI 170"))))))
+
+          (test 'errno (foreign-error:error-set the-error))
+          (test 2 (cdr (assq 'number (foreign-error:code the-error))))
+          (test 'errno/ENOENT (cdr (assq 'symbol (foreign-error:code the-error))))
+          (test 'open-file (foreign-error:scheme-procedure the-error))
+          (test 'open (foreign-error:foreign-interface the-error))
+          (test "open-file called open: errno/ENOENT: No such file or directory" (foreign-error:message the-error))
+          (test '("not-a-valid-filename" 0 428) (cdr (assq 'arguments (foreign-error:data the-error))))
+          (test "SRFI 170" (cdr (assq 'heritage (foreign-error:data the-error))))
+
+
+          ;; tests using the above
 
           (test 0 (errno))
           (test-not-error (set-errno errno/E2BIG))
