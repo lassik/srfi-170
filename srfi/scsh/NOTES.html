@@ -24,26 +24,24 @@ because it uses specialized syntax to catch system errors.
 <h3>3.2&nbsp;&nbsp;I/O</h3>
 <ul>
 <li><p>
-The scsh version of <code>open-file</code> returns a port
-rather than a file descriptor.
 </p></li>
 <li><p>
 Scsh does not distinguish between textual and binary ports,
 so there are only two procedures to convert file descriptors to ports,
-<code>fdes->inport</code> in place of <code>fdes->textual-input-port</code>
-and <code>fdes->binary-input-port</code>, and
-<code>fdes->outport</code> in place of <code>fdes->textual-output-port</code>
-and <code>fdes->binary-output-port</code>.
+<code>fdes->inport</code> in place of <code>fd->textual-input-port</code>
+and <code>fd->binary-input-port</code>, and
+<code>fdes->outport</code> in place of <code>fd->textual-output-port</code>
+and <code>fd->binary-output-port</code>.
 </p></li>
 <li><p>
 The scsh versions of the <code>fdes->*port</code> procedures
 do not support the <i>buffer-mode</i> argument.
 </p></li>
-<li><p>The <code>port-fdes</code> procedure is called <code>port->fdes</code> in scsh.
+<li><p>The <code>port-fd</code> procedure is called <code>port->fdes</code> in scsh.
 The name was changed because the use of the arrow suggests a conversion of the
 port to a file descriptor, which is not the case.
 </p></li>
-<li><p>There is no <code>close-fdes</code> procedure in scsh, as the standard <code>close-port</code>
+<li><p>There is no <code>close-fd</code> procedure in scsh, as the standard <code>close-port</code>
 procedure suffices.
 </p></li>
 </ul>
@@ -63,8 +61,7 @@ When scsh <code>create-hard-link</code> is asked to make a link across file syst
 rather than erroring it creates a copy of the file at <i>newname</i>.
 </p></li>
 <li><p>
-<code>set-file-timespecs</code> is <code>set-file-times</code> in scsh,
-and <code>access-timespec</code> and <code>mod-timespec</code> are rational numbers,
+<code>access-time</code> and <code>mod-time</code> are rational numbers,
 which are coerced to exact integers, and treated as the number of elapsed seconds
 since the POSIX epoch of midnight January 1, 1970.
 </p></li>
@@ -76,7 +73,7 @@ The scsh <code>file-info mode</code> record field is masked to only return the n
 omitting the bits for <code>set-user-ID</code>, <code>set-group-ID</code>, and the save text
 or "sticky" bit.
 The scsh <code>file-info</code> record fields <code>atime</code>, <code>mtime</code>, and <code>ctime</code>
-fields are exact integers instead of <code><i>timespecs</i></code>, and are the number of elapsed seconds
+fields are exact integers instead of <code>time objects</code>, and are the number of elapsed seconds
 (excluding leap seconds) since the POSIX epoch of midnight January 1, 1970.
 It does not implement the <code>rdev</code>, <code>blksize</code>, and <code>blocks</code> fields.
 </p></li>
