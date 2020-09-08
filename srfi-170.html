@@ -231,7 +231,8 @@ has a <code>errno</code> value of 110 on Linux, but 60 on FreeBSD and 116 on Cyg
 This procedure returns a string that is the error message associated,
 with the value of <code>errno</code> when
 the P<small>OSIX</small> function reported an error.
-This string can be obtained from the <code>strerror()</code> function,
+This string may be, or may include, the output of the
+<code>strerror()</code> function,
 and is useful for reporting the cause of the error to the user.
 It may or may not be localized.
 </blockquote>
@@ -341,14 +342,13 @@ contains a duplicate of the file descriptor passed to them,
 and the final procedure returns a file descriptor which is
 a duplicate of the one held by the port.</p>
 <p>It is the responsibility of the caller
-to make sure the file descriptor is closed independently of the
-port being closed.
-By the same token, closing the port may safely close the associated
-file descriptor when <code>close-port</code> is called on it
-or when the port object is garbage-collected.
+to make sure the file descriptor is closed.
+By the same token, the port may safely close its internal
+file descriptor when <code>close-port</code> is called on the port
+or when it is garbage-collected.
 However, as long as both are open,  the port and the file descriptor will share
 the same position, so that reads and writes on one are visible from the other.
-Therefore, use caution when reading or writing to the file descriptor
+Therefore, <b>use caution</b> when reading or writing to the file descriptor
 (something this SRFI does not provide a mechanism for doing),
 especially in the presence of buffering.</p>
 <div><code>(fd->textual-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
