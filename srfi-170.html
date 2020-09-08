@@ -174,7 +174,7 @@ right thing.
 <p>
 Several of this SRFI's procedures either accept or return a <i>time object</i>
 that is fully compatible with the time objects of
-<a href="https://github.com/scheme-requests-for-implementation/srfi-19/srfi-19.html">
+<a href="https://srfi.schemers.org/srfi-19/srfi-19.html">
 SRFI 19</a>.  It contains at least three values: the number of elapsed seconds
 since a given epoch, the number of
 elapsed nanoseconds since the beginning of the specified second,
@@ -189,7 +189,7 @@ resolution, nor is anything guaranteed about accuracy.
 <p>
 The C binding of P<small>OSIX</small> places an error number in the
 global variable <code>errno</code> to report an error, along with
-(in most cases) returning a sentinel value such as -1.  
+(in most cases) returning a sentinel value such as -1.
 However, the procedures of this SRFI work differently.  Rather than
 reporting errors as return values, they report errors by signaling
 condition objects satisfying the predicate <code>posix-error?</code>
