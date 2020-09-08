@@ -8,54 +8,54 @@
 
 (map (lambda (errno-number errno-symbol) (hash-table-set! errno-map errno-number errno-symbol))
      (list
-      errno/E2BIG errno/EACCES errno/EADDRINUSE errno/EADDRNOTAVAIL
-      errno/EAFNOSUPPORT errno/EAGAIN errno/EALREADY errno/EBADF
-      errno/EBADMSG errno/EBUSY errno/ECANCELED errno/ECHILD
-      errno/ECONNABORTED errno/ECONNREFUSED errno/ECONNRESET
-      errno/EDEADLK errno/EDESTADDRREQ errno/EDOM errno/EDQUOT
-      errno/EEXIST errno/EFAULT errno/EFBIG errno/EHOSTUNREACH
-      errno/EIDRM errno/EILSEQ errno/EINPROGRESS errno/EINTR errno/EINVAL
-      errno/EIO errno/EISCONN errno/EISDIR errno/ELOOP errno/EMFILE
-      errno/EMLINK errno/EMSGSIZE errno/ENAMETOOLONG errno/ENETDOWN
-      errno/ENETRESET errno/ENETUNREACH errno/ENFILE errno/ENOBUFS
-      errno/ENODEV errno/ENOENT errno/ENOEXEC errno/ENOLCK errno/ENOMEM
-      errno/ENOMSG errno/ENOPROTOOPT errno/ENOSPC errno/ENOSYS
-      errno/ENOTCONN errno/ENOTDIR errno/ENOTEMPTY errno/ENOTRECOVERABLE
-      errno/ENOTSOCK errno/ENOTSUP errno/ENOTTY errno/ENXIO
-      errno/EOPNOTSUPP errno/EOVERFLOW errno/EOWNERDEAD errno/EPERM
-      errno/EPIPE errno/EPROTO errno/EPROTONOSUPPORT errno/EPROTOTYPE
-      errno/ERANGE errno/EROFS errno/ESPIPE errno/ESRCH errno/ESTALE
-      errno/ETIMEDOUT errno/ETXTBSY errno/EWOULDBLOCK errno/EXDEV
+      E2BIG EACCES EADDRINUSE EADDRNOTAVAIL
+      EAFNOSUPPORT EAGAIN EALREADY EBADF
+      EBADMSG EBUSY ECANCELED ECHILD
+      ECONNABORTED ECONNREFUSED ECONNRESET
+      EDEADLK EDESTADDRREQ EDOM EDQUOT
+      EEXIST EFAULT EFBIG EHOSTUNREACH
+      EIDRM EILSEQ EINPROGRESS EINTR EINVAL
+      EIO EISCONN EISDIR ELOOP EMFILE
+      EMLINK EMSGSIZE ENAMETOOLONG ENETDOWN
+      ENETRESET ENETUNREACH ENFILE ENOBUFS
+      ENODEV ENOENT ENOEXEC ENOLCK ENOMEM
+      ENOMSG ENOPROTOOPT ENOSPC ENOSYS
+      ENOTCONN ENOTDIR ENOTEMPTY ENOTRECOVERABLE
+      ENOTSOCK ENOTSUP ENOTTY ENXIO
+      EOPNOTSUPP EOVERFLOW EOWNERDEAD EPERM
+      EPIPE EPROTO EPROTONOSUPPORT EPROTOTYPE
+      ERANGE EROFS ESPIPE ESRCH ESTALE
+      ETIMEDOUT ETXTBSY EWOULDBLOCK EXDEV
 
       (cond-expand ((not openbsd)
-                    errno/EMULTIHOP errno/ENOLINK
+                    EMULTIHOP ENOLINK
                     ;; STREAMS:
-                    errno/ENODATA errno/ENOSTR errno/ENOSR errno/ETIME)))
+                    ENODATA ENOSTR ENOSR ETIME)))
 
      (list
-      'errno/E2BIG 'errno/EACCES 'errno/EADDRINUSE 'errno/EADDRNOTAVAIL
-      'errno/EAFNOSUPPORT 'errno/EAGAIN 'errno/EALREADY 'errno/EBADF
-      'errno/EBADMSG 'errno/EBUSY 'errno/ECANCELED 'errno/ECHILD
-      'errno/ECONNABORTED 'errno/ECONNREFUSED 'errno/ECONNRESET
-      'errno/EDEADLK 'errno/EDESTADDRREQ 'errno/EDOM 'errno/EDQUOT
-      'errno/EEXIST 'errno/EFAULT 'errno/EFBIG 'errno/EHOSTUNREACH
-      'errno/EIDRM 'errno/EILSEQ 'errno/EINPROGRESS 'errno/EINTR 'errno/EINVAL
-      'errno/EIO 'errno/EISCONN 'errno/EISDIR 'errno/ELOOP 'errno/EMFILE
-      'errno/EMLINK 'errno/EMSGSIZE 'errno/ENAMETOOLONG 'errno/ENETDOWN
-      'errno/ENETRESET 'errno/ENETUNREACH 'errno/ENFILE 'errno/ENOBUFS
-      'errno/ENODEV 'errno/ENOENT 'errno/ENOEXEC 'errno/ENOLCK 'errno/ENOMEM
-      'errno/ENOMSG 'errno/ENOPROTOOPT 'errno/ENOSPC 'errno/ENOSYS
-      'errno/ENOTCONN 'errno/ENOTDIR 'errno/ENOTEMPTY 'errno/ENOTRECOVERABLE
-      'errno/ENOTSOCK 'errno/ENOTSUP 'errno/ENOTTY 'errno/ENXIO
-      'errno/EOPNOTSUPP 'errno/EOVERFLOW 'errno/EOWNERDEAD 'errno/EPERM
-      'errno/EPIPE 'errno/EPROTO 'errno/EPROTONOSUPPORT 'errno/EPROTOTYPE
-      'errno/ERANGE 'errno/EROFS 'errno/ESPIPE 'errno/ESRCH 'errno/ESTALE
-      'errno/ETIMEDOUT 'errno/ETXTBSY 'errno/EWOULDBLOCK 'errno/EXDEV
+      'E2BIG 'EACCES 'EADDRINUSE 'EADDRNOTAVAIL
+      'EAFNOSUPPORT 'EAGAIN 'EALREADY 'EBADF
+      'EBADMSG 'EBUSY 'ECANCELED 'ECHILD
+      'ECONNABORTED 'ECONNREFUSED 'ECONNRESET
+      'EDEADLK 'EDESTADDRREQ 'EDOM 'EDQUOT
+      'EEXIST 'EFAULT 'EFBIG 'EHOSTUNREACH
+      'EIDRM 'EILSEQ 'EINPROGRESS 'EINTR 'EINVAL
+      'EIO 'EISCONN 'EISDIR 'ELOOP 'EMFILE
+      'EMLINK 'EMSGSIZE 'ENAMETOOLONG 'ENETDOWN
+      'ENETRESET 'ENETUNREACH 'ENFILE 'ENOBUFS
+      'ENODEV 'ENOENT 'ENOEXEC 'ENOLCK 'ENOMEM
+      'ENOMSG 'ENOPROTOOPT 'ENOSPC 'ENOSYS
+      'ENOTCONN 'ENOTDIR 'ENOTEMPTY 'ENOTRECOVERABLE
+      'ENOTSOCK 'ENOTSUP 'ENOTTY 'ENXIO
+      'EOPNOTSUPP 'EOVERFLOW 'EOWNERDEAD 'EPERM
+      'EPIPE 'EPROTO 'EPROTONOSUPPORT 'EPROTOTYPE
+      'ERANGE 'EROFS 'ESPIPE 'ESRCH 'ESTALE
+      'ETIMEDOUT 'ETXTBSY 'EWOULDBLOCK 'EXDEV
 
       (cond-expand ((not openbsd)
-                    'errno/EMULTIHOP 'errno/ENOLINK
+                    'EMULTIHOP 'ENOLINK
                     ;; STREAMS:
-                    'errno/ENODATA 'errno/ENOSTR 'errno/ENOSR 'errno/ETIME))
+                    'ENODATA 'ENOSTR 'ENOSR 'ETIME))
       ))
 
 (define (errno-string errno)
@@ -69,7 +69,7 @@
   (hash-table-ref errno-map errno))
 
 (define (errno-error errno procedure-symbol syscall-symbol . data)
-  (raise-foreign-error
+  (raise-posix-error
    (alist-cons 'message
                (string-append (symbol->string procedure-symbol)
                               " called "
@@ -80,23 +80,26 @@
                               (errno-string errno))
                (alist-cons 'scheme-procedure
                            procedure-symbol
-                           (alist-cons 'foreign-interface
+                           (alist-cons 'posix-interface
                                        syscall-symbol
                                        (alist-cons 'data
                                                    (list (cons 'arguments data))
-                                                   (alist-cons 'code
-                                                               (list (cons 'number errno) (cons 'symbol (errno-symbol errno)))
-                                                               '((error-set . errno)))))))))
+                                                   (alist-cons 'errno-number
+                                                               errno
+                                                               (alist-cons 'errno-name
+                                                                           (errno-symbol errno)
+                                                                           '((error-set . errno))))))))))
+
 
 (define (sanity-check-error message procedure-symbol . data)
-  (raise-foreign-error
+  (raise-posix-error
    (alist-cons 'message
                (string-append (symbol->string procedure-symbol) ": " message)
                (alist-cons 'scheme-procedure
                            procedure-symbol
                            (alist-cons 'data
                                        (list (cons 'arguments data))
-                                       '((error-set . error)))))))
+                                       '((error-set . sanity-check)))))))
 
 
 ;; This suffers from the problems discussed in SRFI 199
@@ -108,7 +111,7 @@
   (let loop ((ret (the-lambda)))
     (if ret
         ret
-        (if (equal? errno/EINTR (errno))
+        (if (equal? EINTR (errno))
             (loop (the-lambda))
             ret))))
 

@@ -1,8 +1,8 @@
 Needed to match the SRFI:
 
-Add optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
+The optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
 
-Finish call-with-temporary-filename
+Finishing call-with-temporary-filename
 
 
 Needed for correctness, not production quality without this:
@@ -10,8 +10,7 @@ Needed for correctness, not production quality without this:
 errno manipulation needs to be done at the C level, for Chibi Scheme
 might set errno between any of 1) manually setting errno, 2) a POSIX
 call possibly setting it, and 3) retrieving its value.  See the SRFI
-199 discussion for more details:
-https://srfi-email.schemers.org/srfi-199/
+199 discussion for more details: https://srfi-email.schemers.org/srfi-199/
 
 The functionality of retry-if-EINTR in common.scm needs to be done at
 the C level, for Chibi Scheme might set errno between the retry of the
