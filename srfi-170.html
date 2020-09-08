@@ -228,8 +228,8 @@ has a <code>errno</code> value of 110 on Linux, but 60 on FreeBSD and 116 on Cyg
 </blockquote>
 <div><code>(posix-error-message <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
 <blockquote>
-This procedure returns a string that is the error message associated
-with the value of <code>errno</code> when
+This procedure returns a string that is an error message reflecting
+the value of <code>errno</code> when
 the P<small>OSIX</small> function reported an error.
 This string may be, or may include, the output of the
 <code>strerror()</code> function,
