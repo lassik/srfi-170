@@ -156,7 +156,7 @@ is a good source of usage examples.</p>
 
 <h2>Specification</h2>
 
-Implementations of this SRFI on non-P<small>OSIX</small> systems, especially Windows,
+<p>Implementations of this SRFI on non-P<small>OSIX</small> systems, especially Windows,
 must provide all the procedure names and syntax keywords.
 However, if the specified action is not possible, the procedure should
 either take no action and return some reasonable default value,
@@ -200,13 +200,13 @@ This SRFI provides three procedures which will typically be shims
 over whatever the implementation uses to report such errors:
 </p>
 
-<div><code>(posix-error? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
+<code>(posix-error? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
 <blockquote>
 This procedure returns <code>#t</code> if <code>obj</code> is
 a condition object that describes a P<small>OSIX</small> error,
 and <code>#f</code> otherwise.
 </blockquote>
-<div><code>(posix-error-name <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>symbol</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
+<code>(posix-error-name <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>symbol</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
 <blockquote>
 <p>This procedure returns a symbol that is the name associated
 with the value of <code>errno</code> when
@@ -226,7 +226,7 @@ But <code>ETIMEDOUT</code>, meaning that a TCP connection
 has been unresponsive for too long, is standardized by P<small>OSIX</small>,
 has a <code>errno</code> value of 110 on Linux, but 60 on FreeBSD and 116 on Cygwin.</p>
 </blockquote>
-<div><code>(posix-error-message <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
+<code>(posix-error-message <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
 <blockquote>
 This procedure returns a string that is an error message reflecting
 the value of <code>errno</code> when
@@ -352,7 +352,7 @@ Therefore, <b>use caution</b> when reading or writing to the file descriptor
 (something this SRFI does not provide a mechanism for doing),
 especially in the presence of buffering.</p>
 <div><code>(fd->textual-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<div><code>(fd->binary-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->binary-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
 <div><code>(fd->textual-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
 <div><code>(fd->binary-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
 <blockquote>
