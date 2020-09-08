@@ -15,31 +15,55 @@
           (errno-error (errno) 'open-file 'open fname flags permission-bits)
           fd))))
 
+(define (port-internal-fd the-port)
+  (if (not (port? the-port))
+      (sanity-check-error "argument must be a port" 'port-internal-fd the-port))
+  (port-fileno the-port))
+
+(define (close-fd the-fd)
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'close-fd the-fd))
+  (if (not (retry-if-EINTR (lambda () (%close the-fd))))
+      (errno-error (errno) 'close-fd 'close the-fd)))
+
 ;; seems Chibi handles bogus fds OK, reading input returns eof, output
 ;; raises errors
 
-(define (fdes->textual-input-port the-fd)
-  (%file_descriptor_to_port the-fd #t #f))
-
-(define (fdes->binary-input-port the-fd)
-  (%file_descriptor_to_port the-fd #t #t))
-
-(define (fdes->textual-output-port the-fd)
-  (%file_descriptor_to_port the-fd #f #f))
-
-(define (fdes->binary-output-port the-fd)
-  (%file_descriptor_to_port the-fd #f #t))
-
-(define (port-fdes the-port)
-  (if (not (port? the-port))
-      (sanity-check-error "argument must be a port" 'port-fdes the-port))
-  (port-fileno the-port))
-
-(define (close-fdes the-fd)
+(define (dup-file-descriptor the-fd) ;; not "duplicate" because that's a Chibi procedure.
   (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (sanity-check-error "argument must be a fixnum" 'close-fdes the-fd))
-  (if (not (retry-if-EINTR (lambda () (%close the-fd))))
-      (errno-error (errno) 'close-fdes 'close the-fd)))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'dup-file-descriptor the-fd))
+  (let ((ret (%dup the-fd)))
+    (if (eq? -1 ret)
+        (errno-error (errno) 'dup-file-descriptor 'dup the-fd)
+        ret)))
+
+(define (fd->textual-input-port the-fd)
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->textual-input-port the-fd))
+  (%file_descriptor_to_port (dup-file-descriptor the-fd) #t #f))
+
+(define (fd->binary-input-port the-fd)
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->binary-input-port the-fd))
+  (%file_descriptor_to_port (dup-file-descriptor the-fd) #t #t))
+
+(define (fd->textual-output-port the-fd)
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->textual-output-port the-fd))
+  (%file_descriptor_to_port (dup-file-descriptor the-fd) #f #f))
+
+(define (fd->binary-output-port the-fd)
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->binary-output-port the-fd))
+  (%file_descriptor_to_port (dup-file-descriptor the-fd) #f #t))
+
+(define (port->fd the-port)
+  (if (not (port? the-port))
+      (sanity-check-error "argument must be a port" 'port->fd the-port))
+  (let ((the-original-fd (port-fileno the-port)))
+    (if (not the-original-fd)
+        the-original-fd
+        (dup-file-descriptor the-original-fd))))
 
 
 ;;; 3.3  File system
@@ -113,43 +137,42 @@
   (if (not (retry-if-EINTR (lambda () (%chmod fname permission-bits))))
       (errno-error (errno) 'set-file-mode 'chmod fname permission-bits)))
 
-(define (set-file-owner fname uid)
+(define owner/unchanged -1)
+(define group/unchanged -1)
+
+(define (set-file-owner fname uid gid)
   (if (not (string? fname))
-        (sanity-check-error "fname must be a string" 'set-file-owner fname))
+      (sanity-check-error "fname must be a string" 'set-file-owner fname))
   (if (not (exact-integer? uid))
-        (sanity-check-error "uid must be an exact integer" 'set-file-owner uid))
-  (let ((gid (file-info:gid (file-info fname #t))))
-    (if (not (retry-if-EINTR (lambda () (%chown fname uid gid))))
-        (errno-error (errno) 'set-file-owner 'chown fname uid gid))))
-
-(define (set-file-group fname gid)
-  (if (not (string? fname))
-        (sanity-check-error "fname must be a string" 'set-file-group fname))
+      (sanity-check-error "uid must be an exact integer" 'set-file-owner uid))
   (if (not (exact-integer? gid))
-        (sanity-check-error "gid must be an exact integer" 'set-file-group gid))
-  (let ((uid (file-info:uid (file-info fname #t))))
-    (if (not (retry-if-EINTR (lambda () (%chown fname uid gid))))
-        (errno-error (errno) 'set-file-group 'chown fname uid gid))))
+      (sanity-check-error "gid must be an exact integer" 'set-file-owner gid))
+  (if (not (retry-if-EINTR (lambda () (%chown fname uid gid))))
+      (errno-error (errno) 'set-file-owner 'chown fname uid gid)))
 
-(define timespec/now (make-timespec -1 utimens/utime_now))
-(define timespec/omit (make-timespec -1 utimens/utime_omit))
+;; For the purposes of the SRFI 170 API, the time-type as used here is
+;; irrelevant ~~~ but this could be confusing
+(define time/now (make-time time-utc -1 utimens/utime_now))
+(define time/unchanged (make-time time-utc -1 utimens/utime_omit))
 
-(define set-file-timespecs
+(define set-file-times
   (case-lambda
-   ((fname) (set-file-timespecs* fname timespec/now timespec/now))
-   ((fname atime mtime) (set-file-timespecs* fname atime mtime))))
+   ((fname) (set-file-times* fname time/now time/now))
+   ((fname atime mtime) (set-file-times* fname atime mtime))))
 
-(define (set-file-timespecs* fname atime mtime)
-  (if (or (not (timespec? atime)) (not (timespec? mtime)))
-      (sanity-check-error "atime and mtime must be timespecs" 'set-file-timespecs* fname atime mtime))
+(define (set-file-times* fname atime mtime)
+  (if (or (not (time? atime)) (not (time? mtime)))
+      (sanity-check-error "atime and mtime must be SRFI 19 times" 'set-file-times* fname atime mtime))
+  (if (or (not (eq? time-utc (time-type atime))) (not (eq? time-utc (time-type mtime))))
+      (sanity-check-error "atime and mtime must have a time-type of time-utc" 'set-file-times* fname atime mtime))
   (if (not (%utimensat utimens/at_fdcwd
                        fname
-                       ;; don't change underlying representation until timespec SRFI finalized
-                       ;; and maybe not even then, a cons cell is very simple
-                       (cons (timespec-seconds atime) (timespec-nanoseconds atime))
-                       (cons (timespec-seconds mtime) (timespec-nanoseconds mtime))
+                       ;; This underlying representation will do for now,
+                       ;; a cons cell is very simple
+                       (cons (time-second atime) (time-nanosecond atime))
+                       (cons (time-second mtime) (time-nanosecond mtime))
                        0))
-      (errno-error (errno) 'set-file-timespecs 'utimensat fname atime mtime)))
+      (errno-error (errno) 'set-file-times 'utimensat fname atime mtime)))
 
 (define (truncate-file fname/port len)
   (if (not (exact-integer? len))
@@ -158,7 +181,7 @@
          (if (not (retry-if-EINTR (lambda () (%truncate fname/port len))))
              (errno-error (errno) 'truncate-file 'truncate fname/port len)))
         ((port? fname/port)
-         (if (not (retry-if-EINTR (lambda () (%ftruncate (port-fdes fname/port) len))))
+         (if (not (retry-if-EINTR (lambda () (%ftruncate (port-internal-fd fname/port) len))))
              (errno-error (errno) 'truncate-file 'ftruncate fname/port len)))
         (else (sanity-check-error "first argument must be a file name or a port" 'truncate-file fname/port len))))
 
@@ -211,7 +234,7 @@
                                        'lstat)
                                    fname/port))))
                ((port? fname/port)
-                (let ((the-file-info (%fstat (port-fdes fname/port))))
+                (let ((the-file-info (%fstat (port-internal-fd fname/port))))
                   (if the-file-info
                       the-file-info
                       (errno-error (errno) 'file-info 'fstat fname/port follow?))))
@@ -237,9 +260,9 @@
      (stat:size file-stat)
      (stat:blksize file-stat)
      (stat:blocks file-stat)
-     (make-timespec (posix-timespec:seconds (stat:atime file-stat)) (posix-timespec:nanoseconds (stat:atime file-stat)))
-     (make-timespec (posix-timespec:seconds (stat:mtime file-stat)) (posix-timespec:nanoseconds (stat:mtime file-stat)))
-     (make-timespec (posix-timespec:seconds (stat:ctime file-stat)) (posix-timespec:nanoseconds (stat:ctime file-stat))))))
+     (make-time time-utc (posix-timespec:seconds (stat:atime file-stat)) (posix-timespec:nanoseconds (stat:atime file-stat)))
+     (make-time time-utc (posix-timespec:seconds (stat:mtime file-stat)) (posix-timespec:nanoseconds (stat:mtime file-stat)))
+     (make-time time-utc (posix-timespec:seconds (stat:ctime file-stat)) (posix-timespec:nanoseconds (stat:ctime file-stat))))))
 
 (define (file-info-directory? file-info-record)
   (S_ISDIR (file-info:mode file-info-record)))
@@ -473,7 +496,7 @@
           (let ((fname (string-append the-prefix "." (number->string i))))
             (receive retvals (with-errno-handler ;; ~~~~ "THEN A MIRACLE OCCURS..."
                                ((errno data)
-                                ((errno/EEXIST errno/EACCES) #f))
+                                ((EEXIST EACCES) #f))
                                (maker fname))
               (if (car retvals) (apply values retvals) ;; ~~~~ don't understand the use of values at all
                   (loop (+ i 1)))))))))
@@ -589,16 +612,16 @@
 ;;; 3.10  Time
 
 (define (posix-time)
-  (let ((t (%clock_gettime clck-id/realtime)))
+  (let ((t (%clock_gettime time-utc)))
     (if (not t)
         (errno-error (errno) 'posix-time 'clock_gettime)
-        (make-timespec (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
+        (make-time time-utc (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
 
 (define (monotonic-time)
-  (let ((t (%clock_gettime clck-id/monotonic)))
+  (let ((t (%clock_gettime time-monotonic)))
     (if (not t)
         (errno-error (errno) 'monotonic-time 'clock_gettime)
-        (make-timespec (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
+        (make-time time-monotonic (posix-timespec:seconds t) (posix-timespec:nanoseconds t)))))
 
 
 ;;; 3.11  Environment variables
@@ -623,7 +646,7 @@
 (define (terminal? the-port)
   (if (not (port? the-port))
       (sanity-check-error "argument must be a port" 'terminal? the-port))
-  (let ((the-fd (port-fdes the-port)))
+  (let ((the-fd (port-internal-fd the-port)))
     (if (not the-fd)
         #f)
     (begin
@@ -632,7 +655,7 @@
         (if (equal? 1 ret)
             #t
             (if (or (not (equal? 0 ret))
-                    (not (equal? errno/ENOTTY (errno))))
+                    (not (equal? ENOTTY (errno))))
                 (errno-error (errno) 'terminal? 'isatty the-port)
                 #f))))))
 
@@ -643,7 +666,7 @@
 (define (terminal-file-name the-port)
   (if (not (port? the-port))
       (sanity-check-error "argument must be a port" 'terminal-file-name the-port))
-  (let ((the-fd (port-fdes the-port)))
+  (let ((the-fd (port-fd the-port)))
     (if (not the-fd)
         (sanity-check-error "port must have a file descriptor associated with it" 'terminal-file-name the-port))
     (let ((the-file-name (%ttyname_r the-fd)))

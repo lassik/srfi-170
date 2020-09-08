@@ -3,9 +3,16 @@
 (define-library (srfi 170)
   (export
 
-#|
    ;; 3.1  Errors
 
+   posix-error? posix-error-name posix-error-message
+   ;; these are extra and allowed additions to the official SRFI namespace:
+   posix-error-error-set
+   posix-error-number posix-error-scheme-procedure
+   posix-error-posix-interface posix-error-data
+
+
+#|
    ;; useful for debuging
 
    errno/E2BIG errno/EACCES errno/EADDRINUSE errno/EADDRNOTAVAIL
@@ -34,10 +41,11 @@
    open-file
    open/read open/write open/read+write
    open/append open/create open/exclusive open/nofollow open/truncate
-   fdes->textual-input-port fdes->binary-input-port
-   fdes->textual-output-port fdes->binary-output-port
-   port-fdes
-   close-fdes
+   port-internal-fd
+   close-fd
+   fd->textual-input-port fd->binary-input-port
+   fd->textual-output-port fd->binary-output-port
+   port->fd
 
 
    ;; 3.3  File system
@@ -46,8 +54,8 @@
    read-symlink
    rename-file
    delete-directory
-   set-file-mode set-file-owner set-file-group
-   set-file-timespecs timespec/now timespec/omit
+   set-file-mode set-file-owner owner/unchanged group/unchanged
+   set-file-times time/now time/unchanged
    truncate-file
 
    file-info file-info?
@@ -143,14 +151,19 @@
 
      (only (srfi 1) alist-cons take)
      (only (srfi 8) receive) ;; the only export, but let us maintain form
+     (only (srfi 19) time-monotonic time-utc make-time time? time-type time-second time-nanosecond)
      (only (srfi 27) random-integer)
      (only (srfi 69) make-hash-table hash-table-set! hash-table-ref)
      (only (srfi 98) get-environment-variables)
      (only (srfi 115) regexp-replace-all regexp-split)
      (srfi 151) ;; bitwise operators
-     (rename (only (srfi 174) timespec timespec? timespec-seconds timespec-nanoseconds)
-             (timespec make-timespec))
-     (only (srfi 198) raise-foreign-error)
+
+     (only (srfi 170 posix-error) posix-error?
+                                  posix-error-error-set
+                                  posix-error-name posix-error-message
+                                  posix-error-number posix-error-scheme-procedure
+                                  posix-error-posix-interface posix-error-data
+                                  raise-posix-error)
      )
 
     (include-shared "170/170")
