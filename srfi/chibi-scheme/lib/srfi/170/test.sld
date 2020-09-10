@@ -757,9 +757,13 @@
 
         (test-group "3.12  Terminal device control"
 
-          (test-assert (terminal? (current-input-port)))
+          (test-error (terminal? -1))
+          (test-error (terminal? "a"))
+          (test-error (terminal? (current-input-port)))
+          (test-assert (terminal? 0))
+          (test-assert (terminal? (port-internal-fd (current-input-port))))
           (let ((port-not-terminal (open-input-file tmp-file-1)))
-            (test-not (terminal? port-not-terminal))
+            (test-not (terminal? (port-internal-fd port-not-terminal)))
             (close-port port-not-terminal))
 
 #|

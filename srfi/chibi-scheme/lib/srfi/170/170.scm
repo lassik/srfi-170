@@ -643,21 +643,17 @@
 
 ;;; 3.12  Terminal device control
 
-(define (terminal? the-port)
-  (if (not (port? the-port))
-      (sanity-check-error "argument must be a port" 'terminal? the-port))
-  (let ((the-fd (port-internal-fd the-port)))
-    (if (not the-fd)
-        #f)
-    (begin
-      (set-errno 0)
-      (let ((ret (%isatty the-fd)))
-        (if (equal? 1 ret)
-            #t
-            (if (or (not (equal? 0 ret))
-                    (not (equal? ENOTTY (errno))))
-                (errno-error (errno) 'terminal? 'isatty the-port)
-                #f))))))
+(define (terminal? the-fd)
+  (if (or (not (fixnum? the-fd)) (< the-fd 0))
+      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'terminal? the-fd))
+  (set-errno 0)
+  (let ((ret (%isatty the-fd)))
+    (if (equal? 1 ret)
+        #t
+        (if (or (not (equal? 0 ret))
+                (not (equal? ENOTTY (errno))))
+            (errno-error (errno) 'terminal? 'isatty the-fd)
+            #f))))
 
 #|
 ;; All terminal procedures except for terminal? will be moved to a new
