@@ -203,13 +203,13 @@ This SRFI provides three procedures which will typically be shims
 over whatever the implementation uses to report such errors:
 </p>
 
-<div><code>(posix-error? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
+<div><code>(posix-error? <i>obj</i>)</code> &nbsp;&rarr; <i>boolean</i>
 <blockquote>
 This procedure returns <code>#t</code> if <code>obj</code> is
 a condition object that describes a P<small>OSIX</small> error,
 and <code>#f</code> otherwise.
 </blockquote>
-<div><code>(posix-error-name <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>symbol</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
+<div><code>(posix-error-name <i>posix-error</i>)</code> &nbsp;&rarr; <i>symbol</i>
 <blockquote>
 <p>This procedure returns a symbol that is the name associated
 with the value of <code>errno</code> when
@@ -229,7 +229,7 @@ But <code>ETIMEDOUT</code>, meaning that a TCP connection
 has been unresponsive for too long, is standardized by P<small>OSIX</small>,
 has a <code>errno</code> value of 110 on Linux, but 60 on FreeBSD and 116 on Cygwin.</p>
 </blockquote>
-<div><code>(posix-error-message <i>posix-error</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)
+<div><code>(posix-error-message <i>posix-error</i>)</code> &nbsp;&rarr; <i>string</i>
 <blockquote>
 This procedure returns a string that is an error message reflecting
 the value of <code>errno</code> when
@@ -267,9 +267,19 @@ When a port is garbage collected, it is effectively closed,
 but whether the underlying file descriptor is closed is left as an
 implementation detail.  Because file
 descriptors are just integers, it's impossible to garbage collect them.</p>
+<p>Therefore, this SRFI introduces the concept
+of a <i>file descriptor object</i> (FDO),
+which can be either a simple exact integer
+or the exact integer wrapped in a
+trivial record.  The latter method makes it possible to garbage-collect
+file descriptors after all; the former method is backward compatible.
+In all cases, however, a procedure that takes an FDO argument takes an
+exact integer as well, so that (for example) <code>(terminal? 0)</code>
+will work without the 0 being wrapped.  For that reason no
+procedure to wrap integers as FDOs is provided.
 <p>
-If a Scheme program only used Scheme ports, and never actually used
-file descriptors, this would not be a problem. But Scheme code
+Ideally, a Scheme program could only use ports and not
+file descriptors.  But code written in any language, including Scheme,
 needs to descend to the file descriptor level in at least two circumstances:
 when interfacing to foreign code, and
 when interfacing to a subprocess.
@@ -277,10 +287,10 @@ when interfacing to a subprocess.
 This causes a problem. Suppose we have a Scheme port constructed
 on top of file descriptor 3. We intend to execute a successor program that
 will expect this file descriptor. If we drop references to the port,
-the garbage collector may prematurely close file 3 before we fork
-the subprocess.</p>
+the garbage collector may prematurely close file 3 before 
+the successor program starts.</p>
 <p>
-Unfortunately, there is no even vaguely portable solution to this problem.
+Unfortunately, there is no even vaguely portable solution to the general problem.
 Scsh and Guile undertake heroic measures to
 open new file descriptors for ports when the old file descriptors are
 repurposed for something else, and to track when closing a port implies
@@ -292,13 +302,18 @@ to provide this SRFI.</p>
 <p>Consequently, this SRFI assumes that file descriptors will only
 be used at the edges of the program, and that most I/O operations will be
 performed on ports.
-As an exception, <code>open-file</code> is provided, because
+As exceptions, <code>open-file</code> is provided, because
 it allows arguments that the Scheme standard does not.  It returns
 a file descriptor that can then be converted to a port.
+LIkewise, <code>terminal?</code> accepts an FDO because it is often
+applied to the standard input (fd 0), standard output (1),
+or standard error(3), and it is possible that no port is open
+on any of these.
 </p>
 <p>
-<div><code>(open-file <i>fname flags [permission-bits]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>fd</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>open()</code>&nbsp;</div>
+<div><code>(open-file <i>fname flags [permission-bits]</i>)</code> &nbsp;&rarr; <i>fdo</i>&nbsp;&nbsp; P<small>OSIX</small> <code>open()</code></div>
 <blockquote>
+Opens the file named by <i>fname</i> and returns an FDO.
 <i>Permission-bits</i> defaults to <code>#o666</code>, but are masked by the current umask.
 <i>Flags</i> is an integer bitmask, composed by adding together
 one or more of the following constants:
@@ -313,10 +328,10 @@ one or more of the following constants:
 <p>It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
 <code>open/read+write</code> flags is provided.</p>
 </blockquote>
-<div><code>(port-internal-fd <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>fd</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(port-internal-fd <i>port</i>)</code> &nbsp;&rarr; <i>fdo</i>&nbsp;&nbsp;</div>
 <p></p>
 <blockquote>
-<p>Returns the file descriptor used by <i>port</i>,
+<p>Returns the file descriptor used by <i>port</i> as an FDO,
 or <code>#f</code> if there is no such file descriptor.
 This procedure is made available in order to invoke
 P<small>OSIX</small> functions not provided by this SRFI.
@@ -326,11 +341,11 @@ or otherwise, it is an error
 to do any further operations on <i>port</i>.
 </p>
 </blockquote>
-<div><code>(close-fd <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code>&nbsp;</div>
+<div><code>(close-fd <i>fdo</i>)</code> &nbsp;&rarr; <i>undefined</i>&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code></div>
 <p></p>
 <blockquote>
-<p>Closes the file descriptor <i>fd</i>.
-If <i>fd</i> is the internal file descriptor of a port, it is an error
+<p>Closes the file descriptor <i>fdo</i>.
+If <i>fdo</i> is the internal file descriptor of a port, it is an error
 to do any further operations on that port.
 </p>
 </blockquote>
@@ -351,16 +366,17 @@ the same position, so that reads and writes on one are visible from the other.
 Therefore, <b>use caution</b> when reading or writing to the file descriptor
 (something this SRFI does not provide a mechanism for doing),
 especially in the presence of buffering.</p>
-<div><code>(fd->textual-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<div><code>(fd->binary-input-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<div><code>(fd->textual-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<div><code>(fd->binary-output-port <i>fd</i> [<i>buffer-mode</i>])</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>port</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->textual-input-port <i>fdo-or-exact-int</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->binary-input-port <i>fdo-or-exact-int</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i> &nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->textual-output-port <i>fdo-or-exact-int</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->binary-output-port <i>fdo-or-exact-int</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
 <blockquote>
 <p>These procedures wrap a newly created port around a duplicate of
 the specified file descriptor, effectively importing it into the
 Scheme world.
 In particular, the textual ports use the same character encoding applied
-by default in the underlying implementation.</p>
+by default in the underlying implementation.
+Note that <i>fdo</i> may be an exact integer even if FDOs are disjoint from integers.
 <p>The <i>buffer-mode</i> argument, if present, is one of the constants <code>buffer/none</code>,
   <code>buffer/block</code> (the default), or <code>buffer/line</code>.
   When <i>buffer-mode</i> is <code>buffer/none</code>,
@@ -373,10 +389,10 @@ by default in the underlying implementation.</p>
 </p>
 </blockquote>
 
-<div><code>(port->fd <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(port->fd <i>port</i>)</code> &nbsp;&rarr; <i><i>fdo</i></i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
 
 <blockquote>
-<p>This procedure returns a file descriptor that has been duplicated
+<p>This procedure returns an FDO that has been duplicated
 from <i>port</i>, effectively exporting it from the Scheme world.
 Alternatively, <code>#f</code> is returned if <i>port</i> does not have a
 file descriptor (a string port, for example).
@@ -386,10 +402,10 @@ file descriptor (a string port, for example).
 <p>The following procedures allow access to the
 computer's file system.
 <p>
-<div><code>(create-directory <i>fname [permission-bits]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>mkdir()</code>&nbsp;</div>
-<div><code>(create-fifo <i>fname [permission-bits]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>mkfifo()</code>&nbsp;</div>
-<div><code>(create-hard-link <i>old-fname new-fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>link()</code>&nbsp;</div>
-<div><code>(create-symlink <i>old-fname new-fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>symlink()</code>&nbsp;</div>
+<div><code>(create-directory <i>fname [permission-bits]</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>mkdir()</code></div>
+<div><code>(create-fifo <i>fname [permission-bits]</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>mkfifo()</code></div>
+<div><code>(create-hard-link <i>old-fname new-fname</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>link()</code></div>
+<div><code>(create-symlink <i>old-fname new-fname</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>symlink()</code></div>
 
 <blockquote><p>
 These procedures create objects of various kinds in the file system.
@@ -401,10 +417,10 @@ to <code>#o664</code>, but are masked by the current umask.
 <p>
 </p></blockquote>
 
-<div><code>(read-symlink <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>readlink()</code>&nbsp;</div>
+<div><code>(read-symlink <i>fname</i>)</code> &nbsp;&rarr; <i><i>string</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>readlink()</code></div>
 <blockquote>Return the filename referenced by the symlink <i>fname</i>.
 </blockquote>
-<div><code>(rename-file <i>old-fname new-fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rename()</code>&nbsp;</div>
+<div><code>(rename-file <i>old-fname new-fname</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>rename()</code></div>
 <blockquote>If you override an existing object, then <i>old-fname</i>
 and <i>new-fname</i> must type-match &mdash; either both directories,
 or both non-directories.
@@ -422,11 +438,11 @@ prevent this problem; at least it is highly unlikely to occur in practice.
 </blockquote><p>
 </p>
 <p></p>
-<div><code>(delete-directory <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rmdir()</code>&nbsp;</div>
+<div><code>(delete-directory <i>fname</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>rmdir()</code></div>
 <blockquote>This procedure deletes directories from the file system.
 An error is signaled if <i>fname</i> is not a directory or is not empty.
 </blockquote>
-<div><code>(set-file-owner <i>fname uid gid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
+<div><code>(set-file-owner <i>fname uid gid</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code></div>
 
 <blockquote>
 This procedure sets the owner and group of a
@@ -441,7 +457,7 @@ This procedure follows symlinks and changes the files to which they refer.
 </p>
 <p></p>
 <p></p>
-<div><code>(set-file-times <i>fname [access-time-object modify-time-object]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>utimensat()</code>&nbsp;</div>
+<div><code>(set-file-times <i>fname [access-time-object modify-time-object]</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>utimensat()</code></div>
 
 <blockquote>
 This procedure sets the access and modified times for the file
@@ -462,14 +478,14 @@ status-change (<code>ctime</code>) is set to the current time.
 <p></p>
 <p></p>
 <p></p>
-<div><code>(truncate-file <i>fname/port len</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>truncate()</code>&nbsp;</div>
+<div><code>(truncate-file <i>fname/port len</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>truncate()</code></div>
 <blockquote>The specified file is truncated to <i>len</i> bytes in length.
 </blockquote><p>
 </p>
 <p></p>
 <p></p>
 <p></p>
-<div><code>(file-info <i>fname/port follow?</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>file-info-record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>stat()</code>&nbsp;</div>
+<div><code>(file-info <i>fname/port follow?</i>)</code> &nbsp;&rarr; <i>file-info-record</i>&nbsp;&nbsp; P<small>OSIX</small> <code>stat()</code></div>
 <blockquote>
 The <code>file-info</code> procedure
 returns a file-info record containing useful
@@ -479,23 +495,23 @@ report on the file to which they refer.  If <i>follow?</i> is false
 the procedure checks the actual file itself, even if it's a symlink.
 The <i>follow?</i> flag is ignored if the file argument is a port.
 </blockquote>
-<div><code>(file-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(file-info? <i>obj</i>)</code> &nbsp;&rarr; <i>boolean</i>&nbsp;&nbsp;</div>
 <blockquote>Returns <code>#t</code> if <i>obj</i> is a file-info record and <code>#f</code> otherwise.
 </blockquote>
 
-<div><code>(file-info:device <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:inode <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:mode <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:nlinks <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:uid <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:gid <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:rdev <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:size <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:blksize <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:blocks <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:atime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:mtime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(file-info:ctime <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(file-info:device <i>file-info</i>)</code> &nbsp;&rarr; <i>integer</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:inode <i>file-info</i>)</code> &nbsp;&rarr; <i>integer</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:mode <i>file-info</i>)</code> &nbsp;&rarr; <i>integer</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:nlinks <i>file-info</i>)</code> &nbsp;&rarr; <i>integer</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:uid <i>file-info</i>)</code> &nbsp;&rarr; <i>integer</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:gid <i>file-info</i>)</code> &nbsp;&rarr; <i>integer</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:rdev <i>file-info</i>)</code> &nbsp;&rarr; <i>integer</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:size <i>file-info</i>)</code> &nbsp;&rarr; <i>integer</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:blksize <i>file-info</i>)</code> &nbsp;&rarr; <i>integer</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:blocks <i>file-info</i>)</code> &nbsp;&rarr; <i>integer</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:atime <i>file-info</i>)</code> &nbsp;&rarr; <i>time-object</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:mtime <i>file-info</i>)</code> &nbsp;&rarr; <i>time-object</i>&nbsp;&nbsp;</div>
+<div><code>(file-info:ctime <i>file-info</i>)</code> &nbsp;&rarr; <i>time-object</i>&nbsp;&nbsp;</div>
 <blockquote><p>Returns the device number, inode number, mode (permission and file type bits),
 number of hard links, user id, group id, device ID if file is special,
 size in bytes, optimal blocksize for I/O, number of 512B blocks allocated,
@@ -535,12 +551,12 @@ examine several bits.</p>
 
 </blockquote>
 <p></p>
-<div><code>(file-info-directory? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISDIR()</code>&nbsp;</div>
-<div><code>(file-info-fifo? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISFIFO()</code>&nbsp;</div>
-<div><code>(file-info-symlink? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISLNK()</code>&nbsp;</div>
-<div><code>(file-info-regular? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISREG()</code>&nbsp;</div>
-<div><code>(file-info-socket? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_IFIFO()</code>&nbsp;</div>
-<div><code>(file-info-device? <i>file-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISCHR() || S_ISBLK()</code>&nbsp;</div>
+<div><code>(file-info-directory? <i>file-info</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISDIR()</code></div>
+<div><code>(file-info-fifo? <i>file-info</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISFIFO()</code></div>
+<div><code>(file-info-symlink? <i>file-info</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISLNK()</code></div>
+<div><code>(file-info-regular? <i>file-info</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISREG()</code></div>
+<div><code>(file-info-socket? <i>file-info</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>S_IFIFO()</code></div>
+<div><code>(file-info-device? <i>file-info</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>S_ISCHR() || S_ISBLK()</code></div>
 
 <blockquote>
 These procedures are file-type predicates that test the
@@ -560,14 +576,14 @@ However, not even root can write a file stored on a read-only file system,
 such as a CD-ROM.</p>
 </blockquote>
 <p></p>
-<div><code>(set-file-mode <i>fname mode-bits</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chmod()</code>&nbsp;</div>
+<div><code>(set-file-mode <i>fname mode-bits</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>chmod()</code></div>
 <blockquote>
 This procedure sets the mode bits of a
 file specified by supplying the filename.
 This procedure follows symlinks and changes the files to which they refer.
 </blockquote><p>
 <p></p>
-<div><code>(directory-files <i>dir [dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(directory-files <i>dir [dotfiles?]</i>)</code> &nbsp;&rarr; <i>string list</i>&nbsp;&nbsp;</div>
 
 <blockquote>
 Return a list of filenames in directory <i>dir</i>.
@@ -585,7 +601,7 @@ prepend the directory,
 or change to the directory before using the filenames.
 </blockquote>
 
-<div><code>(make-directory-files-generator <i>dir [dotfiles?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>generator</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(make-directory-files-generator <i>dir [dotfiles?]</i>)</code> &nbsp;&rarr; <i>generator</i>&nbsp;&nbsp;</div>
 
 <blockquote>
 Return a
@@ -604,9 +620,9 @@ common paradigm when using a file system as a document database.</p>
 open directory object.</p>
 </blockquote>
 
-<div><code>(open-directory <i>dir [dot-files?]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>directory-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>opendir()</code>&nbsp;</div>
-<div><code>(read-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string or eof-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>readdir()</code>&nbsp;</div>
-<div><code>(close-directory <i>directory-object</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>closedir()</code>&nbsp;</div>
+<div><code>(open-directory <i>dir [dot-files?]</i>)</code> &nbsp;&rarr; <i>directory-object</i>&nbsp;&nbsp; P<small>OSIX</small> <code>opendir()</code></div>
+<div><code>(read-directory <i>directory-object</i>)</code> &nbsp;&rarr; <i>string or eof-object</i>&nbsp;&nbsp; P<small>OSIX</small> <code>readdir()</code></div>
+<div><code>(close-directory <i>directory-object</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>closedir()</code></div>
 <p>
 These procedures implement an interface to the
 <code>opendir()</code>/
@@ -623,7 +639,7 @@ The <code><i>dot-files?</i></code> argument controls whether filenames beginning
 If it is <code>#f</code>, which is the default, they are not.  The filenames <code>.</code> and <code>..</code> are <i>never</i> returned.
 Finally, <code>close-directory</code> closes a directory object.</p>
 
-<div><code>(real-path <i>path</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>realpath()</code>&nbsp;</div>
+<div><code>(real-path <i>path</i>)</code> &nbsp;&rarr; <i>string</i>&nbsp;&nbsp; P<small>OSIX</small> <code>realpath()</code></div>
 
 <blockquote>
 Returns an absolute pathname
@@ -631,7 +647,7 @@ derived from <i>pathname</i> that names the same file
 and whose resolution does not involve <code>.</code>, <code>..</code>, or symlinks.
 </blockquote>
 
-<div><code>temp-file-prefix</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>string parameter</i>&nbsp;</div>
+<div><code>temp-file-prefix</code><i>string parameter</i></div>
 <p></p>
 <blockquote>
 <a href="https://srfi.schemers.org/srfi-39/srfi-39.html">SRFI 39</a>
@@ -642,7 +658,7 @@ if <code>TMPDIR</code> is set and to
 On Windows, the temporary directory's name is not fixed, and must be obtained by the
 <code>GetTempPath()</code> API function.
 </blockquote>
-<div><code>(create-temp-file <i>[prefix]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(create-temp-file <i>[prefix]</i>)</code> &nbsp;&rarr; <i><i>string</i></i>&nbsp;&nbsp;</div>
 <blockquote>Creates a new temporary file and returns its name.
 The optional argument specifies the filename prefix to use, and defaults
 to the result of invoking <code>temp-file-prefix</code>.
@@ -663,7 +679,7 @@ that collisions are less likely to occur. This speeds things up, but does
 not affect correctness.</p>
 </blockquote><p>
 </p>
-<div><code>(call-with-temporary-filename <i>maker [prefix]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>object</i><sup>+</sup></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(call-with-temporary-filename <i>maker [prefix]</i>)</code> &nbsp;&rarr; <i><i>object</i><sup>+</sup></i>&nbsp;&nbsp;</div>
 
 <blockquote>
 This procedure can be used to perform certain atomic transactions on
@@ -728,13 +744,13 @@ or to return values other than the new filename (for example, an open port).
 <p></p>
 <p></p>
 <p></p>
-<div><code>(umask)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> <code>umask()</code>&nbsp;</div>
+<div><code>(umask)</code> &nbsp;&rarr; <i><i>exact integer</i></i>&nbsp;&nbsp;P<small>OSIX</small> <code>umask()</code></div>
 <blockquote>
 Returns the current file protection mask, or umask, as an exact integer.
 Whenever a file is created, the specified or default permissions are
 bitwise-anded with the complement of the umask before they are used.
 </blockquote>
-<div><code>(set-umask!&nbsp;<i>umask</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>unspecified</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P<small>OSIX</small> <code>umask()</code>&nbsp;</div>
+<div><code>(set-umask!<i>umask</i>)</code> &nbsp;&rarr; <i><i>unspecified</i></i>&nbsp;&nbsp;P<small>OSIX</small> <code>umask()</code></div>
 <blockquote>
 <p>Sets the file protection mask to the exact integer <i>umask</i>
 and returns an unspecified value.</p>
@@ -751,13 +767,13 @@ be set in the primordial thread before any other threads are created
 </blockquote>
 <p></p>
 <p></p>
-<div><code>(current-directory)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getcwd()</code>&nbsp;</div>
+<div><code>(current-directory)</code> &nbsp;&rarr; <i><i>string</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>getcwd()</code></div>
 <blockquote>
 Returns the current directory as a string containing an absolute pathname.
 Whenever a file is referenced with a relative path, it is interpreted as
 relative to this directory.
 </blockquote>
-<div><code>(set-current-directory!&nbsp;<i>new-directory</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>unspecified</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chdir()</code>&nbsp;</div>
+<div><code>(set-current-directory!<i>new-directory</i>)</code> &nbsp;&rarr; <i><i>unspecified</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>chdir()</code></div>
 <blockquote>
 <p>Sets the current directory to <i>new-directory</i>
 and returns an unspecified value.</p>
@@ -774,12 +790,12 @@ be set in the primordial thread before any other threads are created
 </blockquote>
 <p></p>
 <p></p>
-<div><code>(pid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpid()</code>&nbsp;</div>
+<div><code>(pid<i></i>)</code> &nbsp;&rarr; <i><i>exact integer</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>getpid()</code></div>
 <blockquote>
 Retrieves the process id for the current process.
 </blockquote>
 
-<div><code>(nice <i>[delta]</i>)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>nice()</code>&nbsp;</div>
+<div><code>(nice <i>[delta]</i>)</code>&rarr; <i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>nice()</code></div>
 <blockquote><p>
 Increments the niceness of the current process by <i>delta</i>.
 The lower the <i>niceness</i> value is, the more the process is favored during scheduling.
@@ -788,11 +804,11 @@ If <code><i>delta</i></code> is not specified, the increment is 1.
 <p>Real-time processes are not affected by <code>nice</code>.</p>
 </blockquote><p>
 </p>
-<div><code>(user-uid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getuid()</code>&nbsp;</div>
-<div><code>(user-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgid()</code>&nbsp;</div>
-<div><code>(user-effective-uid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>geteuid()</code>&nbsp;</div>
-<div><code>(user-effective-gid<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getegid()</code>&nbsp;</div>
-<div><code>(user-supplementary-gids<i></i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>exact integer</i> list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgroups()</code>&nbsp;</div>
+<div><code>(user-uid<i></i>)</code> &nbsp;&rarr; <i><i>exact integer</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>getuid()</code></div>
+<div><code>(user-gid<i></i>)</code> &nbsp;&rarr; <i><i>exact integer</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>getgid()</code></div>
+<div><code>(user-effective-uid<i></i>)</code> &nbsp;&rarr; <i><i>exact integer</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>geteuid()</code></div>
+<div><code>(user-effective-gid<i></i>)</code> &nbsp;&rarr; <i><i>exact integer</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>getegid()</code></div>
+<div><code>(user-supplementary-gids<i></i>)</code> &nbsp;&rarr; <i><i>exact integer</i> list</i>&nbsp;&nbsp; P<small>OSIX</small> <code>getgroups()</code></div>
 
 <blockquote>
 For the calling process, these routines get the specified data.  The scsh proceedure <code>user-login-name</code>, which uses <code>getlogin()</code> or <code>getlogin_r()</code>, can be simulated with <code>(user-info:name (user-info (user-uid)))</code>, using procedures that are described in the next section.
@@ -806,7 +822,7 @@ For the calling process, these routines get the specified data.  The scsh procee
 </p>
 <p></p>
 <p></p>
-<div><code>(user-info <i>uid/name</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getpwuid/getpwnam()</code>&nbsp;</div>
+<div><code>(user-info <i>uid/name</i>)</code> &nbsp;&rarr; <i>record</i>&nbsp;&nbsp; P<small>OSIX</small> <code>getpwuid/getpwnam()</code></div>
 
 <blockquote>
 Return a <code>user-info</code> record giving the recorded information for a
@@ -818,19 +834,19 @@ and callers must be prepared to handle it.
 </blockquote><p>
 </p>
 <p></p>
-<div><code>(user-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(user-info? <i>obj</i>)</code> &nbsp;&rarr; <i>boolean</i>&nbsp;&nbsp;</div>
 <blockquote>Returns <code>#t</code> if <i>obj</i> is a user-info record and <code>#f</code> otherwise.
 </blockquote>
-<div><code>(user-info:name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(user-info:uid <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(user-info:gid <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(user-info:home-dir <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(user-info:shell <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(user-info:name <i>user-info</i>)</code> &nbsp;&rarr; <i>string</i>&nbsp;&nbsp;</div>
+<div><code>(user-info:uid <i>user-info</i>)</code> &nbsp;&rarr; <i>exact integer</i>&nbsp;&nbsp;</div>
+<div><code>(user-info:gid <i>user-info</i>)</code> &nbsp;&rarr; <i>exact integer</i>&nbsp;&nbsp;</div>
+<div><code>(user-info:home-dir <i>user-info</i>)</code> &nbsp;&rarr; <i>string</i>&nbsp;&nbsp;</div>
+<div><code>(user-info:shell <i>user-info</i>)</code> &nbsp;&rarr; <i>string</i>&nbsp;&nbsp;</div>
 <blockquote>Returns the user name, user id, group id, home directory,
 and shell path stored in <i>user-info</i> respectively.
 An implementation returns <code>#f</code> for any unavailable items.</blockquote>
 
-<div><code>(user-info:full-name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(user-info:full-name <i>user-info</i>)</code> &nbsp;&rarr; <i>string</i>&nbsp;&nbsp;</div>
 <blockquote>Returns the contents of the <code>pw_gecos</code> field
 stored in <i>user-info</i>.
 Although this field is not part of P<small>OSIX</small>,
@@ -840,7 +856,7 @@ It normally contains the user's full name, but may contain additional
 system-specific information;
 on Windows, it contains exactly the full name.</blockquote>
 
-<div><code>(user-info:parsed-full-name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string list</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(user-info:parsed-full-name <i>user-info</i>)</code> &nbsp;&rarr; <i>string list</i>&nbsp;&nbsp;</div>
 <blockquote><p>Returns a parsed and expanded version of the raw string
 returned by <code>user-info:full-name</code>.
 The raw value is split on commas, creating a list of strings to be
@@ -863,7 +879,7 @@ to this user; further elements depend on
 entries in the <code>/etc/nsswitch.conf</code> file.</p>
 </blockquote>
 
-<div><code>(group-info <i>gid/name</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>record</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>getgrgid/getgrnam()</code>&nbsp;</div>
+<div><code>(group-info <i>gid/name</i>)</code> &nbsp;&rarr; <i>record</i>&nbsp;&nbsp; P<small>OSIX</small> <code>getgrgid/getgrnam()</code></div>
 
 <blockquote>
 Return a <code>group-info</code> record giving the recorded information for a
@@ -874,11 +890,11 @@ this does not constitute an error situation,
 and callers must be prepared to handle it.
 </blockquote>
 
-<div><code>(group-info? <i>obj</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>boolean</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(group-info? <i>obj</i>)</code> &nbsp;&rarr; <i>boolean</i>&nbsp;&nbsp;</div>
 <blockquote>Returns <code>#t</code> if <i>obj</i> is a group-info record and <code>#f</code> otherwise.
 </blockquote>
-<div><code>(group-info:name <i>group-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
-<div><code>(group-info:gid <i>group-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>exact integer</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
+<div><code>(group-info:name <i>group-info</i>)</code> &nbsp;&rarr; <i>string</i>&nbsp;&nbsp;</div>
+<div><code>(group-info:gid <i>group-info</i>)</code> &nbsp;&rarr; <i>exact integer</i>&nbsp;&nbsp;</div>
 <blockquote>Returns the group name and group id stored in <i>group-info</i>.  The list of group member ids can be retrieved with the above <code>(user-supplementary-gids)</code></blockquote>
 
 <h3 id="node_sec_3.7">3.7&nbsp;&nbsp;[Intentionally omitted]</h3>
@@ -888,7 +904,7 @@ and callers must be prepared to handle it.
 <h3 id="node_sec_3.9">3.9&nbsp;&nbsp;[Intentionally omitted]</h3>
 
 <h3 id="node_sec_3.10">3.10&nbsp;&nbsp;Time</h3>
-<div><code>(posix-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr;&nbsp;&nbsp;&nbsp;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
+<div><code>(posix-time)</code>&rarr;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code></div>
 
 <blockquote>
 <p>The <code>posix-time</code> procedure returns the current time as a
@@ -898,7 +914,7 @@ since the P<small>OSIX</small> epoch (midnight January
 It uses the P<small>OSIX</small> <code>CLOCK_REALTIME</code> clock.
 </blockquote>
 
-<div><code>(monotonic-time)</code> &nbsp;&nbsp;&nbsp;&nbsp;&rarr;&nbsp;&nbsp;&nbsp;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code>&nbsp;</div>
+<div><code>(monotonic-time)</code>&rarr;<i>time-object</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>clock_gettime()</code></div>
 
 <blockquote>
 <p>The <code>monotonic-time</code> procedure returns the current time as a
@@ -929,7 +945,7 @@ If a program needs to change to a different locale, the most reliable way
 is to set the <code>LANG</code> variable to a new value.
 </p>
 
-<div><code>(set-environment-variable! <i>name</i> <i>value</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>setenv</code></div>
+<div><code>(set-environment-variable! <i>name</i> <i>value</i>)</code> &nbsp;&rarr; <i>undefined</i>&nbsp;&nbsp; P<small>OSIX</small> <code>setenv</code></div>
 <blockquote>
 Change the value of the environment variable <i>name</i> to
 be <i>value</i>. Both <i>name</i> and <i>value</i> are strings.
@@ -941,7 +957,7 @@ Mutating <i>name</i> or <i>value</i> after the call must not change
 the name or value of the environment variable.
 </blockquote>
 
-<div><code>(delete-environment-variable! <i>name</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>undefined</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>unsetenv</code></div>
+<div><code>(delete-environment-variable! <i>name</i>)</code> &nbsp;&rarr; <i>undefined</i>&nbsp;&nbsp; P<small>OSIX</small> <code>unsetenv</code></div>
 <blockquote>
 Remove the environment variable <i>name</i> such that a
 subsequent <code>(get-environment-variable <i>name</i>)</code> would
@@ -969,7 +985,7 @@ so the suffix is kept in this SRFI.</p>
 <p></p>
 <p>
 </p>
-<div><code>(terminal? <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
+<div><code>(terminal? <i>fd</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code></div>
 <blockquote>
 Returns true if the argument is a file descriptor
 that is open on a terminal.
@@ -1008,6 +1024,8 @@ SRFI mailing list.</p>
 <p>(Why <i>quo</i>?  Because in <i>sine qua non</i>
 the pronoun is feminine, agreeing with <i>re</i> 'thing' understood,
 whereas Olin is masculine.)</p>
+
+<p>Special thanks to Alex Shinn for coming up with the idea of FDOs.
 
 <h2>Copyright</h2>
 Copyright &copy; 2019 by John Cowan.
