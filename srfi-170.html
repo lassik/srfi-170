@@ -163,12 +163,15 @@ either take no action and return some reasonable default value,
 or signal an exception.
 </p>
 <p>A Scheme implementation that supports both this SRFI and multiple
-threads of control must ensure that when a thread invokes a blocking I/O
-procedure defined below, only that thread is blocked and not any other
-concurrently running ones.
-Because Scheme threads may be multiplexed on top of P<small>OSIX</small>
-threads, the per-thread P<small>OSIX</small> functions may not do the
-right thing.
+threads of control must ensure that when a thread invokes a blocking
+procedure such as an R[4567]RS I/O operation, only that thread is
+blocked and not any other concurrently running ones.  Because
+a user-visible thread may be multiplexed on a single P<small>OSIX</small>
+thread, be in a 1:1 relationship with P<small>OSIX</small> threads,
+or run on different P<small>OSIX</small> threads at different times
+in its lifecycle, there can be no guarantees that a P<small>OSIX</small>
+function which is MT-Safe (that is, thread-safe in the sense of
+P<small>OSIX</small> threads) is safe for user-visible threads.
 </p>
 
 <p>
@@ -263,10 +266,7 @@ Ports are garbage-collected Scheme objects, not integers.
 When a port is garbage collected, it is effectively closed,
 but whether the underlying file descriptor is closed is left as an
 implementation detail.  Because file
-descriptors are just integers, it's impossible to garbage collect them &mdash; you
-wouldn't be able to close file descriptor 3 unless there were no 3's in the
-system, and you could further prove that your program would never again
-compute a 3. This is difficult at best.</p>
+descriptors are just integers, it's impossible to garbage collect them.</p>
 <p>
 If a Scheme program only used Scheme ports, and never actually used
 file descriptors, this would not be a problem. But Scheme code
@@ -399,9 +399,6 @@ The <i>permission-bits</i> for <code>create-directory</code>
 default to <code>#o775</code>, and for <code>create-fifo</code>
 to <code>#o664</code>, but are masked by the current umask.
 <p>
-</p><p>
-It is an error to try to create a hard link when <i>old-fname</i>
-and <i>new-fname</i> refer to the same file, and your file may be destroyed.
 </p></blockquote>
 
 <div><code>(read-symlink <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>readlink()</code>&nbsp;</div>
@@ -412,6 +409,8 @@ and <i>new-fname</i> refer to the same file, and your file may be destroyed.
 and <i>new-fname</i> must type-match &mdash; either both directories,
 or both non-directories.
 This is required by the semantics of P<small>OSIX</small> <code>rename()</code>.<p>
+Calling <code>rename-file</code> on a symbolic link will rename the symbolic link,
+not the file it refers to.
 </p>
 <blockquote><i>Remark: </i>
 There is an unfortunate atomicity problem with the <code>rename-file</code>
@@ -640,6 +639,8 @@ and whose resolution does not involve <code>.</code>, <code>..</code>, or symlin
 the value of the environment variable <code>TMPDIR</code> concatenated with <code>"/<i>pid</i>"</code>
 if <code>TMPDIR</code> is set and to
 <code>"/tmp/<i>pid</i>"</code> otherwise, where <i>pid</i> is the id of the current process.
+On Windows, the temporary directory's name is not fixed, and must be obtained by the
+<code>GetTempPath()</code> API function.
 </blockquote>
 <div><code>(create-temp-file <i>[prefix]</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>string</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Creates a new temporary file and returns its name.
@@ -827,7 +828,7 @@ and callers must be prepared to handle it.
 <div><code>(user-info:shell <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the user name, user id, group id, home directory,
 and shell path stored in <i>user-info</i> respectively.
-Windows returns <code>#f</code> for any items it doesn't have.</blockquote>
+An implementation returns <code>#f</code> for any unavailable items.</blockquote>
 
 <div><code>(user-info:full-name <i>user-info</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i>string</i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;</div>
 <blockquote>Returns the contents of the <code>pw_gecos</code> field
@@ -968,10 +969,11 @@ so the suffix is kept in this SRFI.</p>
 <p></p>
 <p>
 </p>
-<div><code>(terminal? <i>port</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
+<div><code>(terminal? <i>port-or-fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
 <blockquote>
-Return true if the argument is a terminal.
-Raises an error if <code><i>port</i></code> is not a port,
+Returns true if the argument is a port or file descriptor
+that is open on a terminal.
+Raises an error if <code><i>port</i></code> is not a port or an exact integer,
 or if the underlying call to <code>isatty()</code> returns an error
 other than <code>ENOTTY</code>.
 This procedure is useful when writing programs that change their behavior
