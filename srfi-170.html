@@ -424,7 +424,7 @@ prevent this problem; at least it is highly unlikely to occur in practice.
 <p></p>
 <div><code>(delete-directory <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rmdir()</code>&nbsp;</div>
 <blockquote>This procedure deletes directories from the file system.
-An exception is signaled if <i>fname</i> is not a directory or is not empty.
+An error is signaled if <i>fname</i> is not a directory or is not empty.
 </blockquote>
 <div><code>(set-file-owner <i>fname uid gid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
 
@@ -683,14 +683,14 @@ with a varying string.<p>
 The <i>maker</i> procedure is called serially on each filename
 generated.  It must return at least one value; it may return multiple
 values. If the first return value is <code>#f</code> or if <i>maker</i> signals an
-exception indicating that the file exists
+exception indicating that the file exists,
 <code>call-with-temporary-filename</code> will loop,
 generating a new filename and calling <i>maker</i> again. If the first
 return value is true, the loop is terminated, returning whatever value(s)
 <i>maker</i> returned.</p>
 <p>
-After a number of unsuccessful trials, <code>call-with-temporary-filename</code> may give up
-and signal an error.</p>
+After a number of unsuccessful trials, <code>call-with-temporary-filename</code> may give up,
+in which case an exception is signaled or propagated.
 <p>
 To rename a file to a temporary name:
 </p>
@@ -969,15 +969,17 @@ so the suffix is kept in this SRFI.</p>
 <p></p>
 <p>
 </p>
-<div><code>(terminal? <i>port-or-fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
+<div><code>(terminal? <i>fd</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>boolean</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code>&nbsp;</div>
 <blockquote>
-Returns true if the argument is a port or file descriptor
+Returns true if the argument is a file descriptor
 that is open on a terminal.
-Raises an error if <code><i>port</i></code> is not a port or an exact integer,
+Raises an error if <code><i>port</i></code> is not an exact integer,
 or if the underlying call to <code>isatty()</code> returns an error
 other than <code>ENOTTY</code>.
 This procedure is useful when writing programs that change their behavior
 when their standard input or output is a terminal.
+Note that it is safe to call this operation
+on the result of <code>fd-internal-port</code>.
 </blockquote>
 <h2>Implementation</h2>
 
