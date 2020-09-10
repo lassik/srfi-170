@@ -425,7 +425,7 @@ prevent this problem; at least it is highly unlikely to occur in practice.
 <p></p>
 <div><code>(delete-directory <i>fname</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>rmdir()</code>&nbsp;</div>
 <blockquote>This procedure deletes directories from the file system.
-It is an error if <i>fname</i> is not a directory or is not empty.
+An exception is signaled if <i>fname</i> is not a directory or is not empty.
 </blockquote>
 <div><code>(set-file-owner <i>fname uid gid</i>)</code> &nbsp;&nbsp;&nbsp;&rarr; &nbsp;&nbsp;&nbsp;<i><i>undefined</i></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(procedure)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>chown()</code>&nbsp;</div>
 
