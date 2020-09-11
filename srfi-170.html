@@ -378,7 +378,7 @@ the specified file descriptor, effectively importing it into the
 Scheme world.
 In particular, the textual ports use the same character encoding applied
 by default in the underlying implementation.
-Note that <i>fdo-or-int</i> may be an exact integer
+Note that <i>fdo-or-int</i> can be an exact integer
 whether or not FDOs are disjoint from integers.
 <p>The <i>buffer-mode</i> argument, if present, is one of the constants <code>buffer/none</code>,
   <code>buffer/block</code> (the default), or <code>buffer/line</code>.
@@ -988,17 +988,17 @@ so the suffix is kept in this SRFI.</p>
 <p></p>
 <p>
 </p>
-<div><code>(terminal? <i>fdo-or-exact-int</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code></div>
+<div><code>(terminal? <i>port-or-fdo-or-exact-int</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code></div>
 <blockquote>
 Returns true if the argument is a file descriptor
-that is open on a terminal.
+or a port that is open on a terminal.
 Raises an exception if the underlying call to <code>isatty()</code> returns an error
 other than <code>ENOTTY</code>.
 This procedure is useful when writing programs that change their behavior
 when their standard input or output is a terminal.
 It is safe to call this operation
 on the result of <code>port-internal-fd</code>.
-The <i>fdo-or-exact-int</i> argument may be an exact integer,
+The <i>fdo-or-exact-int</i> argument can be an exact integer,
 whether or not FDOs are disjoint from integers.
 </blockquote>
 <h2>Implementation</h2>
