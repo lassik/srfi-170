@@ -305,7 +305,8 @@ performed on ports.
 As exceptions, <code>open-file</code> is provided, because
 it allows arguments that the Scheme standard does not.  It returns
 a file descriptor that can then be converted to a port.
-LIkewise, <code>terminal?</code> accepts an FDO because it is often
+LIkewise, <code>terminal?</code> in Section 3.12
+accepts an FDO because it is often
 applied to the standard input (fd 0), standard output (1),
 or standard error(3), and it is possible that no port is open
 on any of these.
@@ -331,10 +332,11 @@ one or more of the following constants:
 <div><code>(port-internal-fd <i>port</i>)</code> &nbsp;&rarr; <i>fdo</i>&nbsp;&nbsp;</div>
 <p></p>
 <blockquote>
-<p>Returns the file descriptor used by <i>port</i> as an FDO,
-or <code>#f</code> if there is no such file descriptor.
-This procedure is made available in order to invoke
-P<small>OSIX</small> functions not provided by this SRFI.
+<p>Returns the file descriptor used by <i>port</i> as an FDO
+if the port is open on a file, socket,
+or similar source or sink that involves a file descriptor
+on a P<small>OSIX</small> system,
+or <code>#f</code> otherwise.
 <b>It should be used only when absolutely necessary.</b>
 If <i>fd</i> is closed with <code>close-fd</code>
 or otherwise, it is an error
