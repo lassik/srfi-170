@@ -267,20 +267,11 @@ When a port is garbage collected, it is effectively closed,
 but whether the underlying file descriptor is closed is left as an
 implementation detail.  Because file
 descriptors are just integers, it's impossible to garbage collect them.</p>
-<p>Therefore, this SRFI introduces the concept
+<p>Therefore, this SRFI introduces (or rather borrows from Chibi Scheme) the concept
 of a <i>file descriptor object</i> (FDO),
-which can be either a simple exact integer
-or the exact integer wrapped in a
-trivial record.  The latter method makes it possible to garbage-collect
-file descriptors after all; the former method is backward compatible.
-</p>
-<p>
-In all cases, however, a procedure in this SRFI that takes an FDO argument takes an
-exact integer as well, so that (for example) <code>(terminal? 0)</code>
-will work without the 0 being wrapped.  For that reason no
-procedure to wrap integers as FDOs is provided.
-However, a procedure to unwrap FDOs as exact integers <i>is</i> provided
-for the benefit of procedures in other SRFIs that want exact integer file descriptors.
+which is the exact integer representing a file descriptor
+wrapped in a trivial record.
+This approach makes it possible to garbage-collect file descriptors after all.
 </p>
 <p>
 Ideally, a Scheme program could only use ports and not
@@ -316,12 +307,13 @@ applied to the standard input (fd 0), standard output (1),
 or standard error(3), and it is possible that no port is open
 on any of these.
 </p>
-<div><code>(fdo-internal-fd <i>fdo-or-exact-int</i>)</code> &nbsp;&rarr; <i>exact-int</i>&nbsp;&nbsp;</div>
+<div><code>(fdo-internal-fd <i>fdo</i>)</code> &nbsp;&rarr; <i>exact-int</i>&nbsp;&nbsp;</div>
 <p></p>
 <blockquote>
 <p>Returns the file descriptor encapsulated in <i>fdo</i> as an exact integer.
-<b>It should be used only when absolutely necessary.</b>
-If <i>fdo-or-exact-int</i> is an exact integer it is returned.
+<b>It should be used only when absolutely necessary,</b>
+such as when invoking a P<small>OSIX</small> API function
+not made available in this SRFI.
 </p>
 </blockquote>
 <p>
@@ -359,7 +351,7 @@ to do any further operations on <i>port</i>.
 <div><code>(close-fd <i>fdo</i>)</code> &nbsp;&rarr; <i>undefined</i>&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code></div>
 <p></p>
 <blockquote>
-<p>Closes the file descriptor <i>fdo</i>.
+<p>Closes the file descriptor encapsulated by <i>fdo</i>.
 If <i>fdo</i> is the internal file descriptor of a port, it is an error
 to do any further operations on that port.
 </p>
@@ -381,18 +373,16 @@ the same position, so that reads and writes on one are visible from the other.
 Therefore, <b>use caution</b> when reading or writing to the file descriptor
 (something this SRFI does not provide a mechanism for doing),
 especially in the presence of buffering.</p>
-<div><code>(fd->textual-input-port <i>fdo-or-exact-int</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<div><code>(fd->binary-input-port <i>fdo-or-exact-int</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i> &nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<div><code>(fd->textual-output-port <i>fdo-or-exact-int</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<div><code>(fd->binary-output-port <i>fdo-or-exact-int</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->textual-input-port <i>fdo</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->binary-input-port <i>fdo</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i> &nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->textual-output-port <i>fdo</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(fd->binary-output-port <i>fdo</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
 <blockquote>
 <p>These procedures wrap a newly created port around a duplicate of
 the specified file descriptor, effectively importing it into the
 Scheme world.
 In particular, the textual ports use the same character encoding applied
 by default in the underlying implementation.
-Note that <i>fdo-or-int</i> can be an exact integer
-whether or not FDOs are disjoint from integers.
 <p>The <i>buffer-mode</i> argument, if present, is one of the constants <code>buffer/none</code>,
   <code>buffer/block</code> (the default), or <code>buffer/line</code>.
   When <i>buffer-mode</i> is <code>buffer/none</code>,
@@ -1001,7 +991,7 @@ so the suffix is kept in this SRFI.</p>
 <p></p>
 <p>
 </p>
-<div><code>(terminal? <i>port-or-fdo-or-exact-int</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code></div>
+<div><code>(terminal? <i>port-or-fdo</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code></div>
 <blockquote>
 Returns true if the argument is a port or a file descriptor
 that is open on a terminal.
@@ -1011,8 +1001,6 @@ This procedure is useful when writing programs that change their behavior
 when their standard input or output is a terminal.
 It is safe to call this operation
 on the result of <code>port-internal-fd</code>.
-The <i>port-or-fdo-or-exact-int</i> argument can be an exact integer
-whether or not FDOs are disjoint from integers.
 </blockquote>
 <h2>Implementation</h2>
 
