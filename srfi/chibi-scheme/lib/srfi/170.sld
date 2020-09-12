@@ -38,6 +38,7 @@
 
    ;; 3.2  I/O
 
+   fdo-internal-fd
    open-file
    open/read open/write open/read+write
    open/append open/create open/exclusive open/nofollow open/truncate

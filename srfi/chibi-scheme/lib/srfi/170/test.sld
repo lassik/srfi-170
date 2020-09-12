@@ -277,6 +277,8 @@
 
         (test-group "3.2  I/O"
 
+          (test "a" (fdo-internal-fd "a")) ;; for FDOs as unwrapped integers
+
           (test-error (open-file 1 1 1))
           (test-error (open-file "foo" "bar" 1))
           (test-error (open-file "foo" 1 "baz"))

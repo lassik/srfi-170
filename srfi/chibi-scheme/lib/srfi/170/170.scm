@@ -2,6 +2,9 @@
 
 ;;; 3.2  I/O
 
+(define (fdo-internal-fd the-fdo)
+  the-fdo)
+
 (define (open-file fname flags . o)
   (let-optionals o ((permission-bits #o666))
     (if (not (string? fname))
