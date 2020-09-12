@@ -776,10 +776,12 @@
           (test-error (terminal? -1))
           (test-error (terminal? "a"))
           (test-error (terminal? #f)) ;; in case port-internal-fd returns this, like for a string port
-          (test-error (terminal? (current-input-port)))
+          (test-assert (terminal? (current-input-port)))
           (test-assert (terminal? 0))
           (test-assert (terminal? (port-internal-fd (current-input-port))))
+          (test-not (terminal? the-string-port))
           (let ((port-not-terminal (open-input-file tmp-file-1)))
+            (test-not (terminal? port-not-terminal))
             (test-not (terminal? (port-internal-fd port-not-terminal)))
             (close-port port-not-terminal))
 
