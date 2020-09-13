@@ -26,6 +26,10 @@ more details: https://srfi-email.schemers.org/srfi-199/
 
 Suggested enhancements:
 
+Leverage the existing fileno object for File Descriptor Objects
+(FDOs).  They're pretty much everything FDOs need, including
+closing the fd finalization on GC.
+
 Make appropriate procedures thread safe or thread aware
 
 Improve temp-file-prefix specification and perhaps implementation
