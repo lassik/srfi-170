@@ -10,6 +10,14 @@ and build notes for scsh, in their own <code>srfi</code> subdirectories.
 This file documents the current exceptions and deviations
 of the Chibi Scheme implementation.
 </p>
+<p>
+Note generally that the Chibi implementation is completely thread-naive.
+What is more, the implementation's FDOs don't interoperate with
+those used by Chibi natively, which may cause some issues mixing
+SRFI 170 operations with SRFI 170's.  In particular, make sure to
+hold on to any port on which <code>port-internal-fdo</code> was
+called, so that the garbage collector does not close the file descriptor.
+</p>
 
 <h3>3.1&nbsp;&nbsp;Error handling</h3>
 <ul>
@@ -25,9 +33,6 @@ library call due to an error, and SRFI 170 getting the current errno.
 <li><p>
 The Chibi Scheme versions of the <code>fd->*port</code> procedures
 do not support the <i>buffer-mode</i> argument.
-</p></li>
-<li><p>
-The Chibi implementation is completely thread-naive.
 </p></li>
 </ul>
 
