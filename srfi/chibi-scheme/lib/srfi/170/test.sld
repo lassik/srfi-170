@@ -833,7 +833,7 @@
           ) ;; end terminal device control
 
 
-        (test-group "Epilogue: set-priority to 1, 2, 4"
+        (test-group "Epilogue: cleanup, force a gc, set-priority to 1, 2, 4"
 
           (close-port the-string-port)
 
