@@ -385,6 +385,7 @@
 (define (close-directory directory-object)
   (if (not (directory-object? directory-object))
       (sanity-check-error "argument must be a director object created by open-directory" 'close-directory directory-object))
+  ;; this flag, this check, is because the special finalizer stub c function for %closedir does nothing with errno
   (if (not (directory-object-is-open? directory-object))
       (sanity-check-error "argument must be a directory object not already closed" 'close-directory directory-object))
       (set-directory-object-is-open directory-object #f)
