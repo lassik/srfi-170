@@ -14,7 +14,7 @@ of the Chibi Scheme implementation.
 Note generally that the Chibi implementation is completely thread-naive.
 What is more, the implementation's FDOs don't interoperate with
 those used by Chibi natively, which may cause some issues mixing
-SRFI 170 operations with SRFI 170's.  In particular, make sure to
+SRFI 170 operations with native Chibi ones.  In particular, make sure to
 hold on to any port on which <code>port-internal-fdo</code> was
 called, so that the garbage collector does not close the file descriptor.
 </p>
