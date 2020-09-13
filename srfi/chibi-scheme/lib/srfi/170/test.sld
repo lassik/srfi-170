@@ -17,6 +17,7 @@
   (import (scheme base)
 
           (chibi)
+          (only (chibi ast) gc)
           (only (chibi filesystem) file-exists? delete-file)
           (chibi optional) ;; Snow package for optional args
           (only (chibi process) exit)
@@ -835,6 +836,8 @@
         (test-group "Epilogue: set-priority to 1, 2, 4"
 
           (close-port the-string-port)
+
+          (test-not-error (gc)) ;; see if we blow up
 
           ;; in epilogue so most testing is not slowed down
 
