@@ -1,3 +1,9 @@
+BUG per Alex Shinn: "Chibi tracks fd's with a weak hash table
+internally, which your low-level wrappers are bypassing."  He's going
+to meld that part of SRFI 170 with (chibi filesystem) "e.g. reusing
+the same file-info record from stat so that the two libraries can
+interoperate."  So we can wait on him or whomever to fix that.
+
 Needed to match the SRFI:
 
 The optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
