@@ -280,7 +280,8 @@
 ;; fixnum 1 segfaults because I assume it's expecting a pointer.
 ;;
 ;; It returns SEXP_VOID instead of 0 or -1, and errno does not get set
-;; when it is handed an already closed DIR, which may not be its fault.
+;; when it is handed an already closed DIR because it checks to see if
+;; it's already closed the directory first.
 
 (define-c-type DIR
   finalizer: (%closedir closedir)
