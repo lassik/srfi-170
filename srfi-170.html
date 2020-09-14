@@ -629,6 +629,7 @@ open directory object.</p>
 <div><code>(open-directory <i>dir [dot-files?]</i>)</code> &nbsp;&rarr; <i>directory-object</i>&nbsp;&nbsp; P<small>OSIX</small> <code>opendir()</code></div>
 <div><code>(read-directory <i>directory-object</i>)</code> &nbsp;&rarr; <i>string or eof-object</i>&nbsp;&nbsp; P<small>OSIX</small> <code>readdir()</code></div>
 <div><code>(close-directory <i>directory-object</i>)</code> &nbsp;&rarr; <i><i>undefined</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>closedir()</code></div>
+<blockquote>
 <p>
 These procedures implement an interface to the
 <code>opendir()</code>/
@@ -645,6 +646,7 @@ The <code><i>dot-files?</i></code> argument controls whether filenames beginning
 If it is <code>#f</code>, which is the default, they are not.  The filenames <code>.</code> and <code>..</code> are <i>never</i> returned.
 Finally, <code>close-directory</code> closes a directory object.</p>
 
+</blockquote>
 <div><code>(real-path <i>path</i>)</code> &nbsp;&rarr; <i>string</i>&nbsp;&nbsp; P<small>OSIX</small> <code>realpath()</code></div>
  
 <blockquote>
