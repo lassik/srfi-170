@@ -6,30 +6,13 @@
   (c-system-include "sys/types.h")
   (c-system-include "fcntl.h"))
  (else
-  (c-system-include "string.h")
   (c-system-include "errno.h")
-  (c-system-include "fcntl.h")
-
-;;  (c-system-include "sys/file.h") ; Only needed for BSD low level file operations?
-  (c-system-include "unistd.h")
   (c-system-include "dirent.h")
-
-  (c-system-include "sys/types.h")
+  (c-system-include "sys/statvfs.h")
   (c-system-include "sys/stat.h")
-
-  (c-system-include "sys/resource.h")
-
   (c-system-include "pwd.h")
   (c-system-include "grp.h")
-
-  (c-system-include "sys/utsname.h")
-
-  (c-system-include "signal.h")
-
   (c-system-include "time.h")
-  (c-system-include "sys/time.h")
-
-  (c-system-include "termios.h")
   ))
 
 
