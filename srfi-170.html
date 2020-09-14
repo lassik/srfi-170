@@ -646,11 +646,23 @@ If it is <code>#f</code>, which is the default, they are not.  The filenames <co
 Finally, <code>close-directory</code> closes a directory object.</p>
 
 <div><code>(real-path <i>path</i>)</code> &nbsp;&rarr; <i>string</i>&nbsp;&nbsp; P<small>OSIX</small> <code>realpath()</code></div>
-
+ 
 <blockquote>
 Returns an absolute pathname
 derived from <i>pathname</i> that names the same file
-and whose resolution does not involve <code>.</code>, <code>..</code>, or symlinks.
+and whose resolution does not involve dot (<code>.</code>), dot-dot (<code>..</code>), or symlinks.
+</blockquote>
+
+<div><code>(file-space <i>path-or-port</i>)</code> &nbsp;&rarr; <i>exact integer</i>&nbsp;&nbsp; P<small>OSIX</small> <code>statvfs(), fstatvfs()</code></div>
+
+<blockquote>
+Returns the amount of free space in bytes
+on the same volume as the file <i>path</i> (if it is a string)
+or the file open on <i>port</i> (if it is a port).
+This allows the application to detect if
+the disk is getting full.
+Use <i>path</i> if the file has not yet been created,
+or <i>port</i> if it is already open.
 </blockquote>
 
 <div><code>temp-file-prefix</code><i>string parameter</i></div>
