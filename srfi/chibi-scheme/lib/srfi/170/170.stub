@@ -213,6 +213,30 @@
   ((not windows)
    (define-c errno (%ftruncate ftruncate) (int off_t))))
 
+(define-c-int-type fsblkcnt_t) ;; probably a unsigned 64 bit integer
+(define-c-int-type fsfilcnt_t) ;; probably a unsigned 64 bit integer
+
+(define-c-struct statvfs
+    predicate: statvfs?
+  (unsigned-long f_bsize    fs_bsize    fs:bsize) ;;  File system block size.
+  (unsigned-long f_frsize   fs_frsize   fs:frsize) ;; Fundamental file system block size.
+  (fsblkcnt_t    f_blocks   fs_blocks   fs:blocks) ;; Total number of blocks on file system in units of f_frsize.
+  (fsblkcnt_t    f_bfree    fs_bfree    fs:bfree) ;;  Total number of free blocks.
+  (fsblkcnt_t    f_bavail   fs_bavail   fs:bavail) ;; Number of free blocks available to non-privileged process.
+  (fsfilcnt_t    f_files    fs_files    fs:files) ;;  Total number of file serial numbers.
+  (fsfilcnt_t    f_ffree    fs_ffree    fs:ffree) ;;  Total number of free file serial numbers.
+  (fsfilcnt_t    f_favail   fs_favail   fs:favail) ;; Number of file serial numbers available to non-privileged process.
+  (unsigned-long f_fsid     fs_fsid     fs:fsid) ;;   File system ID.
+  (unsigned-long f_flag     fs_flag     fs:flag) ;;   Bit mask of f_flag values.
+  (unsigned-long f_namemax  fs_namemax  fs:namemax) ;; Maximum filename length.
+  )
+
+(define-c-const int (statvfs/RDONLY "ST_RDONLY")) ;; Read-only file system
+(define-c-const int (statvfs/ST_NOSUID "ST_NOSUID")) ;; Does not support the semantics of the ST_ISUID and ST_ISGID file mode bits.
+
+(define-c errno (%statvfs statvfs) (string (result statvfs)))
+(define-c errno (%fstatvfs fstatvfs) (int (result statvfs)))
+
 (cond-expand
   (windows
    (c-include-verbatim "filesystem_win32_shim.c")
