@@ -651,6 +651,27 @@
           (test-error (real-path bogus-path))
           (test-not-error (set-current-directory! starting-dir))
 
+          (test-error (free-space #\a))
+          (test-error (free-space bogus-path))
+          (test-error (free-space the-string-port))
+          (test-not-error (free-space "/tmp"))
+
+          ;; the following free-space tests are inherantly fragile, between the two invocations of free-space something else may change free space on /tmp
+;;          (test (free-space "/tmp") (free-space tmp-containing-dir))
+;;          (test (free-space "/tmp") (free-space tmp-file-1))
+
+          ;; ~~~ test for an decrease in free space, large so less likely to be a false positive
+          (truncate-file tmp-file-1 0)
+          (let* ((the-port (open-output-file tmp-file-1))
+                 (the-big-string (make-string (* 1024 1024) 0))
+                 (the-original-free-space (free-space tmp-file-1)))
+            (do ((i 32 (- i 1)))
+                ((< i 1))
+              (write-string the-big-string the-port))
+            (flush-output-port the-port)
+            (test-assert (< (free-space tmp-file-1) the-original-free-space)))
+          ;; truncate-file must be called outside of test group (see below) because of how (chibi test) catches raises
+
           (test-assert (string? (temp-file-prefix)))
           (set-environment-variable! "TMPDIR" "foo")
           (parameterize ((temp-file-prefix "foo/"))
@@ -686,6 +707,7 @@
 
           ) ;; end file system
 
+        (truncate-file tmp-file-1 30)
 
         (test-group "3.5  Process state"
 

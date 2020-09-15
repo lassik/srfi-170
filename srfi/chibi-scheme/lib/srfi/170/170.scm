@@ -400,6 +400,21 @@
         the-real-path
         (errno-error (errno) 'real-path 'realpath the-starting-path))))
 
+(define (free-space fname-or-port)
+    (let ((the-statvfs (cond ((string? fname-or-port)
+                              (retry-if-EINTR (lambda () (%statvfs fname-or-port))))
+                             ((port? fname-or-port)
+                              (let ((the-fd (port-internal-fd fname-or-port)))
+                                (if (not the-fd)
+                                    (sanity-check-error "port must have a file descriptor associated with it" 'fstatvfs fname-or-port)
+                                    (retry-if-EINTR (lambda () (%fstatvfs the-fd))))))
+                             (else (sanity-check-error "argument must be a file name or a port" 'fstatvfs fname-or-port)))))
+      (if (not the-statvfs)
+          (if (string? fname-or-port)
+              (errno-error (errno) 'free-space 'statvfs fname-or-port)
+              (errno-error (errno) 'file-file 'fstatvfs fname-or-port)))
+      (* (fs:bsize the-statvfs) (fs:bavail the-statvfs))))
+
 (define the-character-set "ABCDEFGHIJKLMNOPQURTUVWXYZ0123456789")
 
 (define the-character-set-length (string-length the-character-set))

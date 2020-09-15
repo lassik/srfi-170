@@ -59,29 +59,6 @@
    set-file-times time/now time/unchanged
    truncate-file
 
-   ;; Temp names for exercising
-
-   %statvfs
-   %fstatvfs
-   statvfs?
-
-   ;; Candidate names for getters
-
-   fs:bsize ;;  File system block size.
-   fs:frsize ;; Fundamental file system block size.
-   fs:blocks ;; Total number of blocks on file system in units of f_frsize.
-   fs:bfree ;;  Total number of free blocks.
-   fs:bavail ;; Number of free blocks available to non-privileged process.
-   fs:files ;; Total number of file serial numbers.
-   fs:ffree ;; Total number of free file serial numbers.
-   fs:favail ;; Number of file serial numbers available to non-privileged process.
-   fs:fsid ;; File system ID.
-   fs:flag ;; Bit mask of f_flag values.
-   fs:namemax ;; Maximum filename length.
-
-   statvfs/RDONLY
-   statvfs/ST_NOSUID
-
    file-info file-info?
    file-info:device file-info:inode file-info:mode file-info:nlinks
    file-info:uid file-info:gid file-info:rdev file-info:size
@@ -95,6 +72,18 @@
    open-directory read-directory close-directory
 
    real-path
+
+   ;; Temp names for exercising
+
+   %statvfs
+   %fstatvfs
+
+   ;; Candidate names for getters
+
+   fs:bsize ;;  File system block size.
+   fs:bavail ;; Number of free blocks available to non-privileged process.
+
+   free-space
 
    temp-file-prefix
    create-temp-file
