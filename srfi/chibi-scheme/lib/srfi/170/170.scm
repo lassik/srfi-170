@@ -177,16 +177,16 @@
                        0))
       (errno-error (errno) 'set-file-times 'utimensat fname atime mtime)))
 
-(define (truncate-file fname/port len)
+(define (truncate-file fname-or-port len)
   (if (not (exact-integer? len))
         (sanity-check-error "second argument must be an exact integer" 'truncate-file len))
-  (cond ((string? fname/port)
-         (if (not (retry-if-EINTR (lambda () (%truncate fname/port len))))
-             (errno-error (errno) 'truncate-file 'truncate fname/port len)))
-        ((port? fname/port)
-         (if (not (retry-if-EINTR (lambda () (%ftruncate (port-internal-fd fname/port) len))))
-             (errno-error (errno) 'truncate-file 'ftruncate fname/port len)))
-        (else (sanity-check-error "first argument must be a file name or a port" 'truncate-file fname/port len))))
+  (cond ((string? fname-or-port)
+         (if (not (retry-if-EINTR (lambda () (%truncate fname-or-port len))))
+             (errno-error (errno) 'truncate-file 'truncate fname-or-port len)))
+        ((port? fname-or-port)
+         (if (not (retry-if-EINTR (lambda () (%ftruncate (port-internal-fd fname-or-port) len))))
+             (errno-error (errno) 'truncate-file 'ftruncate fname-or-port len)))
+        (else (sanity-check-error "first argument must be a file name or a port" 'truncate-file fname-or-port len))))
 
 (cond-expand
   (windows
@@ -222,12 +222,12 @@
      (mtime file-info:mtime)
      (ctime file-info:ctime))))
 
-(define (file-info fname/port follow?)
+(define (file-info fname-or-port follow?)
   (let ((file-stat
-         (cond ((string? fname/port)
+         (cond ((string? fname-or-port)
                 (let ((the-file-info (if follow?
-                                         (%stat fname/port)
-                                         (%lstat fname/port))))
+                                         (%stat fname-or-port)
+                                         (%lstat fname-or-port))))
                   (if the-file-info
                       the-file-info
                       (errno-error (errno)
@@ -235,22 +235,22 @@
                                    (if follow?
                                        'stat
                                        'lstat)
-                                   fname/port))))
-               ((port? fname/port)
-                (let ((the-file-info (%fstat (port-internal-fd fname/port))))
+                                   fname-or-port))))
+               ((port? fname-or-port)
+                (let ((the-file-info (%fstat (port-internal-fd fname-or-port))))
                   (if the-file-info
                       the-file-info
-                      (errno-error (errno) 'file-info 'fstat fname/port follow?))))
-               (else (sanity-check-error "first argument must be a string or port" 'file-info fname/port)))))
+                      (errno-error (errno) 'file-info 'fstat fname-or-port follow?))))
+               (else (sanity-check-error "first argument must be a string or port" 'file-info fname-or-port)))))
     (if (not file-stat)
         (errno-error (errno)
                      'file-info
-                     (if (string? fname/port)
+                     (if (string? fname-or-port)
                             (if follow?
                                 'stat
                                 'lstat)
-                            'fname/port)
-                     fname/port
+                            'fname-or-port)
+                     fname-or-port
                      follow?))
     (make-file-info
      (stat:dev file-stat)
