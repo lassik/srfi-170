@@ -166,6 +166,8 @@
                                   posix-error-number posix-error-scheme-procedure
                                   posix-error-posix-interface posix-error-data
                                   raise-posix-error)
+
+     (only (srfi 170 fdo) fdo? make-fdo fdo:fd)
      )
 
     (include-shared "170/170")

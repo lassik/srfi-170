@@ -34,6 +34,7 @@
           (srfi 170)
 
           (srfi 170 posix-error)
+          (srfi 170 fdo)
           )
 
   (include-shared "170")
