@@ -334,7 +334,7 @@ one or more of the following constants:
 <p>It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
 <code>open/read+write</code> flags is provided.</p>
 </blockquote>
-<div><code>(port-internal-fd <i>port</i>)</code> &nbsp;&rarr; <i>fdo</i>&nbsp;&nbsp;</div>
+<div><code>(port-internal-fdo <i>port</i>)</code> &nbsp;&rarr; <i>fdo</i>&nbsp;&nbsp;</div>
 <p></p>
 <blockquote>
 <p>Returns the file descriptor used by <i>port</i> as an FDO
@@ -348,7 +348,7 @@ or otherwise, it is an error
 to do any further operations on <i>port</i>.
 </p>
 </blockquote>
-<div><code>(close-fd <i>fdo</i>)</code> &nbsp;&rarr; <i>undefined</i>&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code></div>
+<div><code>(close-fdo <i>fdo</i>)</code> &nbsp;&rarr; <i>undefined</i>&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code></div>
 <p></p>
 <blockquote>
 <p>Closes the file descriptor encapsulated by <i>fdo</i>.
@@ -395,7 +395,7 @@ by default in the underlying implementation.
 </p>
 </blockquote>
 
-<div><code>(port->fd <i>port</i>)</code> &nbsp;&rarr; <i><i>fdo</i></i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
+<div><code>(port->fdo <i>port</i>)</code> &nbsp;&rarr; <i><i>fdo</i></i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
 
 <blockquote>
 <p>This procedure returns an FDO that has been duplicated
@@ -1014,7 +1014,7 @@ other than <code>ENOTTY</code>.
 This procedure is useful when writing programs that change their behavior
 when their standard input or output is a terminal.
 It is safe to call this operation
-on the result of <code>port-internal-fd</code>.
+on the result of <code>port-internal-fdo</code>.
 </blockquote>
 <h2>Implementation</h2>
 
