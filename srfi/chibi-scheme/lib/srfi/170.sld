@@ -72,17 +72,6 @@
    open-directory read-directory close-directory
 
    real-path
-
-   ;; Temp names for exercising
-
-   %statvfs
-   %fstatvfs
-
-   ;; Candidate names for getters
-
-   fs:bsize ;;  File system block size.
-   fs:bavail ;; Number of free blocks available to non-privileged process.
-
    free-space
 
    temp-file-prefix
