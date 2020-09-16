@@ -279,16 +279,16 @@
 
         (test-group "3.2  I/O"
 
-          (test "a" (fdo-internal-fd "a")) ;; for FDOs as unwrapped integers
+          (test-error (fdo-internal-fd "a"))
 
           (test-error (open-file 1 1 1))
           (test-error (open-file "foo" "bar" 1))
           (test-error (open-file "foo" 1 "baz"))
           (test-error (open-file bogus-path open/read))
 
-          (test 0 (port-internal-fd (current-input-port)))
-          (test 1 (port-internal-fd (current-output-port)))
-          (test 2 (port-internal-fd (current-error-port)))
+          (test 0 (fdo-internal-fd (port-internal-fd (current-input-port))))
+          (test 1 (fdo-internal-fd (port-internal-fd (current-output-port))))
+          (test 2 (fdo-internal-fd (port-internal-fd (current-error-port))))
           (test-not (port-internal-fd the-string-port))
 
           (test-error (close-fd "a"))
@@ -330,12 +330,12 @@
             (test-not-error (close-port the-port))
             (test-not-error (close-fd new-fd)))
 
-          (let ((new-fd (port->fd (current-input-port))))
+          (let ((new-fd (fdo-internal-fd (port->fd (current-input-port)))))
             (test-assert (fixnum? new-fd))
             (test-assert (> new-fd 2))
             (test 3 new-fd) ;; a bit dangerous, but on normal systems, if all of the above worked, should be true.
             (test-assert (not (eq? 0 new-fd)))
-            (test-not-error (close-fd new-fd)))
+            (test-not-error (close-fd (make-fdo new-fd))))
           (test-not (port-internal-fd the-string-port))
 
 
@@ -803,7 +803,6 @@
           (test-error (terminal? "a"))
           (test-error (terminal? #f)) ;; in case port-internal-fd returns this, like for a string port
           (test-assert (terminal? (current-input-port)))
-          (test-assert (terminal? 0))
           (test-assert (terminal? (port-internal-fd (current-input-port))))
           (test-not (terminal? the-string-port))
           (let ((port-not-terminal (open-input-file tmp-file-1)))

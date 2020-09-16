@@ -13,6 +13,9 @@ Finishing call-with-temporary-filename
 
 Needed for correctness, not production quality without this:
 
+FDOs should wrap Chibi's fileno object, not integer fds, for proper
+bookkeeping and finalization with closing the fd.
+
 errno manipulation needs to be done at the C level, for Chibi Scheme
 might set errno between any of 1) manually setting errno, 2) a POSIX
 call possibly setting it, and 3) retrieving its value.  See the SRFI

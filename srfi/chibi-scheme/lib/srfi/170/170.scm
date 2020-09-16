@@ -3,7 +3,9 @@
 ;;; 3.2  I/O
 
 (define (fdo-internal-fd the-fdo)
-  the-fdo)
+  (if (not (fdo? the-fdo))
+      (sanity-check-error "argument must be a file descriptor object (fdo)" 'fdo-internal-fd the-fdo))
+  (fdo:fd the-fdo))
 
 (define (open-file fname flags . o)
   (let-optionals o ((permission-bits #o666))
@@ -16,49 +18,53 @@
     (let ((fd (retry-if-EINTR (lambda () (%open fname flags permission-bits)))))
       (if (equal? -1 fd)
           (errno-error (errno) 'open-file 'open fname flags permission-bits)
-          fd))))
+          (make-fdo fd)))))
 
 (define (port-internal-fd the-port)
   (if (not (port? the-port))
       (sanity-check-error "argument must be a port" 'port-internal-fd the-port))
-  (port-fileno the-port))
+  (let ((ret (port-fileno the-port)))
+    (if ret
+        (make-fdo ret)
+        ret)))
 
-(define (close-fd the-fd)
-  (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'close-fd the-fd))
-  (if (not (retry-if-EINTR (lambda () (%close the-fd))))
-      (errno-error (errno) 'close-fd 'close the-fd)))
+(define (close-fd the-fdo)
+  (if (not (fdo? the-fdo))
+      (sanity-check-error "argument must be a file descriptor object (fdo)" 'close-fd the-fdo))
+  (if (not (retry-if-EINTR (lambda () (%close (fdo:fd the-fdo)))))
+      (errno-error (errno) 'close-fd 'close the-fdo)))
 
 ;; seems Chibi handles bogus fds OK, reading input returns eof, output
 ;; raises errors
 
-(define (dup-file-descriptor the-fd) ;; not "duplicate" because that's a Chibi procedure.
-  (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'dup-file-descriptor the-fd))
-  (let ((ret (%dup the-fd)))
-    (if (eq? -1 ret)
-        (errno-error (errno) 'dup-file-descriptor 'dup the-fd)
-        ret)))
+(define (dup-file-descriptor the-fdo) ;; not "duplicate" because that's a Chibi procedure.
+  (let ((the-fd (fdo:fd the-fdo)))
+    (if (or (not (fixnum? the-fd)) (< the-fd 0))
+        (sanity-check-error "file descriptor inside file descriptor object must be a fixnum, and greater than or equal to 0" 'dup-file-descriptor the-fdo))
+    (let ((ret (%dup the-fd)))
+      (if (eq? -1 ret)
+          (errno-error (errno) 'dup-file-descriptor 'dup the-fdo)
+          ret))))
 
-(define (fd->textual-input-port the-fd)
-  (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->textual-input-port the-fd))
-  (%file_descriptor_to_port (dup-file-descriptor the-fd) #t #f))
+(define (fd->textual-input-port the-fdo)
+  (if (not (fdo? the-fdo))
+      (sanity-check-error "argument must be a file descriptor object (fdo)" 'fd->textual-input-port the-fdo))
+  (%file_descriptor_to_port (dup-file-descriptor the-fdo) #t #f))
 
-(define (fd->binary-input-port the-fd)
-  (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->binary-input-port the-fd))
-  (%file_descriptor_to_port (dup-file-descriptor the-fd) #t #t))
+(define (fd->binary-input-port the-fdo)
+  (if (not (fdo? the-fdo))
+      (sanity-check-error "argument must be a file descriptor object (fdo)" 'fd->binary-input-port the-fdo))
+  (%file_descriptor_to_port (dup-file-descriptor the-fdo) #t #t))
 
-(define (fd->textual-output-port the-fd)
-  (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->textual-output-port the-fd))
-  (%file_descriptor_to_port (dup-file-descriptor the-fd) #f #f))
+(define (fd->textual-output-port the-fdo)
+  (if (not (fdo? the-fdo))
+      (sanity-check-error "argument must be a file descriptor object (fdo)" 'fd->textual-output-port the-fdo))
+  (%file_descriptor_to_port (dup-file-descriptor the-fdo) #f #f))
 
-(define (fd->binary-output-port the-fd)
-  (if (or (not (fixnum? the-fd)) (< the-fd 0))
-      (sanity-check-error "argument must be a fixnum, and greater than or equal to 0" 'fd->binary-output-port the-fd))
-  (%file_descriptor_to_port (dup-file-descriptor the-fd) #f #t))
+(define (fd->binary-output-port the-fdo)
+  (if (not (fdo? the-fdo))
+      (sanity-check-error "argument must be a file descriptor object (fdo)" 'fd->binary-output-port the-fdo))
+  (%file_descriptor_to_port (dup-file-descriptor the-fdo) #f #t))
 
 (define (port->fd the-port)
   (if (not (port? the-port))
@@ -66,7 +72,7 @@
   (let ((the-original-fd (port-fileno the-port)))
     (if (not the-original-fd)
         the-original-fd
-        (dup-file-descriptor the-original-fd))))
+        (make-fdo (dup-file-descriptor (make-fdo the-original-fd))))))
 
 
 ;;; 3.3  File system
@@ -184,7 +190,7 @@
          (if (not (retry-if-EINTR (lambda () (%truncate fname-or-port len))))
              (errno-error (errno) 'truncate-file 'truncate fname-or-port len)))
         ((port? fname-or-port)
-         (if (not (retry-if-EINTR (lambda () (%ftruncate (port-internal-fd fname-or-port) len))))
+         (if (not (retry-if-EINTR (lambda () (%ftruncate (port-fileno fname-or-port) len))))
              (errno-error (errno) 'truncate-file 'ftruncate fname-or-port len)))
         (else (sanity-check-error "first argument must be a file name or a port" 'truncate-file fname-or-port len))))
 
@@ -237,7 +243,7 @@
                                        'lstat)
                                    fname-or-port))))
                ((port? fname-or-port)
-                (let ((the-file-info (%fstat (port-internal-fd fname-or-port))))
+                (let ((the-file-info (%fstat (port-fileno fname-or-port))))
                   (if the-file-info
                       the-file-info
                       (errno-error (errno) 'file-info 'fstat fname-or-port follow?))))
@@ -404,7 +410,7 @@
     (let ((the-statvfs (cond ((string? fname-or-port)
                               (retry-if-EINTR (lambda () (%statvfs fname-or-port))))
                              ((port? fname-or-port)
-                              (let ((the-fd (port-internal-fd fname-or-port)))
+                              (let ((the-fd (port-fileno fname-or-port)))
                                 (if (not the-fd)
                                     (sanity-check-error "port must have a file descriptor associated with it" 'fstatvfs fname-or-port)
                                     (retry-if-EINTR (lambda () (%fstatvfs the-fd))))))
@@ -665,9 +671,9 @@
 ;;; 3.12  Terminal device control
 
 (define (terminal? the-arg)
-  (let ((the-fd (cond ((fixnum? the-arg) the-arg)
-                      ((port? the-arg) (port-internal-fd the-arg))
-                      (else (sanity-check-error "argument must be a fixnum or a port" 'terminal? the-arg)))))
+  (let ((the-fd (cond ((fdo? the-arg) (fdo-internal-fd the-arg))
+                      ((port? the-arg) (port-fileno the-arg))
+                      (else (sanity-check-error "argument must be a port or file descriptor object (fdo)" 'terminal? the-arg)))))
     (if (eq? #f the-fd)
         #f
         (if (< the-fd 0)
