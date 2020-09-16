@@ -218,7 +218,7 @@
 
 (define-c-struct statvfs
 ;;    predicate: statvfs?
-  (unsigned-long f_bsize    fs:bsize)  ;;  File system block size.
+;;  (unsigned-long f_bsize    fs:bsize)  ;;  File system block size.
   (unsigned-long f_frsize   fs:frsize) ;; Fundamental file system block size.
 ;;  (fsblkcnt_t    f_blocks   fs:blocks)   ;; Total number of blocks on file system in units of f_frsize.
 ;;  (fsblkcnt_t    f_bfree    fs:bfree)   ;;  Total number of free blocks.

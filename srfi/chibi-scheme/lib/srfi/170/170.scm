@@ -414,9 +414,7 @@
               (errno-error (errno) 'free-space 'statvfs fname-or-port)
               (errno-error (errno) 'file-file 'fstatvfs fname-or-port)))
       (*
-       (cond-expand
-        (openbsd (fs:frsize the-statvfs))
-        (else (fs:bsize the-statvfs)))
+       (fs:frsize the-statvfs)
        (fs:bavail the-statvfs))))
 
 (define the-character-set "ABCDEFGHIJKLMNOPQURTUVWXYZ0123456789")
