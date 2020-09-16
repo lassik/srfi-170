@@ -286,17 +286,17 @@
           (test-error (open-file "foo" 1 "baz"))
           (test-error (open-file bogus-path open/read))
 
-          (test 0 (fdo-internal-fd (port-internal-fd (current-input-port))))
-          (test 1 (fdo-internal-fd (port-internal-fd (current-output-port))))
-          (test 2 (fdo-internal-fd (port-internal-fd (current-error-port))))
-          (test-not (port-internal-fd the-string-port))
+          (test 0 (fdo-internal-fd (port-internal-fdo (current-input-port))))
+          (test 1 (fdo-internal-fd (port-internal-fdo (current-output-port))))
+          (test 2 (fdo-internal-fd (port-internal-fdo (current-error-port))))
+          (test-not (port-internal-fdo the-string-port))
 
-          (test-error (close-fd "a"))
-          (test-error (close-fd -1))
+          (test-error (close-fdo "a"))
+          (test-error (close-fdo -1))
 
           (let* ((dev-zero-fd (open-file "/dev/zero" open/read)))
-            (test-not-error (close-fd dev-zero-fd))
-            (test-error (close-fd dev-zero-fd)))
+            (test-not-error (close-fdo dev-zero-fd))
+            (test-error (close-fdo dev-zero-fd)))
 
           (test-error (fd->textual-input-port "a"))
           (test-error (fd->textual-input-port -1))
@@ -311,32 +311,32 @@
                  (the-port (fd->binary-output-port new-fd)))
             (test-not-error (write-bytevector the-binary-bytevector the-port))
             (test-not-error (close-port the-port))
-            (test-not-error (close-fd new-fd)))
+            (test-not-error (close-fdo new-fd)))
           (let* ((new-fd (open-file tmp-file-1 open/read))
                  (the-port (fd->binary-input-port new-fd)))
             (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
             (test-not-error (close-port the-port))
-            (test-not-error (close-fd new-fd)))
+            (test-not-error (close-fdo new-fd)))
           (let* ((new-fd (open-file tmp-file-1 open-write-create-truncate))
                  (the-port (fd->textual-output-port new-fd)))
             (test-not-error (write-string the-text-string the-port))
             (test-not-error (close-port the-port))
-            (test-not-error (close-fd new-fd)))
+            (test-not-error (close-fdo new-fd)))
           (let* ((new-fd (open-file tmp-file-1 open/read))
                  (the-port (fd->textual-input-port new-fd)))
             (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
             (test-not-error (close-port the-port))
-            (test-not-error (close-fd new-fd)))
+            (test-not-error (close-fdo new-fd)))
 
-          (let ((new-fd (fdo-internal-fd (port->fd (current-input-port)))))
+          (let ((new-fd (fdo-internal-fd (port->fdo (current-input-port)))))
             (test-assert (fixnum? new-fd))
             (test-assert (> new-fd 2))
             (test 3 new-fd) ;; a bit dangerous, but on normal systems, if all of the above worked, should be true.
             (test-assert (not (eq? 0 new-fd)))
-            (test-not-error (close-fd (make-fdo new-fd))))
-          (test-not (port-internal-fd the-string-port))
+            (test-not-error (close-fdo (make-fdo new-fd))))
+          (test-not (port-internal-fdo the-string-port))
 
 
           ) ;; end I/O
@@ -801,13 +801,13 @@
 
           (test-error (terminal? -1))
           (test-error (terminal? "a"))
-          (test-error (terminal? #f)) ;; in case port-internal-fd returns this, like for a string port
+          (test-error (terminal? #f)) ;; in case port-internal-fdo returns this, like for a string port
           (test-assert (terminal? (current-input-port)))
-          (test-assert (terminal? (port-internal-fd (current-input-port))))
+          (test-assert (terminal? (port-internal-fdo (current-input-port))))
           (test-not (terminal? the-string-port))
           (let ((port-not-terminal (open-input-file tmp-file-1)))
             (test-not (terminal? port-not-terminal))
-            (test-not (terminal? (port-internal-fd port-not-terminal)))
+            (test-not (terminal? (port-internal-fdo port-not-terminal)))
             (close-port port-not-terminal))
 
 #|

@@ -20,19 +20,19 @@
           (errno-error (errno) 'open-file 'open fname flags permission-bits)
           (make-fdo fd)))))
 
-(define (port-internal-fd the-port)
+(define (port-internal-fdo the-port)
   (if (not (port? the-port))
-      (sanity-check-error "argument must be a port" 'port-internal-fd the-port))
+      (sanity-check-error "argument must be a port" 'port-internal-fdo the-port))
   (let ((ret (port-fileno the-port)))
     (if ret
         (make-fdo ret)
         ret)))
 
-(define (close-fd the-fdo)
+(define (close-fdo the-fdo)
   (if (not (fdo? the-fdo))
-      (sanity-check-error "argument must be a file descriptor object (fdo)" 'close-fd the-fdo))
+      (sanity-check-error "argument must be a file descriptor object (fdo)" 'close-fdo the-fdo))
   (if (not (retry-if-EINTR (lambda () (%close (fdo:fd the-fdo)))))
-      (errno-error (errno) 'close-fd 'close the-fdo)))
+      (errno-error (errno) 'close-fdo 'close the-fdo)))
 
 ;; seems Chibi handles bogus fds OK, reading input returns eof, output
 ;; raises errors
@@ -66,9 +66,9 @@
       (sanity-check-error "argument must be a file descriptor object (fdo)" 'fd->binary-output-port the-fdo))
   (%file_descriptor_to_port (dup-file-descriptor the-fdo) #f #t))
 
-(define (port->fd the-port)
+(define (port->fdo the-port)
   (if (not (port? the-port))
-      (sanity-check-error "argument must be a port" 'port->fd the-port))
+      (sanity-check-error "argument must be a port" 'port->fdo the-port))
   (let ((the-original-fd (port-fileno the-port)))
     (if (not the-original-fd)
         the-original-fd

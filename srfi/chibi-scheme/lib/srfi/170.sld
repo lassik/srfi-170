@@ -42,11 +42,11 @@
    open-file
    open/read open/write open/read+write
    open/append open/create open/exclusive open/nofollow open/truncate
-   port-internal-fd
-   close-fd
+   port-internal-fdo
+   close-fdo
    fd->textual-input-port fd->binary-input-port
    fd->textual-output-port fd->binary-output-port
-   port->fd
+   port->fdo
 
 
    ;; 3.3  File system
