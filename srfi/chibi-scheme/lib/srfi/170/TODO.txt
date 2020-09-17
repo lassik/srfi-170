@@ -4,6 +4,41 @@ to meld that part of SRFI 170 with (chibi filesystem) "e.g. reusing
 the same file-info record from stat so that the two libraries can
 interoperate."  So we can wait on him or whomever to fix that.
 
+Many more details from https://srfi-email.schemers.org/srfi-170/msg/15185410/
+
+On Sun, Sep 13, 2020 at 7:00 AM Shiro Kawai [redacted]
+
+> So it gets to the similar argument when we talked about the ownership of fd in fd->*-port.
+> 
+> There'll also be a thing that once we get fd->fdo (not in this srfi,
+> but we need it eventually along the line), the runtime must bookkeep
+> if other fdo is co-owning the fd; e.g. some kind of reference
+> counting per fd, or having a table so that active fd and fdo is
+> always 1:1.
+
+Yes, Chibi uses reference counting for fdo's, but there's additional
+bookkeeping to keep everything sane.
+
+All fdo objects are stored in a global weak hash table.
+fd->fdo will lookup this hash table to see if we already have the fdo.
+The FFI implicitly uses fd->fdo for procedures returning an fd.
+
+fd->*port will link the fdo to a field in the resulting port, so that it won't be gc'ed.
+In addition, we increment the ref count in the fdo.
+When a port is closed, it decements the ref count, and if the count reaches 0 we close the fdo.
+Either of the fdo and/or the port can be flagged as non-closing, for objects not managed by Scheme.
+
+close-fd closes absolutely, ignoring the count.
+
+open-[binary-]input-file calls fopen and creates a port backed by a FILE*.
+In the common case we don't care about the fdo, so it isn't reified by default.
+However, if that FILE* was already backed by an fd with a known fdo, we link it.
+
+In the event that an fd is closed outside of Scheme (via a native C call
+that knows nothing about the Scheme fdos), and subsequently reallocated
+while the fdo still exists, bad things will happen.  Don't do that.
+
+
 Needed to match the SRFI:
 
 The optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
