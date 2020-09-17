@@ -671,7 +671,8 @@
 ;;; 3.12  Terminal device control
 
 (define (terminal? the-arg)
-  (let ((the-fd (cond ((fdo? the-arg) (fdo-internal-fd the-arg))
+  (let ((the-fd (cond ((fixnum? the-arg) the-arg)
+                      ((fdo? the-arg) (fdo-internal-fd the-arg))
                       ((port? the-arg) (port-fileno the-arg))
                       (else (sanity-check-error "argument must be a port or file descriptor object (fdo)" 'terminal? the-arg)))))
     (if (eq? #f the-fd)

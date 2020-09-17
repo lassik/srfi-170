@@ -804,6 +804,7 @@
           (test-error (terminal? #f)) ;; in case port-internal-fdo returns this, like for a string port
           (test-assert (terminal? (current-input-port)))
           (test-assert (terminal? (port-internal-fdo (current-input-port))))
+          (test-assert (terminal? 0))
           (test-not (terminal? the-string-port))
           (let ((port-not-terminal (open-input-file tmp-file-1)))
             (test-not (terminal? port-not-terminal))
