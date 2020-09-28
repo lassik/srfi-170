@@ -302,11 +302,6 @@ performed on ports.
 As exceptions, <code>open-file</code> is provided, because
 it allows arguments that the Scheme standard does not.  It returns
 a file descriptor that can then be converted to a port.
-Likewise, <code>terminal?</code> in Section 3.12
-accepts an FDO as well as a port because it is often
-applied to the standard input (fd 0), standard output (1),
-or standard error(3), and it is possible that no port is open
-on any of these.
 </p>
 <div><code>(fdo-internal-fd <i>fdo</i>)</code> &nbsp;&rarr; <i>exact-int</i>&nbsp;&nbsp;</div>
 <p></p>
@@ -1006,16 +1001,15 @@ so the suffix is kept in this SRFI.</p>
 <p></p>
 <p>
 </p>
-<div><code>(terminal? <i>port-or-fdo</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code></div>
+<div><code>(terminal? <i>port</i>)</code> &nbsp;&rarr; <i><i>boolean</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>isatty()</code></div>
 <blockquote>
-Returns true if the argument is a port or a file descriptor
-that is open on a terminal.
+Returns true if the argument is a file descriptor that is open on a terminal.
 Raises an exception if the underlying call to <code>isatty()</code> returns an error
 other than <code>ENOTTY</code>.
 This procedure is useful when writing programs that change their behavior
 when their standard input or output is a terminal.
-It is safe to call this operation
-on the result of <code>port-internal-fdo</code>.
+Because it is expected to be called before doing input or output
+on the terminal, it accepts a port rather than an file descriptor object.
 </blockquote>
 <h2>Implementation</h2>
 
