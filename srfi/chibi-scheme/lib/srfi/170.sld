@@ -38,14 +38,15 @@
 
    ;; 3.2  I/O
 
+   fdo-internal-fd
    open-file
    open/read open/write open/read+write
    open/append open/create open/exclusive open/nofollow open/truncate
-   port-internal-fd
-   close-fd
+   port-internal-fdo
+   close-fdo
    fd->textual-input-port fd->binary-input-port
    fd->textual-output-port fd->binary-output-port
-   port->fd
+   port->fdo
 
 
    ;; 3.3  File system
@@ -71,6 +72,7 @@
    open-directory read-directory close-directory
 
    real-path
+   free-space
 
    temp-file-prefix
    create-temp-file
@@ -115,7 +117,7 @@
    terminal?
 
    )
-  
+
   (cond-expand ((not windows)
     (export
 
@@ -164,6 +166,8 @@
                                   posix-error-number posix-error-scheme-procedure
                                   posix-error-posix-interface posix-error-data
                                   raise-posix-error)
+
+     (only (srfi 170 fdo) fdo? make-fdo fdo:fd)
      )
 
     (include-shared "170/170")

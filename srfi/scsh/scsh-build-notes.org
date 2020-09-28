@@ -22,7 +22,7 @@ checking host system type... x86_64-unknown-linux-gnu
 checking for gcc... gcc
 checking whether the C compiler works... yes
 checking for C compiler default output file name... a.out
-checking for suffix of executables... 
+checking for suffix of executables...
 checking whether we are cross compiling... no
 checking for suffix of object files... o
 checking whether we are using the GNU C compiler... yes
@@ -35,7 +35,7 @@ checking for BIT_SUFFIX... 64
 checking whether we are building a Universal Binary... no
 checking how to compile position independent code... -fPIC
 checking -rdynamic... yes
-checking LDFLAGS_VM... 
+checking LDFLAGS_VM...
 checking for library containing strerror... none required
 checking for special C compiler options needed for large files... no
 checking for _FILE_OFFSET_BITS value needed for large files... no
@@ -170,7 +170,7 @@ checking host system type... x86_64-unknown-linux-gnu
 checking for gcc... gcc
 checking whether the C compiler works... yes
 checking for C compiler default output file name... a.out
-checking for suffix of executables... 
+checking for suffix of executables...
 checking whether we are cross compiling... no
 checking for suffix of object files... o
 checking whether we are using the GNU C compiler... yes
@@ -298,7 +298,7 @@ Testing file-system:directory-files-3 ... OK
 Testing process-state:set-umask ... OK
 Testing process-state:with-umask ... OK
 #{Unspecific}
-> 
+>
 #+END_EXAMPLE
 
 It can then be installed in /usr/local with "make install" or "sudo make install", but be warned it has no uninstall target.

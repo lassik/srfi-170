@@ -34,7 +34,7 @@ all: $(COMPILED_LIBS) # $(META_FILES)
 ########################################################################
 # Tests
 
-repl:
+repl: all
 	$(CHIBI_LOCAL) -m "(srfi 170)"
 
 
