@@ -268,12 +268,6 @@ When a port is garbage collected, it is effectively closed,
 but whether the underlying file descriptor is closed is left as an
 implementation detail.  Because file
 descriptors are just integers, it's impossible to garbage collect them.</p>
-<p>Therefore, this SRFI introduces (or rather borrows from Chibi Scheme) the concept
-of a <i>file descriptor object</i> (FDO),
-which is the exact integer representing a file descriptor
-wrapped in a trivial record.
-This approach makes it possible to garbage-collect file descriptors after all.
-</p>
 <p>
 Ideally, a Scheme program could only use ports and not
 file descriptors.  But code written in any language, including Scheme,
@@ -299,24 +293,39 @@ to provide this SRFI.</p>
 <p>Consequently, this SRFI assumes that file descriptors will only
 be used at the edges of the program, and that most I/O operations will be
 performed on ports.
-As exceptions, <code>open-file</code> is provided, because
+As an exception, <code>open-file</code> is provided, because
 it allows arguments that the Scheme standard does not.  It returns
-a file descriptor that can then be converted to a port.
-</p>
-<div><code>(fdo-internal-fd <i>fdo</i>)</code> &nbsp;&rarr; <i>exact-int</i>&nbsp;&nbsp;</div>
-<p></p>
-<blockquote>
-<p>Returns the file descriptor encapsulated in <i>fdo</i> as an exact integer.
-<b>It should be used only when absolutely necessary,</b>
-such as when invoking a P<small>OSIX</small> API function
-not made available in this SRFI.
+a port of a specified type.
 </p>
 </blockquote>
 <p>
-<div><code>(open-file <i>fname flags [permission-bits]</i>)</code> &nbsp;&rarr; <i>fdo</i>&nbsp;&nbsp; P<small>OSIX</small> <code>open()</code></div>
+<div><code>binary-input</code></div>
+<div><code>textual-input</code></div>
+<div><code>binary-output</code></div>
+<div><code>textual-output</code></div>
+<div><code>binary-input/output</code></div>
+<blockquote>Symbols representing the type of port to be returned
+by <code>open-file</code> or <code>fd->port</code>.
+The textual ports use the same character encoding applied
+by default in the underlying implementation.
+The symbol <code>binary-input/output</code> represents a binary port
+that allows both input and output operations, as explained in
+<a href="https://srfi.schemers.org/srfi-181/srfi-181.html">SRFI 181</a>.
+</blockquote>
+<div><code>buffer-none</code></div>
+<div><code>buffer-block</code></div>
+<div><code>buffer-line</code></div>
 <blockquote>
-Opens the file named by <i>fname</i> and returns an FDO.
-<i>Permission-bits</i> defaults to <code>#o666</code>, but are masked by the current umask.
+Symbols representing, respectively: the absence of port buffering,
+where bytes are intended to appear from the source or at the destination as soon as possible;
+buffering with a block of implementation-dependent size;
+and buffering line by line, where a line is terminated
+by a newline byte <code>#xA</code>.
+</blockquote>
+<div><code>(open-file <i>fname port-type flags [permission-bits [buffer-mode] ]</i>)</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp; P<small>OSIX</small> <code>open()</code></div>
+<blockquote>
+Opens the file named by <i>fname</i> and returns a port
+of the type specified by <i>port-type</i>.
 <i>Flags</i> is an integer bitmask, composed by adding together
 one or more of the following constants:
 <code>open/read</code>,
@@ -327,79 +336,35 @@ one or more of the following constants:
 <code>open/exclusive</code>,
 <code>open/nofollow</code>,
 <code>open/truncate</code>.
+<i>Permission-bits</i> defaults to <code>#o666</code>, but are masked by the current umask.</p>
 <p>It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
 <code>open/read+write</code> flags is provided.</p>
 </blockquote>
-<div><code>(port-internal-fdo <i>port</i>)</code> &nbsp;&rarr; <i>fdo</i>&nbsp;&nbsp;</div>
-<p></p>
+<div><code>(fd->port <i>fd port-type</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>
 <blockquote>
-<p>Returns the file descriptor used by <i>port</i> as an FDO
-if the port is open on a file, socket,
-or similar source or sink that involves a file descriptor
-on a P<small>OSIX</small> system,
-or <code>#f</code> otherwise.
-<b>It should be used only when absolutely necessary.</b>
-If <i>fd</i> is closed with <code>close-fd</code>
-or otherwise, it is an error
-to do any further operations on <i>port</i>.
-</p>
-</blockquote>
-<div><code>(close-fdo <i>fdo</i>)</code> &nbsp;&rarr; <i>undefined</i>&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code></div>
-<p></p>
-<blockquote>
-<p>Closes the file descriptor encapsulated by <i>fdo</i>.
-If <i>fdo</i> is the internal file descriptor of a port, it is an error
-to do any further operations on that port.
-</p>
-</blockquote>
-
-<p>The following routines allow reasonably safe conversion between ports and file
-descriptors.
-More precisely, the port returned by the first four procedures
-contains a duplicate of the file descriptor passed to them,
-and the final procedure returns a file descriptor which is
-a duplicate of the one held by the port.</p>
-<p>It is the responsibility of the caller
-to make sure the file descriptor is closed.
-By the same token, the port may safely close its internal
-file descriptor when <code>close-port</code> is called on the port
-or when it is garbage-collected.
-However, as long as both are open,  the port and the file descriptor will share
-the same position, so that reads and writes on one are visible from the other.
-Therefore, <b>use caution</b> when reading or writing to the file descriptor
-(something this SRFI does not provide a mechanism for doing),
-especially in the presence of buffering.</p>
-<div><code>(fd->textual-input-port <i>fdo</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<div><code>(fd->binary-input-port <i>fdo</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i> &nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<div><code>(fd->textual-output-port <i>fdo</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<div><code>(fd->binary-output-port <i>fdo</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<blockquote>
-<p>These procedures wrap a newly created port around a duplicate of
+<p>This procedure wraps a newly created port around
 the specified file descriptor, effectively importing it into the
 Scheme world.
-In particular, the textual ports use the same character encoding applied
-by default in the underlying implementation.
-<p>The <i>buffer-mode</i> argument, if present, is one of the constants <code>buffer/none</code>,
-  <code>buffer/block</code> (the default), or <code>buffer/line</code>.
-  When <i>buffer-mode</i> is <code>buffer/none</code>,
-  bytes are intended to appear from the source or at the destination as soon as possible;
-  otherwise, bytes may be accumulated and transmitted as a block.
-  When <i>buffer-mode</i> is <code>buffer/block</code>, bytes are intended
-  to be transmitted as a fixed size block when a buffer is filled.
-  When <i>buffer-mode</i> is <code>buffer/line</code>, bytes are intended
-  to be transmitted as a block when a newline byte <code>#xA</code> is encountered.
+The most common use of this procedure is for a file descriptor other
+than 0, 1, 2 (standard input, standard output, standard error)
+that is already open when the Scheme program starts.
+It is an error if a port already exists that encapsulates <i>fd</i>.
 </p>
 </blockquote>
 
-<div><code>(port->fdo <i>port</i>)</code> &nbsp;&rarr; <i><i>fdo</i></i>&nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-
+<div><code>(with-port-fd <i>port proc</i>)</code> &nbsp;&rarr; <i>unspecified</i>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup ()</code></div>
+<p></p>
 <blockquote>
-<p>This procedure returns an FDO that has been duplicated
-from <i>port</i>, effectively exporting it from the Scheme world.
-Alternatively, <code>#f</code> is returned if <i>port</i> does not have a
-file descriptor (a string port, for example).
-</p></blockquote>
-
+<p>Extracts the file descriptor from <i>port</i>, calls <code>dup()</code> on it,
+and invokes <i>proc</i> with a single argument, the new file descriptor.
+When <i>proc</i> returns, the file descriptor is closed.
+<b>This procedure should be used only when absolutely necessary,</b>
+such as when invoking a P<small>OSIX</small> API function
+not made available in this SRFI.
+It is an error to do a read, write, seek, or close operation on the port
+while <i>proc</i> is executing, or to let the file descriptor leak out of <i>proc</i>.
+</p>
+</blockquote>
 <h3>3.3&nbsp;&nbsp;File system</h3>
 <p>The following procedures allow access to the
 computer's file system.
