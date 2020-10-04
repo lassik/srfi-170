@@ -352,31 +352,6 @@ It is an error if a port already exists that encapsulates <i>fd</i>.
 </p>
 </blockquote>
 
-<div><code>(call-with-port-fd <i>port proc</i>)</code> &nbsp;&rarr; <i>obj... </i>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>dup()</code></div>
-<p></p>
-<blockquote>
-<p>Extracts the file descriptor from <i>port</i>, calls <code>dup()</code> on it,
-and invokes <i>proc</i> with a single argument, the new file descriptor.
-When <i>proc</i> returns, the file descriptor is closed
-and <code>call-with-port-fd</code> returns the value(s) that <i>proc</i> returned.
-As such, it is closely analogous to the R6RS and R7RS procedure
-<code>call-with-port</code>.</p>
-<p><b>This procedure should be used only when absolutely necessary,</b>
-such as when invoking a P<small>OSIX</small> API function
-not made available in this SRFI.
-If a read, write, or positioning operation is done on either <i>port</i>
-or the new file descriptor
-while <i>proc</i> is executing, the results are unpredictable.
-</p>
-</blockquote>
-<div><code>(close-fd <i>fd</i>)</code> &nbsp;&rarr; <i>unspecified</i>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; P<small>OSIX</small> <code>close()</code></div>
-<p></p>
-<blockquote>
-Closes the file descriptor <i>fd</i>.
-<b>This procedure is dangerous</b>, and it is an error to call it
-except when cleaning up after a <code>call-with-port-id</code>
-that needs to make a non-local exit.
-</blockquote>
 <h3>3.3&nbsp;&nbsp;File system</h3>
 <p>The following procedures allow access to the
 computer's file system.
