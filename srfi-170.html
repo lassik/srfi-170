@@ -611,7 +611,7 @@ Use <i>path</i> if the file has not yet been created,
 or <i>port</i> if it is already open.
 </blockquote>
 
-<div><code>temp-file-prefix</code><i>string parameter</i></div>
+<div><code>temp-file-prefix</code>&nbsp;<i>string parameter</i></div>
 <p></p>
 <blockquote>
 <a href="https://srfi.schemers.org/srfi-39/srfi-39.html">SRFI 39</a>
@@ -714,7 +714,7 @@ Returns the current file protection mask, or umask, as an exact integer.
 Whenever a file is created, the specified or default permissions are
 bitwise-anded with the complement of the umask before they are used.
 </blockquote>
-<div><code>(set-umask!<i>umask</i>)</code> &nbsp;&rarr; <i><i>unspecified</i></i>&nbsp;&nbsp;P<small>OSIX</small> <code>umask()</code></div>
+<div><code>(set-umask!&nbsp;<i>umask</i>)</code> &nbsp;&rarr; <i><i>unspecified</i></i>&nbsp;&nbsp;P<small>OSIX</small> <code>umask()</code></div>
 <blockquote>
 <p>Sets the file protection mask to the exact integer <i>umask</i>
 and returns an unspecified value.</p>
@@ -737,7 +737,7 @@ Returns the current directory as a string containing an absolute pathname.
 Whenever a file is referenced with a relative path, it is interpreted as
 relative to this directory.
 </blockquote>
-<div><code>(set-current-directory!<i>new-directory</i>)</code> &nbsp;&rarr; <i><i>unspecified</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>chdir()</code></div>
+<div><code>(set-current-directory!&nbsp;<i>new-directory</i>)</code> &nbsp;&rarr; <i><i>unspecified</i></i>&nbsp;&nbsp; P<small>OSIX</small> <code>chdir()</code></div>
 <blockquote>
 <p>Sets the current directory to <i>new-directory</i>
 and returns an unspecified value.</p>
