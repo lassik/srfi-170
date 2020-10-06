@@ -324,18 +324,15 @@ The default is implementation-dependent.
 Opens the file named by <i>fname</i> and returns a port
 of the type specified by <i>port-type</i>.
 <i>Flags</i> is an integer bitmask, composed by adding together
-one or more of the following constants:
-<code>open/read</code>,
-<code>open/write</code>,
-<code>open/read+write</code>,
+any of the following constants:
 <code>open/append</code>,
 <code>open/create</code>,
 <code>open/exclusive</code>,
 <code>open/nofollow</code>,
 <code>open/truncate</code>.
+(The P<small>OSIX</small> flags O_RDONLY, R_WRONLY, and O_RDWR
+are inferred from the port type.)
 <i>Permission-bits</i> defaults to <code>#o666</code>, but are masked by the current umask.</p>
-<p>It is an error unless exactly one of the <code>open/read</code>, <code>open/write</code>, or
-<code>open/read+write</code> flags is provided.</p>
 </blockquote>
 <div><code>(fd->port <i>fd port-type</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>
 <blockquote>
