@@ -317,6 +317,7 @@ where bytes are intended to appear from the source or at the destination as soon
 buffering with a block of implementation-dependent size;
 and buffering line by line, where a line is terminated
 by a newline byte <code>#xA</code>.
+The default is implementation-dependent.
 </blockquote>
 <div><code>(open-file <i>fname port-type flags [permission-bits [buffer-mode] ]</i>)</code> &nbsp;&rarr; <i>port</i>&nbsp;&nbsp; P<small>OSIX</small> <code>open()</code></div>
 <blockquote>
@@ -344,7 +345,9 @@ Scheme world.
 The most common use of this procedure is for a file descriptor other
 than 0, 1, 2 (standard input, standard output, standard error)
 that is already open when the Scheme program starts.
-It is an error if a port already exists that encapsulates <i>fd</i>.
+It is an error if a port already exists that encapsulates <i>fd</i>,
+or if an attempt is made to use <code>fd->port</code>
+twice on the same fd.
 </p>
 </blockquote>
 
