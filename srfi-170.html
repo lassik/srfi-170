@@ -274,7 +274,7 @@ when interfacing to a subprocess.
 This causes a problem. Suppose we have a Scheme port constructed
 on top of file descriptor 3. We intend to execute a successor program that
 will expect this file descriptor. If we drop references to the port,
-the garbage collector may prematurely close file 3 before 
+the garbage collector may prematurely close file 3 before
 the successor program starts.</p>
 <p>
 Unfortunately, there is no even vaguely portable solution to the general problem.
@@ -591,7 +591,7 @@ Finally, <code>close-directory</code> closes a directory object.</p>
 
 </blockquote>
 <div><code>(real-path <i>path</i>)</code> &nbsp;&rarr; <i>string</i>&nbsp;&nbsp; P<small>OSIX</small> <code>realpath()</code></div>
- 
+
 <blockquote>
 Returns an absolute pathname
 derived from <i>pathname</i> that names the same file
