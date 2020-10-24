@@ -17,6 +17,7 @@
   (import (scheme base)
 
           (chibi)
+          (only (chibi ast) gc)
           (only (chibi filesystem) file-exists? delete-file)
           (chibi optional) ;; Snow package for optional args
           (only (chibi process) exit)
@@ -33,6 +34,7 @@
           (srfi 170)
 
           (srfi 170 posix-error)
+          (srfi 170 fdo)
           )
 
   (include-shared "170")
@@ -78,8 +80,8 @@
 
     (define starting-dir (current-directory))
 
-    (define no-dot (list-sort string<? '("fifo" "file-1" "hard-link" "symlink")))
-    (define with-dot (list-sort string<? '(".dot-file" "fifo" "file-1" "hard-link" "symlink")))
+    (define no-dot (list-sort string<? '("dir-1" "fifo" "file-1" "hard-link" "symlink")))
+    (define with-dot (list-sort string<? '("dir-1" ".dot-file" "fifo" "file-1" "hard-link" "symlink")))
 
     (define over-max-path "/tmp/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
@@ -146,6 +148,8 @@
         (test-group "3.1  Errors"
 
           ;; tests from old SRFI 198 implementation
+
+          (test #f (posix-error? 1))
 
           (set! the-error (make-posix-error 1))
           (test 'error (posix-error-error-set the-error))
@@ -219,7 +223,6 @@
 
 
           ;; tests using the above
-
           (test 0 (errno))
           (test-not-error (set-errno E2BIG))
           (set-errno E2BIG)
@@ -276,22 +279,24 @@
 
         (test-group "3.2  I/O"
 
+          (test-error (fdo-internal-fd "a"))
+
           (test-error (open-file 1 1 1))
           (test-error (open-file "foo" "bar" 1))
           (test-error (open-file "foo" 1 "baz"))
           (test-error (open-file bogus-path open/read))
 
-          (test 0 (port-internal-fd (current-input-port)))
-          (test 1 (port-internal-fd (current-output-port)))
-          (test 2 (port-internal-fd (current-error-port)))
-          (test-not (port-internal-fd the-string-port))
+          (test 0 (fdo-internal-fd (port-internal-fdo (current-input-port))))
+          (test 1 (fdo-internal-fd (port-internal-fdo (current-output-port))))
+          (test 2 (fdo-internal-fd (port-internal-fdo (current-error-port))))
+          (test-not (port-internal-fdo the-string-port))
 
-          (test-error (close-fd "a"))
-          (test-error (close-fd -1))
+          (test-error (close-fdo "a"))
+          (test-error (close-fdo -1))
 
           (let* ((dev-zero-fd (open-file "/dev/zero" open/read)))
-            (test-not-error (close-fd dev-zero-fd))
-            (test-error (close-fd dev-zero-fd)))
+            (test-not-error (close-fdo dev-zero-fd))
+            (test-error (close-fdo dev-zero-fd)))
 
           (test-error (fd->textual-input-port "a"))
           (test-error (fd->textual-input-port -1))
@@ -306,32 +311,32 @@
                  (the-port (fd->binary-output-port new-fd)))
             (test-not-error (write-bytevector the-binary-bytevector the-port))
             (test-not-error (close-port the-port))
-            (test-not-error (close-fd new-fd)))
+            (test-not-error (close-fdo new-fd)))
           (let* ((new-fd (open-file tmp-file-1 open/read))
                  (the-port (fd->binary-input-port new-fd)))
             (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
             (test-not-error (close-port the-port))
-            (test-not-error (close-fd new-fd)))
+            (test-not-error (close-fdo new-fd)))
           (let* ((new-fd (open-file tmp-file-1 open-write-create-truncate))
                  (the-port (fd->textual-output-port new-fd)))
             (test-not-error (write-string the-text-string the-port))
             (test-not-error (close-port the-port))
-            (test-not-error (close-fd new-fd)))
+            (test-not-error (close-fdo new-fd)))
           (let* ((new-fd (open-file tmp-file-1 open/read))
                  (the-port (fd->textual-input-port new-fd)))
             (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
             (test-not-error (close-port the-port))
-            (test-not-error (close-fd new-fd)))
+            (test-not-error (close-fdo new-fd)))
 
-          (let ((new-fd (port->fd (current-input-port))))
+          (let ((new-fd (fdo-internal-fd (port->fdo (current-input-port)))))
             (test-assert (fixnum? new-fd))
             (test-assert (> new-fd 2))
             (test 3 new-fd) ;; a bit dangerous, but on normal systems, if all of the above worked, should be true.
             (test-assert (not (eq? 0 new-fd)))
-            (test-not-error (close-fd new-fd)))
-          (test-not (port-internal-fd the-string-port))
+            (test-not-error (close-fdo (make-fdo new-fd))))
+          (test-not (port-internal-fdo the-string-port))
 
 
           ) ;; end I/O
@@ -505,6 +510,21 @@
                                 (time? ctime)
                                 (> (time-second ctime) 0)
                                 (> (time-nanosecond ctime) 0)))))
+          (test-not-error (create-directory tmp-dir-1))
+          (test-not-error (set-file-times tmp-dir-1)) ;; "now" for both
+          (let ((fi (file-info tmp-dir-1 #t)))
+            (let ((atime (file-info:atime fi))
+                  (mtime (file-info:mtime fi))
+                  (ctime (file-info:ctime fi)))
+              (test-assert (and (time? atime)
+                                (> (time-second atime) 0)
+                                (> (time-nanosecond atime) 0)
+                                (time? mtime)
+                                (> (time-second mtime) 0)
+                                (> (time-nanosecond mtime) 0)
+                                (time? ctime)
+                                (> (time-second ctime) 0)
+                                (> (time-nanosecond ctime) 0)))))
 
           (test the-text-string-length (file-info:size (file-info tmp-file-1  #t)))
           (test-not-error (truncate-file tmp-file-1 30))
@@ -632,6 +652,27 @@
           (test-error (real-path bogus-path))
           (test-not-error (set-current-directory! starting-dir))
 
+          (test-error (free-space #\a))
+          (test-error (free-space bogus-path))
+          (test-error (free-space the-string-port))
+          (test-not-error (free-space "/tmp"))
+
+          ;; the following free-space tests are inherantly fragile, between the two invocations of free-space something else may change free space on /tmp
+;;          (test (free-space "/tmp") (free-space tmp-containing-dir))
+;;          (test (free-space "/tmp") (free-space tmp-file-1))
+
+          ;; ~~~ test for an decrease in free space, large so less likely to be a false positive
+          (truncate-file tmp-file-1 0)
+          (let* ((the-port (open-output-file tmp-file-1))
+                 (the-big-string (make-string (* 1024 1024) 0))
+                 (the-original-free-space (free-space tmp-file-1)))
+            (do ((i 32 (- i 1)))
+                ((< i 1))
+              (write-string the-big-string the-port))
+            (flush-output-port the-port)
+            (test-assert (< (free-space tmp-file-1) the-original-free-space)))
+          ;; truncate-file must be called outside of test group (see below) because of how (chibi test) catches raises
+
           (test-assert (string? (temp-file-prefix)))
           (set-environment-variable! "TMPDIR" "foo")
           (parameterize ((temp-file-prefix "foo/"))
@@ -653,20 +694,21 @@
             (test the-prefix (string-copy the-filename 0 (string-length the-prefix)))
             (test-not-error (delete-file the-filename))) ;; cleaning up after self, but bad for debugging
 
-          (parameterize ((temp-file-prefix tmp-dir-1))
+          (parameterize ((temp-file-prefix tmp-file-1))
             (let ((the-filename (create-temp-file))
-                  (the-prefix (string-append tmp-dir-1 ".")))
-            (test-assert (file-exists? the-filename))
-            (test the-prefix (string-copy the-filename 0 (string-length the-prefix)))
-            (test-not-error (delete-file the-filename)))) ;; cleaning up after self, but bad for debugging
+                  (the-prefix (string-append tmp-file-1 ".")))
+              (test-assert (file-exists? the-filename))
+              (test the-prefix (string-copy the-filename 0 (string-length the-prefix)))
+              (test-not-error (delete-file the-filename)))) ;; cleaning up after self, but bad for debugging
 
           (if (not (equal? 0 (user-effective-uid)))
               (test-error (create-temp-file bogus-path)))
 
-          ;; call-with-temporary-filename
+          ;; ~~~ call-with-temporary-filename
 
           ) ;; end file system
 
+        (truncate-file tmp-file-1 30)
 
         (test-group "3.5  Process state"
 
@@ -757,9 +799,16 @@
 
         (test-group "3.12  Terminal device control"
 
+          (test-error (terminal? -1))
+          (test-error (terminal? "a"))
+          (test-error (terminal? #f)) ;; in case port-internal-fdo returns this, like for a string port
           (test-assert (terminal? (current-input-port)))
+          (test-assert (terminal? (port-internal-fdo (current-input-port))))
+          (test-assert (terminal? 0))
+          (test-not (terminal? the-string-port))
           (let ((port-not-terminal (open-input-file tmp-file-1)))
             (test-not (terminal? port-not-terminal))
+            (test-not (terminal? (port-internal-fdo port-not-terminal)))
             (close-port port-not-terminal))
 
 #|
@@ -807,9 +856,11 @@
           ) ;; end terminal device control
 
 
-        (test-group "Epilogue: set-priority to 1, 2, 4"
+        (test-group "Epilogue: cleanup, force a gc, set-priority to 1, 2, 4"
 
           (close-port the-string-port)
+
+          (test-not-error (gc)) ;; see if we blow up
 
           ;; in epilogue so most testing is not slowed down
 
