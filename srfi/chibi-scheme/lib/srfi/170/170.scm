@@ -671,14 +671,13 @@
 ;;; 3.12  Terminal device control
 
 (define (terminal? the-arg)
-  (let ((the-fd (cond ((fixnum? the-arg) the-arg)
-                      ((fdo? the-arg) (fdo-internal-fd the-arg))
-                      ((port? the-arg) (port-fileno the-arg))
-                      (else (sanity-check-error "argument must be a port or file descriptor object (fdo)" 'terminal? the-arg)))))
+  (let ((the-fd (if (port? the-arg)
+                    (port-fileno the-arg)
+                    (sanity-check-error "argument must be a port" 'terminal? the-arg))))
     (if (eq? #f the-fd)
         #f
         (if (< the-fd 0)
-            (sanity-check-error "if argument is a fixnum, it must be greater than or equal to 0" 'terminal? the-arg)
+            (sanity-check-error "file descriptor for port is less than zero" 'terminal? the-arg)
             (begin
               (set-errno 0)
               (let ((ret (%isatty the-fd)))

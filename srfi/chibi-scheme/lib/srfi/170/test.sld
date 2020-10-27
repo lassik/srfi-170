@@ -800,15 +800,13 @@
         (test-group "3.12  Terminal device control"
 
           (test-error (terminal? -1))
+          (test-error (terminal? 0))
           (test-error (terminal? "a"))
-          (test-error (terminal? #f)) ;; in case port-internal-fdo returns this, like for a string port
+          (test-error (terminal? #f))
           (test-assert (terminal? (current-input-port)))
-          (test-assert (terminal? (port-internal-fdo (current-input-port))))
-          (test-assert (terminal? 0))
           (test-not (terminal? the-string-port))
           (let ((port-not-terminal (open-input-file tmp-file-1)))
             (test-not (terminal? port-not-terminal))
-            (test-not (terminal? (port-internal-fdo port-not-terminal)))
             (close-port port-not-terminal))
 
 #|
