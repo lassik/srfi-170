@@ -24,8 +24,6 @@ because it uses specialized syntax to catch system errors.
 <h3>3.2&nbsp;&nbsp;I/O</h3>
 <ul>
 <li><p>
-</p></li>
-<li><p>
 Scsh does not distinguish between textual and binary ports,
 so there are only two procedures to convert file descriptors to ports,
 <code>fdes->inport</code> in place of <code>fd->textual-input-port</code>
@@ -34,12 +32,14 @@ and <code>fd->binary-input-port</code>, and
 and <code>fd->binary-output-port</code>.
 </p></li>
 <li><p>
-The scsh versions of the <code>fdes->*port</code> procedures
+The scsh versions of the <code>fd->*port</code> procedures
+are named <code>fdes->*port</code>, and
 do not support the <i>buffer-mode</i> argument.
 </p></li>
-<li><p>The <code>port-fd</code> procedure is called <code>port->fdes</code> in scsh.
+<li><p>The <code>port-internal-fd</code> procedure is called <code>port->fdes</code> in scsh.
 The name was changed because the use of the arrow suggests a conversion of the
 port to a file descriptor, which is not the case.
+There is no equivalent of SRFI 170's <code>port->fd</code>.
 </p></li>
 <li><p>There is no <code>close-fd</code> procedure in scsh, as the standard <code>close-port</code>
 procedure suffices.
@@ -137,7 +137,8 @@ Scsh specifies but does not implement <code>nice</code>.
   Scsh does not provide <code>posix-time</code>, but it is easily defined using the procedures
   <code>time+ticks</code> and <code>ticks/sec</code>.  The first procedure returns two values, the Posix
   second and the subsecond time in ticks; the second procedure specifies how many ticks
-  a second contains.  These are easily converted to seconds and nanoseconds.
+  a second contains.  These are easily converted to seconds and nanoseconds
+and from there to a SRFI 19 time object.
 </p></li>
 </ul>
 
@@ -145,8 +146,15 @@ Scsh specifies but does not implement <code>nice</code>.
 <h3>3.11&nbsp;&nbsp;Environment variables</h3>
 <ul>
 <li><p>
-  Scsh's <code>set-environment-variable!</code> is <code>setenv</code>, and does not signal an error in
+  Scsh's <code>set-environment-variable!</code> is named <code>setenv</code>, and does not signal an error in
   any way if it fails.  It does not implement any equivalent to <code>delete-environment-variable!</code>
+</p></li>
+</ul>
+
+<h3>12&nbsp;&nbsp;Terminal device control</h3>
+<ul>
+<li><p>
+  Scsh's <code>terminal?</code> is named <code>tty?</code>.
 </p></li>
 </ul>
 
