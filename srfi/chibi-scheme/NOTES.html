@@ -12,11 +12,6 @@ of the Chibi Scheme implementation.
 </p>
 <p>
 Note generally that the Chibi implementation is completely thread-naive.
-What is more, the implementation's FDOs don't interoperate with
-those used by Chibi natively, which may cause some issues mixing
-SRFI 170 operations with native Chibi ones.  In particular, make sure to
-hold on to any port on which <code>port-internal-fdo</code> was
-called, so that the garbage collector does not close the file descriptor.
 </p>
 
 <h3>3.1&nbsp;&nbsp;Error handling</h3>
@@ -32,8 +27,8 @@ the current value.
 <h3>3.2&nbsp;&nbsp;I/O</h3>
 <ul>
 <li><p>
-The <code>fd->port</code> procedure
-does not support either the <i>buffer-mode</i> argument or
+The <code>open-file</code> and <code>fd->port</code> procedures
+do not support either the <i>buffer-mode</i> argument or
 the <code>binary-input/output</code> value of the <i>port-type</i> argument.
 </p></li>
 </ul>
