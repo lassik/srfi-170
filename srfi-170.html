@@ -39,6 +39,7 @@
   <li>Draft #9 published: 2020-07-21</li>
   <li>Draft #10 published: 2020-08-09</li>
   <li>Draft #11 published: 2020-09-08</li>
+  <li>Draft #12 published: 2020-10-24</li>
   <li>John Cowan's <a href="https://github.com/johnwcowan/srfi-170">personal
     Git repo for this SRFI</a> for reference while the SRFI is in
     <em>draft</em> status (<a href="https://htmlpreview.github.io/?https://github.com/johnwcowan/srfi-170/blob/master/srfi-170.html">preview</a>)</li>
@@ -200,13 +201,13 @@ This SRFI provides three procedures which will typically be shims
 over whatever the implementation uses to report such errors:
 </p>
 
-<div><code>(posix-error? <i>obj</i>)</code> &nbsp;&rarr; <i>boolean</i>
+<code>(posix-error? <i>obj</i>)</code> &nbsp;&rarr; <i>boolean</i>
 <blockquote>
 This procedure returns <code>#t</code> if <code>obj</code> is
 a condition object that describes a P<small>OSIX</small> error,
 and <code>#f</code> otherwise.
 </blockquote>
-<div><code>(posix-error-name <i>posix-error</i>)</code> &nbsp;&rarr; <i>symbol</i>
+<code>(posix-error-name <i>posix-error</i>)</code> &nbsp;&rarr; <i>symbol</i>
 <blockquote>
 <p>This procedure returns a symbol that is the name associated
 with the value of <code>errno</code> when
@@ -226,7 +227,7 @@ But although <code>ETIMEDOUT</code> (meaning that a TCP connection
 has been unresponsive for too long) is standardized by P<small>OSIX</small>,
 it has a <code>errno</code> value of 110 on Linux, 60 on FreeBSD, and 116 on Cygwin.</p>
 </blockquote>
-<div><code>(posix-error-message <i>posix-error</i>)</code> &nbsp;&rarr; <i>string</i>
+<code>(posix-error-message <i>posix-error</i>)</code> &nbsp;&rarr; <i>string</i>
 <blockquote>
 This procedure returns a string that is an error message reflecting
 the value of <code>errno</code> when
@@ -274,7 +275,7 @@ when interfacing to a subprocess.
 This causes a problem. Suppose we have a Scheme port constructed
 on top of file descriptor 3. We intend to execute a successor program that
 will expect this file descriptor. If we drop references to the port,
-the garbage collector may prematurely close file 3 before 
+the garbage collector may prematurely close file 3 before
 the successor program starts.</p>
 <p>
 Unfortunately, there is no even vaguely portable solution to the general problem.
@@ -293,7 +294,6 @@ As an exception, <code>open-file</code> is provided, because
 it allows arguments that the Scheme standard does not.  It returns
 a port of a specified type.
 </p>
-</blockquote>
 <p>
 <div><code>binary-input</code></div>
 <div><code>textual-input</code></div>
@@ -332,9 +332,9 @@ any of the following constants:
 <code>open/truncate</code>.
 (The P<small>OSIX</small> flags O_RDONLY, R_WRONLY, and O_RDWR
 are inferred from the port type.)
-<i>Permission-bits</i> defaults to <code>#o666</code>, but are masked by the current umask.</p>
+<i>Permission-bits</i> defaults to <code>#o666</code>, but are masked by the current umask.
 </blockquote>
-<div><code>(fd->port <i>fd port-type</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>
+<code>(fd->port <i>fd port-type</i> [<i>buffer-mode</i>])</code> &nbsp;&rarr; <i>port</i>
 <blockquote>
 <p>This procedure wraps a newly created port around
 the specified file descriptor, effectively importing it into the
@@ -592,7 +592,7 @@ Finally, <code>close-directory</code> closes a directory object.</p>
 
 </blockquote>
 <div><code>(real-path <i>path</i>)</code> &nbsp;&rarr; <i>string</i>&nbsp;&nbsp; P<small>OSIX</small> <code>realpath()</code></div>
- 
+
 <blockquote>
 Returns an absolute pathname
 derived from <i>pathname</i> that names the same file
