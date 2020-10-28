@@ -38,15 +38,9 @@
 
    ;; 3.2  I/O
 
-   fdo-internal-fd
    open-file
-   open/read open/write open/read+write
    open/append open/create open/exclusive open/nofollow open/truncate
-   port-internal-fdo
-   close-fdo
-   fd->textual-input-port fd->binary-input-port
-   fd->textual-output-port fd->binary-output-port
-   port->fdo
+   fd->port
 
 
    ;; 3.3  File system
