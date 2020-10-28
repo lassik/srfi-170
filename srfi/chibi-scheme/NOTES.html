@@ -22,24 +22,26 @@ called, so that the garbage collector does not close the file descriptor.
 <h3>3.1&nbsp;&nbsp;Error handling</h3>
 <ul>
 <li>
-<p>The Chibi Scheme implementation's setting and getting of errno are
-done at the Scheme level, and arbitrary Chibi Scheme code that might
-change errno can run between SRFI 170 setting, setting by a system or
-library call due to an error, and SRFI 170 getting the current errno.
+<p>The implementation gets and sets <code>errno</code>
+at the Scheme level, and arbitrary code that might
+change <code>errno</code> can run between the time a system or
+library call sets its value due to an error and Scheme code gets
+the current value.
 </ul>
 
 <h3>3.2&nbsp;&nbsp;I/O</h3>
 <ul>
 <li><p>
-The Chibi Scheme versions of the <code>fd->*port</code> procedures
-do not support the <i>buffer-mode</i> argument.
+The <code>fd->port</code> procedure
+does not support either the <i>buffer-mode</i> argument or
+the <code>binary-input/output</code> value of the <i>port-type</i> argument.
 </p></li>
 </ul>
 
 <h3>3.3&nbsp;&nbsp;File system</h3>
 <ul>
 <li><p>
-The Chibi Scheme implementation of <code>call-with-temporary-filename</code> is
+The implementation of <code>call-with-temporary-filename</code> is
 neither finished or exported.
 </li></p>
 </ul>

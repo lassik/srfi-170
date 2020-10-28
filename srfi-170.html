@@ -300,11 +300,11 @@ a port of a specified type.
 <div><code>binary-output</code></div>
 <div><code>textual-output</code></div>
 <div><code>binary-input/output</code></div>
-<blockquote>Symbols representing the type of port to be returned
+<blockquote>Constants whose values represent the type of port to be returned
 by <code>open-file</code> or <code>fd->port</code>.
 The textual ports use the same character encoding applied
 by default in the underlying implementation.
-The symbol <code>binary-input/output</code> represents a binary port
+The value of <code>binary-input/output</code> represents a binary port
 that allows both input and output operations, as discussed in
 <a href="https://srfi.schemers.org/srfi-181/srfi-181.html">SRFI 181</a>.
 </blockquote>
@@ -312,7 +312,7 @@ that allows both input and output operations, as discussed in
 <div><code>buffer-block</code></div>
 <div><code>buffer-line</code></div>
 <blockquote>
-Symbols representing, respectively: the absence of port buffering,
+Constants whose values represent, respectively: the absence of port buffering,
 where bytes are intended to appear from the source or at the destination as soon as possible;
 buffering with a block of implementation-dependent size;
 and buffering line by line, where a line is terminated
