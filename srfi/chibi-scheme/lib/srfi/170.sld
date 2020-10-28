@@ -39,6 +39,8 @@
    ;; 3.2  I/O
 
    open-file
+   binary-input textual-input binary-output textual-output binary-input/output
+   buffer-none buffer-block buffer-line
    open/append open/create open/exclusive open/nofollow open/truncate
    fd->port
 
@@ -160,8 +162,6 @@
                                   posix-error-number posix-error-scheme-procedure
                                   posix-error-posix-interface posix-error-data
                                   raise-posix-error)
-
-     (only (srfi 170 fdo) fdo? make-fdo fdo:fd)
      )
 
     (include-shared "170/170")

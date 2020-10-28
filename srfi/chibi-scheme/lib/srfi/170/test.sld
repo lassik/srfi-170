@@ -18,9 +18,9 @@
 
           (chibi)
           (only (chibi ast) gc)
-          (only (chibi filesystem) file-exists? delete-file open open/read)
+          (only (chibi filesystem) file-exists? delete-file open)
           (chibi optional) ;; Snow package for optional args
-          (only (chibi process) exit)
+          (only (chibi process) exit) ;; for printf style debugging
           (chibi test)
 
           (only (srfi 1) alist-cons list-index)
@@ -34,7 +34,6 @@
           (srfi 170)
 
           (srfi 170 posix-error)
-          (srfi 170 fdo)
           )
 
   (include-shared "170")
@@ -76,6 +75,7 @@
     (define the-text-string-length (string-length the-text-string))
     (define the-binary-bytevector (bytevector 0 1 2 3 4 5 6 7 8 9))
     (define the-binary-bytevector-length (bytevector-length the-binary-bytevector))
+    (define open-create-truncate (bitwise-ior open/create open/truncate))
     (define open-write-create-truncate (bitwise-ior open/write open/create open/truncate))
 
     (define starting-dir (current-directory))
@@ -249,7 +249,7 @@
           ;; Make sure the error raising code works for a real error
           (test-error ((with-exception-handler
                         (lambda (exception) (set! the-error exception))
-                        (lambda () (open-file bogus-path 'textual-input open/read)))))
+                        (lambda () (open-file bogus-path textual-input 0)))))
           (test-assert (posix-error? the-error))
           (test 'errno (posix-error-error-set the-error))
           (test 2 (posix-error-number the-error))
@@ -282,33 +282,55 @@
           (test-error (open-file 1 1 1))
           (test-error (open-file 1 1 1 1))
           (test-error (open-file 1 1 1 1 1))
-          (test-error (open-file bogus-path 'binary-input open/read))
+          (test-error (open-file bogus-path binary-input 0))
 
-          (let* ((dev-zero-port (open-file "/dev/zero" 'binary-input open/read)))
-            ;; ~~~ read a byte, make sure it's 0
+          ;; None of are buffer-none, buffer-block, or buffer-line are implemented or even checked for as of yet:
+
+          (let* ((dev-zero-port (open-file "/dev/zero" binary-input 0)))
+            (test-assert 0 (read-char dev-zero-port))
             (test-not-error (close-port dev-zero-port)))
 
-          (let ((the-port (open-file tmp-file-1 'binary-output open-write-create-truncate)))
+          (let ((the-port (open-file tmp-file-1 textual-output open-create-truncate)))
+            (test-not-error (write-string the-text-string the-port))
+            (test-not-error (close-port the-port)))
+          (let ((the-port (open-file tmp-file-1 textual-input 0)))
+            (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
+            (test-assert (eof-object? (read-char the-port)))
+            (test-not-error (close-port the-port)))
+          (let ((the-port (open-file tmp-file-1 binary-output open-create-truncate)))
             (test-not-error (write-bytevector the-binary-bytevector the-port))
             (test-not-error (close-port the-port)))
-          (let ((the-port (open-file tmp-file-1 'binary-input open/read)))
+          (let ((the-port (open-file tmp-file-1 binary-input 0)))
             (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
             (test-not-error (close-port the-port)))
-          (let ((the-port (open-file tmp-file-1 'textual-output open-write-create-truncate)))
+
+          (test-error (open-file tmp-file-1 binary-input/output 0))
+
+          (let* ((the-fileno (open tmp-file-1 open-write-create-truncate))
+                 (the-fd (%fileno-to-fd the-fileno))
+                 (the-port (fd->port the-fd textual-output)))
             (test-not-error (write-string the-text-string the-port))
             (test-not-error (close-port the-port)))
-          (let ((the-port (open-file tmp-file-1 'textual-input open/read)))
+          (let* ((the-fileno (open tmp-file-1 open/read 0))
+                 (the-fd (%fileno-to-fd the-fileno))
+                 (the-port (fd->port the-fd textual-input)))
             (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
+            (test-assert (eof-object? (read-char the-port)))
+            (test-not-error (close-port the-port)))
+          (let* ((the-fileno (open tmp-file-1 open-write-create-truncate))
+                 (the-fd (%fileno-to-fd the-fileno))
+                 (the-port (fd->port the-fd binary-output)))
+            (test-not-error (write-bytevector the-binary-bytevector the-port))
+            (test-not-error (close-port the-port)))
+          (let* ((the-fileno (open tmp-file-1 open/read 0))
+                 (the-fd (%fileno-to-fd the-fileno))
+                 (the-port (fd->port the-fd binary-input)))
+            (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
             (test-not-error (close-port the-port)))
 
-          (let* ((the-fileno (open tmp-file-1 open/read))
-                 (the-fd (%fileno-to-fd the-fileno))
-                 (the-port (fd->port 'textual-input)))
-            (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
-            (test-assert (eof-object? (read-char the-port)))
-            (test-not-error (close-port the-port)))
+          (test-error (fd->port 4 binary-input/output))
 
           ) ;; end I/O
 
@@ -497,7 +519,7 @@
                                 (> (time-second ctime) 0)
                                 (> (time-nanosecond ctime) 0)))))
 
-          (test the-text-string-length (file-info:size (file-info tmp-file-1  #t)))
+          (test the-binary-bytevector-length (file-info:size (file-info tmp-file-1  #t)))
           (test-not-error (truncate-file tmp-file-1 30))
           (test 30 (file-info:size (file-info tmp-file-1 #t)))
           (let ((the-port (open-output-file tmp-file-1))) ;; note this truncates the file to 0 length
