@@ -2,77 +2,72 @@
 
 ;;; 3.2  I/O
 
-(define (fdo-internal-fd the-fdo)
-  (if (not (fdo? the-fdo))
-      (sanity-check-error "argument must be a file descriptor object (fdo)" 'fdo-internal-fd the-fdo))
-  (fdo:fd the-fdo))
+(define binary-input 'internal-binary-input-symbol)
+(define textual-input 'internal-textual-input-symbol)
+(define binary-output 'internal-binary-ouput-symbol)
+(define textual-output 'internal-textual-output-symbol)
+(define binary-input/output 'internal-binary-input/output-symbol)
+;; None of these are implemented or even checked for as of yet:
+(define buffer-none 'unimplemented-buffer-none-symbol)
+(define buffer-block 'unimplemented-buffer-block-symbol)
+(define buffer-line 'unimplemented-buffer-line-symbol)
 
-(define (open-file fname flags . o)
+(define (fd->textual-input-port the-fd)
+  (%file_descriptor_to_port the-fd #t #f))
+
+(define (fd->binary-input-port the-fd)
+  (%file_descriptor_to_port the-fd #t #t))
+
+(define (fd->textual-output-port the-fd)
+  (%file_descriptor_to_port the-fd #f #f))
+
+(define (fd->binary-output-port the-fd)
+  (%file_descriptor_to_port the-fd #f #t))
+
+(define (open-file* fname flags permission-bits)
+    (let ((fd (retry-if-EINTR (lambda () (%open fname flags permission-bits)))))
+      (if (equal? -1 fd)
+          (errno-error (errno) 'open-file 'open fname flags permission-bits)
+          fd)))
+
+(define (open-file fname port-type flags . o)
   (let-optionals o ((permission-bits #o666))
     (if (not (string? fname))
         (sanity-check-error "fname must be a string" 'open-file fname))
+    (if (not (symbol? port-type))
+        (sanity-check-error "invalid port-type" 'open-file port-type))
     (if (not (fixnum? flags))
         (sanity-check-error "flags must be a fixnum" 'open-file flags))
     (if (not (fixnum? permission-bits))
         (sanity-check-error "permission-bits must be a fixnum" 'open-file permission-bits))
-    (let ((fd (retry-if-EINTR (lambda () (%open fname flags permission-bits)))))
-      (if (equal? -1 fd)
-          (errno-error (errno) 'open-file 'open fname flags permission-bits)
-          (make-fdo fd)))))
+    (cond ((eq? port-type textual-input)
+           (fd->textual-input-port (open-file* fname (bitwise-ior open/read flags) permission-bits)))
+          ((eq? port-type binary-input)
+           (fd->binary-input-port (open-file* fname (bitwise-ior open/read flags) permission-bits)))
+          ((eq? port-type textual-output)
+           (fd->textual-output-port (open-file* fname (bitwise-ior open/write flags) permission-bits)))
+          ((eq? port-type binary-output)
+           (fd->binary-output-port (open-file* fname (bitwise-ior open/write flags) permission-bits)))
+          ((eq? port-type binary-input/output)
+           (sanity-check-error "binary-input/output is not implemented" 'open-file))
+          (else (sanity-check-error "unknown port-type" 'open-file port-type)))))
 
-(define (port-internal-fdo the-port)
-  (if (not (port? the-port))
-      (sanity-check-error "argument must be a port" 'port-internal-fdo the-port))
-  (let ((ret (port-fileno the-port)))
-    (if ret
-        (make-fdo ret)
-        ret)))
-
-(define (close-fdo the-fdo)
-  (if (not (fdo? the-fdo))
-      (sanity-check-error "argument must be a file descriptor object (fdo)" 'close-fdo the-fdo))
-  (if (not (retry-if-EINTR (lambda () (%close (fdo:fd the-fdo)))))
-      (errno-error (errno) 'close-fdo 'close the-fdo)))
-
-;; seems Chibi handles bogus fds OK, reading input returns eof, output
-;; raises errors
-
-(define (dup-file-descriptor the-fdo) ;; not "duplicate" because that's a Chibi procedure.
-  (let ((the-fd (fdo:fd the-fdo)))
-    (if (or (not (fixnum? the-fd)) (< the-fd 0))
-        (sanity-check-error "file descriptor inside file descriptor object must be a fixnum, and greater than or equal to 0" 'dup-file-descriptor the-fdo))
-    (let ((ret (%dup the-fd)))
-      (if (eq? -1 ret)
-          (errno-error (errno) 'dup-file-descriptor 'dup the-fdo)
-          ret))))
-
-(define (fd->textual-input-port the-fdo)
-  (if (not (fdo? the-fdo))
-      (sanity-check-error "argument must be a file descriptor object (fdo)" 'fd->textual-input-port the-fdo))
-  (%file_descriptor_to_port (dup-file-descriptor the-fdo) #t #f))
-
-(define (fd->binary-input-port the-fdo)
-  (if (not (fdo? the-fdo))
-      (sanity-check-error "argument must be a file descriptor object (fdo)" 'fd->binary-input-port the-fdo))
-  (%file_descriptor_to_port (dup-file-descriptor the-fdo) #t #t))
-
-(define (fd->textual-output-port the-fdo)
-  (if (not (fdo? the-fdo))
-      (sanity-check-error "argument must be a file descriptor object (fdo)" 'fd->textual-output-port the-fdo))
-  (%file_descriptor_to_port (dup-file-descriptor the-fdo) #f #f))
-
-(define (fd->binary-output-port the-fdo)
-  (if (not (fdo? the-fdo))
-      (sanity-check-error "argument must be a file descriptor object (fdo)" 'fd->binary-output-port the-fdo))
-  (%file_descriptor_to_port (dup-file-descriptor the-fdo) #f #t))
-
-(define (port->fdo the-port)
-  (if (not (port? the-port))
-      (sanity-check-error "argument must be a port" 'port->fdo the-port))
-  (let ((the-original-fd (port-fileno the-port)))
-    (if (not the-original-fd)
-        the-original-fd
-        (make-fdo (dup-file-descriptor (make-fdo the-original-fd))))))
+(define (fd->port the-fd port-type)
+  (if (not (exact-integer? the-fd))
+      (sanity-check-error "argument must be an exact integer" 'fd->port the-fd))
+  (if (not (symbol? port-type))
+      (sanity-check-error "invalid port-type" 'fd->port port-type))
+  (cond ((eq? port-type textual-input)
+         (fd->textual-input-port the-fd))
+        ((eq? port-type binary-input)
+         (fd->binary-input-port the-fd))
+        ((eq? port-type textual-output)
+         (fd->textual-output-port the-fd))
+        ((eq? port-type binary-output)
+         (fd->binary-output-port the-fd))
+        ((eq? port-type binary-input/output)
+         (sanity-check-error "binary-input/output is not implemented" 'open-file))
+        (else (sanity-check-error "unknown port-type" 'open-file port-type))))
 
 
 ;;; 3.3  File system
@@ -671,14 +666,13 @@
 ;;; 3.12  Terminal device control
 
 (define (terminal? the-arg)
-  (let ((the-fd (cond ((fixnum? the-arg) the-arg)
-                      ((fdo? the-arg) (fdo-internal-fd the-arg))
-                      ((port? the-arg) (port-fileno the-arg))
-                      (else (sanity-check-error "argument must be a port or file descriptor object (fdo)" 'terminal? the-arg)))))
+  (let ((the-fd (if (port? the-arg)
+                    (port-fileno the-arg)
+                    (sanity-check-error "argument must be a port" 'terminal? the-arg))))
     (if (eq? #f the-fd)
         #f
         (if (< the-fd 0)
-            (sanity-check-error "if argument is a fixnum, it must be greater than or equal to 0" 'terminal? the-arg)
+            (sanity-check-error "file descriptor for port is less than zero" 'terminal? the-arg)
             (begin
               (set-errno 0)
               (let ((ret (%isatty the-fd)))
