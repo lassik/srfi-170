@@ -18,7 +18,7 @@
 
           (chibi)
           (only (chibi ast) gc)
-          (only (chibi filesystem) file-exists? delete-file)
+          (only (chibi filesystem) file-exists? delete-file open open/read)
           (chibi optional) ;; Snow package for optional args
           (only (chibi process) exit)
           (chibi test)
@@ -249,7 +249,7 @@
           ;; Make sure the error raising code works for a real error
           (test-error ((with-exception-handler
                         (lambda (exception) (set! the-error exception))
-                        (lambda () (open-file bogus-path open/read)))))
+                        (lambda () (open-file bogus-path 'textual-input open/read)))))
           (test-assert (posix-error? the-error))
           (test 'errno (posix-error-error-set the-error))
           (test 2 (posix-error-number the-error))
@@ -279,65 +279,36 @@
 
         (test-group "3.2  I/O"
 
-          (test-error (fdo-internal-fd "a"))
-
           (test-error (open-file 1 1 1))
-          (test-error (open-file "foo" "bar" 1))
-          (test-error (open-file "foo" 1 "baz"))
-          (test-error (open-file bogus-path open/read))
+          (test-error (open-file 1 1 1 1))
+          (test-error (open-file 1 1 1 1 1))
+          (test-error (open-file bogus-path 'binary-input open/read))
 
-          (test 0 (fdo-internal-fd (port-internal-fdo (current-input-port))))
-          (test 1 (fdo-internal-fd (port-internal-fdo (current-output-port))))
-          (test 2 (fdo-internal-fd (port-internal-fdo (current-error-port))))
-          (test-not (port-internal-fdo the-string-port))
+          (let* ((dev-zero-port (open-file "/dev/zero" 'binary-input open/read)))
+            ;; ~~~ read a byte, make sure it's 0
+            (test-not-error (close-port dev-zero-port)))
 
-          (test-error (close-fdo "a"))
-          (test-error (close-fdo -1))
-
-          (let* ((dev-zero-fd (open-file "/dev/zero" open/read)))
-            (test-not-error (close-fdo dev-zero-fd))
-            (test-error (close-fdo dev-zero-fd)))
-
-          (test-error (fd->textual-input-port "a"))
-          (test-error (fd->textual-input-port -1))
-          (test-error (fd->binary-input-port "a"))
-          (test-error (fd->binary-input-port -1))
-          (test-error (fd->textual-output-port "a"))
-          (test-error (fd->textual-output-port -1))
-          (test-error (fd->binary-output-port "a"))
-          (test-error (fd->binary-output-port -1))
-
-          (let* ((new-fd (open-file tmp-file-1 open-write-create-truncate))
-                 (the-port (fd->binary-output-port new-fd)))
+          (let ((the-port (open-file tmp-file-1 'binary-output open-write-create-truncate)))
             (test-not-error (write-bytevector the-binary-bytevector the-port))
-            (test-not-error (close-port the-port))
-            (test-not-error (close-fdo new-fd)))
-          (let* ((new-fd (open-file tmp-file-1 open/read))
-                 (the-port (fd->binary-input-port new-fd)))
+            (test-not-error (close-port the-port)))
+          (let ((the-port (open-file tmp-file-1 'binary-input open/read)))
             (test-assert (equal? the-binary-bytevector (read-bytevector the-binary-bytevector-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
-            (test-not-error (close-port the-port))
-            (test-not-error (close-fdo new-fd)))
-          (let* ((new-fd (open-file tmp-file-1 open-write-create-truncate))
-                 (the-port (fd->textual-output-port new-fd)))
+            (test-not-error (close-port the-port)))
+          (let ((the-port (open-file tmp-file-1 'textual-output open-write-create-truncate)))
             (test-not-error (write-string the-text-string the-port))
-            (test-not-error (close-port the-port))
-            (test-not-error (close-fdo new-fd)))
-          (let* ((new-fd (open-file tmp-file-1 open/read))
-                 (the-port (fd->textual-input-port new-fd)))
+            (test-not-error (close-port the-port)))
+          (let ((the-port (open-file tmp-file-1 'textual-input open/read)))
             (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
             (test-assert (eof-object? (read-char the-port)))
-            (test-not-error (close-port the-port))
-            (test-not-error (close-fdo new-fd)))
+            (test-not-error (close-port the-port)))
 
-          (let ((new-fd (fdo-internal-fd (port->fdo (current-input-port)))))
-            (test-assert (fixnum? new-fd))
-            (test-assert (> new-fd 2))
-            (test 3 new-fd) ;; a bit dangerous, but on normal systems, if all of the above worked, should be true.
-            (test-assert (not (eq? 0 new-fd)))
-            (test-not-error (close-fdo (make-fdo new-fd))))
-          (test-not (port-internal-fdo the-string-port))
-
+          (let* ((the-fileno (open tmp-file-1 open/read))
+                 (the-fd (%fileno-to-fd the-fileno))
+                 (the-port (fd->port 'textual-input)))
+            (test-assert (equal? the-text-string (read-string the-text-string-length the-port)))
+            (test-assert (eof-object? (read-char the-port)))
+            (test-not-error (close-port the-port)))
 
           ) ;; end I/O
 
