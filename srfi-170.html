@@ -127,11 +127,11 @@ P<small>OSIX</small> date and time operations are irregular and awkward.
 This SRFI provides only the current time.
 </p></li><li><p>
 Access to command-line arguments and environment variables, as well
-as provisions for exiting a process, as they are already provided by R<sup>7</sup>RS-small.
+as provisions for exiting a process, as they are already provided by R<sup>7</sup>RS Small.
 </p></li><li><p>
 P<small>OSIX</small> file locking, which is notoriously
 <a href="http://0pointer.de/blog/projects/locking.html">broken as designed</a>.
-Consider the use of dot files (or if necessary
+Consider the use of dot files (or, if necessary,
 non-portable facilities) instead.
 </p></li><li><p>
 All provisions for signal handling, as they are complex and require deep
@@ -269,8 +269,8 @@ descriptors are just integers, it's impossible to garbage collect them.</p>
 Ideally, a Scheme program could only use ports and not
 file descriptors.  But code written in any language, including Scheme,
 needs to descend to the file descriptor level in at least two circumstances:
-when interfacing to foreign code, and
-when interfacing to a subprocess.
+when interfacing with foreign code, and
+when interfacing with a subprocess.
 </p><p>
 This causes a problem. Suppose we have a Scheme port constructed
 on top of file descriptor 3. We intend to execute a successor program that
@@ -585,7 +585,7 @@ The <code>open-directory</code> procedure opens the
 directory with the specified pathname for reading, returning an opaque directory object.
 Then <code>read-directory</code>
 returns the name of the next available file,
-or the end of file object if there are no more files.
+or the end-of-file object if there are no more files.
 The <code><i>dot-files?</i></code> argument controls whether filenames beginning with &quot;<code>.</code>&quot; are returned.
 If it is <code>#f</code>, which is the default, they are not.  The filenames <code>.</code> and <code>..</code> are <i>never</i> returned.
 Finally, <code>close-directory</code> closes a directory object.</p>
