@@ -4,7 +4,11 @@ to meld that part of SRFI 170 with (chibi filesystem) "e.g. reusing
 the same file-info record from stat so that the two libraries can
 interoperate."  So we can wait on him or whomever to fix that.
 
-Many more details from https://srfi-email.schemers.org/srfi-170/msg/15185410/
+Many more details from
+https://srfi-email.schemers.org/srfi-170/msg/15185410/; note part is
+obsolete with the elimination of file descriptor objects in the SRFI,
+and close-fd.  Also, the fd->*port procedures have become one fd->port
+one:
 
 On Sun, Sep 13, 2020 at 7:00 AM Shiro Kawai [redacted]
 
@@ -41,15 +45,17 @@ while the fdo still exists, bad things will happen.  Don't do that.
 
 Needed to match the SRFI:
 
-The optional buffer-mode argument to fdes->[textual|binary]-[input|output]-port
+For open-file and fd->port, add optional buffer-mode argument, and the
+binary-input/output port-type option.
+
+For fd->port, enforce the restrictions that "It is an error if a port
+already exists that encapsulates fd, or if an attempt is made to use
+fd->port twice on the same fd."
 
 Finishing call-with-temporary-filename
 
 
 Needed for correctness, not production quality without this:
-
-FDOs should wrap Chibi's fileno object, not integer fds, for proper
-bookkeeping and finalization with closing the fd.
 
 errno manipulation needs to be done at the C level, for Chibi Scheme
 might set errno between any of 1) manually setting errno, 2) a POSIX
@@ -63,10 +69,6 @@ more details: https://srfi-email.schemers.org/srfi-199/
 
 
 Suggested enhancements:
-
-Leverage the existing fileno object for File Descriptor Objects
-(FDOs).  They're pretty much everything FDOs need, including
-closing the fd finalization on GC.
 
 Make appropriate procedures thread safe or thread aware
 
