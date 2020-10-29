@@ -14,8 +14,8 @@ of scsh 0.7 considered as an implementation of this SRFI.
 <h3>3.1&nbsp;&nbsp;Error handling</h3>
 <ul>
 <li><p>
-Scsh does not use SRFI 198, and only exposes <code>errno-error</code>,
-because it uses specialized syntax to catch system errors.
+Scsh exposes <code>errno-error</code>
+and uses specialized syntax to catch system errors.
 </p>
 </li>
 </p></li>
@@ -25,24 +25,10 @@ because it uses specialized syntax to catch system errors.
 <ul>
 <li><p>
 Scsh does not distinguish between textual and binary ports,
-so there are only two procedures to convert file descriptors to ports,
-<code>fdes->inport</code> in place of <code>fd->textual-input-port</code>
-and <code>fd->binary-input-port</code>, and
-<code>fdes->outport</code> in place of <code>fd->textual-output-port</code>
-and <code>fd->binary-output-port</code>.
-</p></li>
-<li><p>
-The scsh versions of the <code>fd->*port</code> procedures
-are named <code>fdes->*port</code>, and
-do not support the <i>buffer-mode</i> argument.
-</p></li>
-<li><p>The <code>port-internal-fd</code> procedure is called <code>port->fdes</code> in scsh.
-The name was changed because the use of the arrow suggests a conversion of the
-port to a file descriptor, which is not the case.
-There is no equivalent of SRFI 170's <code>port->fd</code>.
-</p></li>
-<li><p>There is no <code>close-fd</code> procedure in scsh, as the standard <code>close-port</code>
-procedure suffices.
+so there are two procedures to convert file descriptors to ports,
+<code>fdes->inport</code> and <code>fdes->outport</code>.
+Textual and binary ports are the same, and there is no support
+for buffering or for binary input/output ports.
 </p></li>
 </ul>
 
